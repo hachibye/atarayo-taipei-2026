@@ -379,6 +379,38 @@
   }
   .song-empty b{ display:block;color:var(--cream);font-size:15px;margin-bottom:6px; }
   .song-row .hit{ color:var(--teal); }
+  /* ── 곡 목록 정렬 ─────────────────────────────────────────
+     여기서 고른 순서대로 곡 화면의 '이전/다음 곡'도 따라갑니다. */
+  .song-sorts{
+    display:flex;gap:5px;
+    max-width:640px;margin:0 auto 12px;
+    padding:4px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:rgba(0,0,0,0.3);
+  }
+  .song-sort{
+    flex:1;
+    display:inline-flex;align-items:center;justify-content:center;gap:5px;
+    padding:9px 6px;
+    border:none;border-radius:9px;
+    background:none;
+    color:#b9a98a;
+    font-family:inherit;font-size:12.5px;font-weight:700;
+    cursor:pointer;white-space:nowrap;
+    transition:background .2s ease, color .2s ease, box-shadow .2s ease;
+  }
+  .song-sort:hover{ color:var(--cream); }
+  .song-sort.active{
+    background:linear-gradient(180deg, rgba(94,205,196,0.22), rgba(94,205,196,0.10));
+    color:var(--cream);
+    box-shadow:inset 0 0 0 1px rgba(94,205,196,0.38);
+  }
+  .song-sort .dir{ font-size:11px; color:var(--teal); }
+  @media (max-width:400px){
+    .song-sort{ font-size:11.5px; padding:9px 3px; gap:3px; }
+  }
+
   .song-list{
     max-width:640px;margin:0 auto;
     list-style:none;padding:0;
@@ -4946,7 +4978,7 @@
               <span class="legend-item"><span class="legend-icon jump">${INLINE_ICONS.jump}</span>점프</span>
               <span class="legend-item"><span class="legend-icon spin">${INLINE_ICONS.spin}</span>팔 돌리기</span>
             </div>
-            <p class="song-legend-note">숫자는 떼창이 나오는 가사 줄 수예요. 숫자가 큰 곡부터 연습하면 좋습니다.<br>박수 · 손 흔들기는 거의 모든 곡에 있어 폰 화면에서는 생략했어요.</p>
+            <p class="song-legend-note">숫자는 떼창이 나오는 가사 줄 수예요. 아래에서 정렬을 바꾸면 <b>곡 화면의 이전 · 다음 곡</b>도 그 순서를 따라갑니다.<br>박수 · 손 흔들기는 거의 모든 곡에 있어 폰 화면에서는 생략했어요.</p>
           </div>
           <div class="song-search-sentinel" id="song-search-sentinel"></div>
           <div class="song-search">
@@ -4957,18 +4989,14 @@
               <button type="button" class="song-search-clear" id="song-search-clear" aria-label="지우기">✕</button>
             </div>
           </div>
+          <div class="song-sorts" role="tablist" aria-label="곡 목록 정렬">
+            <button class="song-sort" type="button" role="tab" data-sort="default">기본</button>
+            <button class="song-sort" type="button" role="tab" data-sort="title" id="sort-title">가나다</button>
+            <button class="song-sort" type="button" role="tab" data-sort="chant" id="sort-chant">떼창</button>
+          </div>
           <div class="song-search-meta"><span id="song-count">전체 ${SONGS.length}곡</span></div>
           <p class="song-empty" id="song-empty" hidden><b>찾는 곡이 없어요</b>제목 일부나 곡 번호를 입력해 보세요</p>
-          <ul class="song-list">
-            ${SONGS.map((s,i)=>`
-              <li>
-                <button class="song-row" data-id="${s.id}">
-                  <span class="song-num">${pad(i+1)}</span>
-                  <span class="song-title">${escapeHtml(s.title)}</span>
-                  ${songMarksHtml(s)}
-                </button>
-              </li>`).join("")}
-          </ul>
+          <ul class="song-list" id="song-list"></ul>
         </section>
 
         <div class="credits">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo; · SEOUL FAN CHANT GUIDE (비공식 팬 제작)</div>
@@ -4977,17 +5005,21 @@
 
     document.getElementById("back-btn").addEventListener("click", ()=>{ location.hash = "#/"; });
 
-    setupSongSearch();
-
-    // 곡을 탭한 그 순간 바로 재생을 시작시킨다 (모바일 소리 허용을 위해)
-    app.querySelectorAll(".song-row").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const target = SONGS.find(s => s.id === btn.dataset.id);
-        if (!target) return;
-        setSongFrom("guide");     // 여기서 들어왔으니 '뒤로'는 곡 목록으로
-        gotoSong(target);
+    // 정렬 칩 — '떼창'은 다시 누르면 많은 순 ↔ 적은 순이 바뀐다
+    app.querySelectorAll(".song-sort").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        const kind = b.dataset.sort;
+        // 같은 칩을 다시 누르면 순서가 뒤집힌다
+        if (kind === "chant")      songSort = (songSort === "chant-desc") ? "chant-asc" : "chant-desc";
+        else if (kind === "title") songSort = (songSort === "title")      ? "title-desc" : "title";
+        else                       songSort = kind;
+        store("horo-song-sort", songSort);
+        paintSongList();
       });
     });
+
+    setupSongSearch();
+    paintSongList();
   }
 
   /* ---------------- SETLIST (스포일러) ----------------
@@ -5414,41 +5446,91 @@
   }
   const squash = (str) => String(str).toLowerCase().replace(/\s+/g, "");
 
-  function setupSongSearch(){
+  /* 고른 순서대로 목록을 다시 그린다 (검색어는 그대로 유지) */
+  function paintSongList(){
+    const ul = document.getElementById("song-list");
+    if (!ul) return;
+
+    ul.innerHTML = sortedSongs().map(s=>`
+      <li data-no="${songNo(s)}">
+        <button class="song-row" data-id="${escapeHtml(s.id)}">
+          <span class="song-num">${pad(songNo(s))}</span>
+          <span class="song-title">${escapeHtml(s.title)}</span>
+          ${songMarksHtml(s)}
+        </button>
+      </li>`).join("");
+
+    // 곡을 탭한 그 순간 바로 재생을 시작시킨다 (모바일 소리 허용을 위해)
+    ul.querySelectorAll(".song-row").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const target = SONGS.find(x => x.id === btn.dataset.id);
+        if (!target) return;
+        setSongFrom("guide");     // 여기서 들어왔으니 '뒤로'는 곡 목록으로
+        gotoSong(target);
+      });
+    });
+
+    // 어느 칩이 켜져 있는지 + 떼창 방향 표시
+    app.querySelectorAll(".song-sort").forEach(b=>{
+      const on = (b.dataset.sort === "chant" || b.dataset.sort === "title")
+        ? songSort.startsWith(b.dataset.sort)
+        : b.dataset.sort === songSort;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    const chantBtn = document.getElementById("sort-chant");
+    if (chantBtn){
+      const dir = songSort === "chant-asc" ? "적은 순" : "많은 순";
+      chantBtn.innerHTML = songSort.startsWith("chant")
+        ? `떼창 <span class="dir">${dir}</span>`
+        : "떼창";
+    }
+    const titleBtn = document.getElementById("sort-title");
+    if (titleBtn){
+      const dir = songSort === "title-desc" ? "ㅎ→ㄱ" : "ㄱ→ㅎ";
+      titleBtn.innerHTML = songSort.startsWith("title")
+        ? `가나다 <span class="dir">${dir}</span>`
+        : "가나다";
+    }
+
+    applyGuideFilter();
+  }
+
+  /* 검색어에 맞춰 보이고 숨긴다 (목록을 다시 그린 뒤에도 그대로 적용된다) */
+  function applyGuideFilter(){
     const input = document.getElementById("song-search-input");
     const clear = document.getElementById("song-search-clear");
     const count = document.getElementById("song-count");
     const empty = document.getElementById("song-empty");
-    if (!input) return;
+    const items = document.querySelectorAll("#song-list > li");
+    if (!input || !items.length) return;
 
-    const rows = [...document.querySelectorAll(".song-list > li")].map((li,i)=>{
+    // "5", "05", "5번" 모두 5번 곡으로 인식
+    const q = squash(input.value).replace(/번$/, "");
+    const isNum = /^\d{1,2}$/.test(q);
+    let hit = 0;
+
+    items.forEach(li=>{
       const title = li.querySelector(".song-title").textContent;
-      return {
-        li,
-        plain: squash(title),
-        cho:   squash(toCho(title)),
-        num:   String(i + 1),          // "5"
-        pad:   pad(i + 1)              // "05"
-      };
+      const no = li.dataset.no;
+      const ok = !q || (isNum
+        ? (no === String(Number(q)) || pad(Number(no)) === q)      // 번호 검색
+        : (squash(title).includes(q) || squash(toCho(title)).includes(q)));  // 제목 · 초성
+      li.hidden = !ok;
+      if (ok) hit++;
     });
 
-    const apply = ()=>{
-      // "5", "05", "5번" 모두 5번 곡으로 인식
-      const raw = squash(input.value).replace(/번$/, "");
-      const q   = raw;
-      const isNum = /^\d{1,2}$/.test(q);
-      let hit = 0;
-      rows.forEach(r=>{
-        const ok = !q || (isNum
-          ? (r.num === String(Number(q)) || r.pad === q)   // 번호 검색
-          : (r.plain.includes(q) || r.cho.includes(q)));   // 제목 · 초성 검색
-        r.li.hidden = !ok;
-        if (ok) hit++;
-      });
-      count.textContent = q ? `검색 결과 ${hit}곡` : `전체 ${rows.length}곡`;
-      empty.hidden = hit !== 0;
-      clear.classList.toggle("show", !!input.value);
-    };
+    if (count) count.textContent = q ? `검색 결과 ${hit}곡` : `전체 ${items.length}곡`;
+    if (empty) empty.hidden = hit !== 0;
+    if (clear) clear.classList.toggle("show", !!input.value);
+  }
+
+  function setupSongSearch(){
+    const input = document.getElementById("song-search-input");
+    const clear = document.getElementById("song-search-clear");
+    if (!input) return;
+
+    const apply = applyGuideFilter;
 
     // 검색창이 화면 맨 위에 붙었을 때만 뒤 배경을 흐리게 (붙기 전에는 그대로 둠)
     const bar = document.querySelector(".song-search");
@@ -5547,10 +5629,11 @@
     const isNum = /^\d{1,2}$/.test(q);
     let hit = 0;
 
-    items.forEach((li, i)=>{
+    items.forEach((li)=>{
       const name = li.querySelector(".song-sheet-name").textContent;
+      const no = li.dataset.no;
       const ok = !q || (isNum
-        ? (String(i + 1) === String(Number(q)) || pad(i + 1) === q)
+        ? (no === String(Number(q)) || pad(Number(no)) === q)
         : (squash(name).includes(q) || squash(toCho(name)).includes(q)));
       li.hidden = !ok;
       if (ok) hit++;
@@ -5597,12 +5680,15 @@
      페이지에 딱 한 번만 만들어 두고, 곡이 바뀌면 내용만 갈아끼운다. */
   let songShellBuilt = false;
 
+  /* 이전/다음 곡은 곡 목록에서 고른 정렬 순서를 그대로 따른다 */
   function songNeighbors(song){
-    const idx = SONGS.findIndex(s => s.id === song.id);
+    const list = sortedSongs();
+    const idx = list.findIndex(s => s.id === song.id);
+    if (idx < 0) return { idx: -1, prev: song, next: song };
     return {
       idx,
-      prev: SONGS[(idx - 1 + SONGS.length) % SONGS.length],
-      next: SONGS[(idx + 1) % SONGS.length]
+      prev: list[(idx - 1 + list.length) % list.length],
+      next: list[(idx + 1) % list.length]
     };
   }
 
@@ -5844,10 +5930,10 @@
         </button>
       </li>`).join("");
 
-    document.getElementById("song-sheet-list").innerHTML = SONGS.map((s,i)=>`
-      <li>
+    document.getElementById("song-sheet-list").innerHTML = sortedSongs().map((s)=>`
+      <li data-no="${songNo(s)}">
         <button class="song-sheet-item${s.id === song.id ? " current" : ""}" data-id="${s.id}">
-          <span class="song-sheet-num">${pad(i+1)}</span>
+          <span class="song-sheet-num">${pad(songNo(s))}</span>
           <span class="song-sheet-name">${escapeHtml(s.title)}</span>
           ${s.id === song.id ? `<span class="song-sheet-now">NOW</span>` : ""}
         </button>
@@ -6134,6 +6220,34 @@
 
     songMarksCache.set(song.id, mark);
     return mark;
+  }
+
+  /* ── 곡 목록 정렬 ─────────────────────────────────────────────
+     "default" 등록순 · "title" 가나다순 · "chant-desc/asc" 떼창 줄 수
+     여기서 정한 순서를 곡 화면의 이전/다음 곡, 곡 목록 시트도 함께 따른다. */
+  let songSort = (()=>{
+    const v = store("horo-song-sort");
+    return ["default","title","title-desc","chant-desc","chant-asc"].includes(v) ? v : "default";
+  })();
+
+  /* 곡의 원래 번호(1부터). 정렬을 바꿔도 이 번호는 그대로라 번호 검색이 계속 통한다. */
+  function songNo(song){ return SONGS.findIndex(s => s.id === song.id) + 1; }
+
+  const startsHangul = (t)=> /^[\u3131-\u318E\uAC00-\uD7A3]/.test(String(t).trim());
+  function byTitle(a, b){
+    // 한글 제목을 먼저, 그다음 영문·숫자 제목
+    const ha = startsHangul(a.title) ? 0 : 1, hb = startsHangul(b.title) ? 0 : 1;
+    if (ha !== hb) return ha - hb;
+    return String(a.title).localeCompare(String(b.title), "ko");
+  }
+
+  function sortedSongs(){
+    const list = SONGS.slice();
+    if (songSort === "title")      return list.sort(byTitle);
+    if (songSort === "title-desc") return list.sort((a,b)=> byTitle(b,a));
+    if (songSort === "chant-desc") return list.sort((a,b)=> songMarks(b).chant - songMarks(a).chant || byTitle(a,b));
+    if (songSort === "chant-asc")  return list.sort((a,b)=> songMarks(a).chant - songMarks(b).chant || byTitle(a,b));
+    return list;
   }
 
   /* 곡 목록 한 줄의 오른쪽에 붙는 배지들.
