@@ -1042,6 +1042,142 @@
   }
   .song-sheet-item.current .song-sheet-num{color:var(--teal);}
   .song-sheet-item.current .song-sheet-name{font-weight:800;}
+
+  /* ── 가사 제보 ───────────────────────────────────────────────
+     곡 화면 오른쪽 아래 연필 버튼 → 아래에서 올라오는 제보 창 */
+  .report-toggle{
+    display:flex;align-items:center;justify-content:center;
+    width:40px;height:40px;
+    border-radius:50%;
+    border:1px solid var(--gold-soft);
+    background:linear-gradient(180deg, #2c130c, #1c0a06);
+    color:var(--gold-soft);
+    cursor:pointer;
+    box-shadow:0 3px 12px rgba(0,0,0,0.5);
+    opacity:.72;
+    transition:transform .12s ease, opacity .18s ease, border-color .18s ease, color .18s ease;
+  }
+  .report-toggle svg{ width:17px;height:17px; }
+  .report-toggle:hover, .report-toggle:focus-visible{
+    opacity:1;border-color:var(--teal);color:var(--teal);outline:none;
+  }
+  .report-toggle:active{ transform:scale(0.94); }
+
+  .report-body{
+    flex:1;min-height:0;
+    overflow-y:auto;overscroll-behavior:contain;
+    padding:14px 16px calc(18px + env(safe-area-inset-bottom,0px));
+  }
+  .report-intro{
+    margin:0 0 14px;
+    font-size:12.5px;line-height:1.65;color:#b9a98a;
+  }
+  .report-intro b{ color:var(--cream); }
+  .report-song{
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:rgba(0,0,0,0.25);
+    font-size:13.5px;font-weight:700;
+    color:var(--cream);
+    margin-bottom:14px;
+  }
+  .report-label{
+    display:block;
+    margin:0 0 7px;
+    font-size:11.5px;font-weight:700;
+    letter-spacing:.06em;
+    color:#a5947a;
+  }
+  .report-label span{ font-weight:500;color:#8d7d62;letter-spacing:0; }
+  .report-select{
+    width:100%;
+    padding:10px 12px;
+    margin-bottom:12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:rgba(0,0,0,0.3);
+    color:var(--cream);
+    font-family:inherit;font-size:13px;
+  }
+  .report-now{
+    margin-bottom:16px;
+    padding:11px 12px;
+    border:1px solid var(--line);
+    border-left:3px solid var(--gold-soft);
+    border-radius:0 10px 10px 0;
+    background:rgba(0,0,0,0.22);
+    font-size:12.5px;line-height:1.75;
+    color:#b9a98a;
+    word-break:break-word;
+  }
+  .report-now .k{
+    display:inline-block;min-width:34px;
+    color:#8d7d62;font-size:11px;
+  }
+  .report-now .v{ color:var(--cream); }
+  .report-kinds{
+    display:flex;flex-wrap:wrap;gap:7px;
+    margin-bottom:16px;
+  }
+  .report-kind{
+    padding:8px 12px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:rgba(0,0,0,0.25);
+    color:#b9a98a;
+    font-family:inherit;font-size:12px;
+    cursor:pointer;
+    transition:border-color .18s ease,color .18s ease,background .18s ease;
+  }
+  .report-kind:hover{ color:var(--cream); }
+  .report-kind.on{
+    border-color:var(--teal);
+    color:var(--cream);
+    background:linear-gradient(180deg, rgba(94,205,196,0.20), rgba(94,205,196,0.08));
+  }
+  .report-text{
+    width:100%;
+    padding:12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:rgba(0,0,0,0.3);
+    color:var(--cream);
+    font-family:inherit;font-size:13.5px;line-height:1.6;
+    resize:vertical;
+  }
+  .report-text::placeholder{ color:#7a6a52; }
+  .report-text:focus{ outline:none;border-color:var(--teal); }
+  .report-actions{
+    display:flex;flex-wrap:wrap;gap:8px;
+    margin-top:14px;
+  }
+  .report-btn{
+    flex:1;min-width:130px;
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    padding:12px 14px;
+    border-radius:11px;
+    border:1px solid var(--line);
+    background:rgba(0,0,0,0.28);
+    color:var(--cream);
+    font-family:inherit;font-size:13px;font-weight:700;
+    text-decoration:none;cursor:pointer;
+    transition:border-color .18s ease,color .18s ease,background .18s ease;
+  }
+  .report-btn:hover{ border-color:var(--teal);color:var(--teal); }
+  .report-btn.send{
+    border-color:rgba(94,205,196,0.45);
+    background:linear-gradient(180deg, rgba(94,205,196,0.18), rgba(94,205,196,0.06));
+  }
+  .report-btn[disabled]{ opacity:.45;cursor:default; }
+  .report-btn[disabled]:hover{ border-color:var(--line);color:var(--cream); }
+  .report-hint{
+    margin:11px 2px 0;
+    min-height:17px;
+    font-size:11.5px;line-height:1.6;
+    color:#8d7d62;
+  }
+  .report-hint.ok{ color:var(--wave); }
   .song-sheet-now{
     flex:none;
     font-family:'Anton',sans-serif;
@@ -2550,6 +2686,22 @@
      · 사진을 없애고 싶은 줄에는 아무것도 적지 않으면 됩니다 — 자동으로 사라집니다.
      · 파일이 아직 없으면 그냥 조용히 넘어갑니다. (화면이 깨지지 않아요)
      ───────────────────────────────────────────────────────────── */
+  /* ─────────────────────────────────────────────────────────────
+     ★ 가사 제보 받는 곳 — 여기만 채우면 됩니다
+     ─────────────────────────────────────────────────────────────
+     · 아무것도 안 채워도 동작합니다. 그때는 '제보 내용 복사'만 보이고,
+       사람들이 복사해서 원하는 곳(디엠·오픈카톡 등)으로 보내면 됩니다.
+     · url  : 구글폼 · 오픈카톡 · 트위터 DM 등 아무 주소나 넣으면
+              '복사하고 열기' 버튼이 생깁니다. (제보 내용은 자동 복사됩니다)
+     · email: 메일로 받고 싶을 때. 제목·내용이 채워진 채로 메일 앱이 열립니다.
+     · 둘 다 채우면 두 버튼이 모두 나옵니다.
+     ───────────────────────────────────────────────────────────── */
+  const REPORT_TO = {
+    url:   "",                  // 예: "https://forms.gle/XXXXXXXX"  또는 "https://open.kakao.com/o/XXXX"
+    label: "제보 보내기",        // 위 url 버튼에 적힐 글자
+    email: "limskyy1234567@gmail.com"                   // 예: "abc@example.com"
+  };
+
   const PICS = {
     /* 이름            파일 경로                              사진 아래 설명(없어도 됨) */
     "wave_jump":  { src: "./images/tips/wave_jump.gif",  caption: "jump" },
@@ -5534,6 +5686,234 @@
   const CHEV_RIGHT_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
   const CLOSE_SVG      = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
 
+  /* ── 가사 제보 ─────────────────────────────────────────────────
+     곡 화면 오른쪽 아래 연필 버튼 → 아래에서 창이 올라온다.
+     보내는 곳은 파일 맨 위 REPORT_TO 에서 정한다. 아무것도 안 정해도
+     '복사'는 항상 되므로, 사람들이 복사해서 원하는 곳으로 보낼 수 있다. */
+  const REPORT_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.6 3.6a2.1 2.1 0 0 1 3 3L7.5 18.7 3.5 19.8l1.1-4z"/></svg>';
+
+  let reportKinds = new Set();
+
+  /* 가사에서 [wave] 같은 표시를 떼고 글자만 남긴다 */
+  function plainJp(jp){ return String(jp || "").replace(ICON_TOKEN_RE, "").trim(); }
+  function plainKo(ko){
+    if (!ko) return "";
+    const raw = (typeof ko === "string") ? ko : ko.map(s => s.text || "").join("");
+    return raw.replace(ICON_TOKEN_RE, "").replace(/\s+/g, " ").trim();
+  }
+  function fmtTime(sec){
+    const s = Math.max(0, Math.round(Number(sec) || 0));
+    return Math.floor(s / 60) + ":" + pad(s % 60);
+  }
+
+  function reportLineLabel(line, i){
+    const t = plainKo(line.ko) || plainJp(line.jp) || "(빈 줄)";
+    return pad(i + 1) + ". " + (t.length > 24 ? t.slice(0, 24) + "…" : t);
+  }
+
+  function fillReportLines(){
+    const sel = document.getElementById("report-line");
+    if (!sel || !currentSong) return;
+    sel.innerHTML = currentSong.lyrics
+      .map((l, i) => `<option value="${i}">${escapeHtml(reportLineLabel(l, i))}</option>`).join("");
+    const start = (lastActiveIdx >= 0 && lastActiveIdx < currentSong.lyrics.length) ? lastActiveIdx : 0;
+    sel.value = String(start);
+  }
+
+  function updateReportNow(){
+    const sel = document.getElementById("report-line");
+    const box = document.getElementById("report-now");
+    if (!sel || !box || !currentSong) return;
+    const line = currentSong.lyrics[Number(sel.value)] || {};
+    const rows = [["JP", plainJp(line.jp)], ["발음", plainKo(line.ko)], ["해석", String(line.tr || "")]]
+      .filter(r => r[1]);
+    box.innerHTML =
+      `<div style="margin-bottom:6px;color:#8d7d62;font-size:11px;">지금 이렇게 적혀 있어요 · ${fmtTime(line.time)}</div>`
+      + rows.map(r => `<div><span class="k">${r[0]}</span><span class="v">${escapeHtml(r[1])}</span></div>`).join("");
+  }
+
+  function paintReportKinds(){
+    document.querySelectorAll("#report-kinds .report-kind").forEach(b=>{
+      b.classList.toggle("on", reportKinds.has(b.dataset.kind));
+    });
+  }
+
+  function buildReportText(){
+    const sel = document.getElementById("report-line");
+    const txt = document.getElementById("report-text");
+    if (!currentSong || !sel) return "";
+    const i = Number(sel.value);
+    const line = currentSong.lyrics[i] || {};
+    const no = SONGS.findIndex(s => s.id === currentSong.id) + 1;
+    const kinds = [...reportKinds];
+    const L = [];
+    L.push("[HORO 응원가이드 · 가사 제보]");
+    L.push("곡 : " + pad(no) + ". " + currentSong.title);
+    L.push("줄 : " + (i + 1) + "번째 줄 (" + fmtTime(line.time) + ")");
+    if (kinds.length) L.push("분류 : " + kinds.join(", "));
+    L.push("");
+    L.push("— 지금 —");
+    if (plainJp(line.jp)) L.push("JP   " + plainJp(line.jp));
+    if (plainKo(line.ko)) L.push("발음  " + plainKo(line.ko));
+    if (line.tr)          L.push("해석  " + line.tr);
+    L.push("");
+    L.push("— 이렇게 고쳐 주세요 —");
+    L.push((txt && txt.value.trim()) || "(내용을 적어 주세요)");
+    return L.join("\n");
+  }
+
+  /* 클립보드 — 안 되는 브라우저를 위해 옛 방식도 같이 둔다 */
+  async function copyText(text){
+    try {
+      if (navigator.clipboard && window.isSecureContext){
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch(e){ /* 아래 방식으로 다시 시도 */ }
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.cssText = "position:fixed;top:-1000px;opacity:0;";
+      document.body.appendChild(ta);
+      ta.select(); ta.setSelectionRange(0, ta.value.length);
+      const ok = document.execCommand("copy");
+      ta.remove();
+      return ok;
+    } catch(e){ return false; }
+  }
+
+  function reportHint(msg, ok){
+    const el = document.getElementById("report-hint");
+    if (!el) return;
+    el.textContent = msg || "";
+    el.classList.toggle("ok", !!ok);
+  }
+
+  function saveReportDraft(){
+    const sel = document.getElementById("report-line");
+    const txt = document.getElementById("report-text");
+    if (!currentSong || !sel || !txt) return;
+    store("horo-report-draft", JSON.stringify({
+      song: currentSong.id, idx: Number(sel.value),
+      kinds: [...reportKinds], text: txt.value
+    }));
+  }
+
+  /* 쓰다 만 제보가 있으면 같은 곡에서 다시 열었을 때 살려 준다 */
+  function restoreReportDraft(){
+    const sel = document.getElementById("report-line");
+    const txt = document.getElementById("report-text");
+    if (!sel || !txt || !currentSong) return;
+    let d = null;
+    try { d = JSON.parse(store("horo-report-draft") || "null"); } catch(e){}
+    if (!d || d.song !== currentSong.id) return;
+    if (d.idx != null && currentSong.lyrics[d.idx]) sel.value = String(d.idx);
+    txt.value = d.text || "";
+    reportKinds = new Set(Array.isArray(d.kinds) ? d.kinds : []);
+  }
+
+  function openReportSheet(){
+    const sheet = document.getElementById("report-sheet");
+    if (!sheet || !currentSong) return;
+    const no = SONGS.findIndex(s => s.id === currentSong.id) + 1;
+    const songEl = document.getElementById("report-song");
+    if (songEl) songEl.textContent = pad(no) + ". " + currentSong.title;
+
+    reportKinds = new Set();
+    const txt = document.getElementById("report-text");
+    if (txt) txt.value = "";
+    fillReportLines();
+    restoreReportDraft();
+    paintReportKinds();
+    updateReportNow();
+    updateReportOnline();
+
+    sheet.classList.add("open");
+    sheet.setAttribute("aria-hidden", "false");
+  }
+
+  function closeReportSheet(){
+    const sheet = document.getElementById("report-sheet");
+    if (!sheet) return;
+    saveReportDraft();
+    sheet.classList.remove("open");
+    sheet.setAttribute("aria-hidden", "true");
+  }
+
+  function isReportSheetOpen(){
+    const sheet = document.getElementById("report-sheet");
+    return !!sheet && sheet.classList.contains("open");
+  }
+
+  /* 인터넷이 없으면 '보내기'는 못 쓰고 복사만 된다 */
+  function updateReportOnline(){
+    const on = navigator.onLine;
+    document.querySelectorAll("#report-actions .report-btn.send").forEach(b=>{
+      b.disabled = !on;
+    });
+    if (!on) reportHint("지금은 인터넷이 없어요. 복사해 두었다가 나중에 보내 주세요.");
+    else if (!REPORT_TO.url && !REPORT_TO.email) reportHint("복사한 뒤 디엠 · 오픈카톡 등 편한 곳으로 보내 주세요.");
+    else reportHint("");
+  }
+
+  function setupReportSheet(){
+    const box = document.getElementById("report-actions");
+    if (!box) return;
+
+    let html = `<button type="button" class="report-btn" id="report-copy">제보 내용 복사</button>`;
+    if (REPORT_TO.url)
+      html += `<button type="button" class="report-btn send" id="report-open">복사하고 ${escapeHtml(REPORT_TO.label || "보내기")}</button>`;
+    if (REPORT_TO.email)
+      html += `<button type="button" class="report-btn send" id="report-mail">메일로 보내기</button>`;
+    box.innerHTML = html;
+
+    const copyBtn = document.getElementById("report-copy");
+    copyBtn.addEventListener("click", async ()=>{
+      const ok = await copyText(buildReportText());
+      saveReportDraft();
+      reportHint(ok ? "복사했어요! 붙여넣기로 보내 주세요." : "복사가 안 됐어요. 내용을 길게 눌러 직접 복사해 주세요.", ok);
+    });
+
+    const openBtn = document.getElementById("report-open");
+    if (openBtn) openBtn.addEventListener("click", async ()=>{
+      const ok = await copyText(buildReportText());
+      saveReportDraft();
+      reportHint(ok ? "복사했어요. 열린 곳에 붙여넣어 주세요." : "복사가 안 됐어요. 내용을 직접 복사해 주세요.", ok);
+      window.open(REPORT_TO.url, "_blank", "noopener");
+    });
+
+    const mailBtn = document.getElementById("report-mail");
+    if (mailBtn) mailBtn.addEventListener("click", ()=>{
+      saveReportDraft();
+      const subject = "[HORO 응원가이드] 가사 제보 — " + (currentSong ? currentSong.title : "");
+      location.href = "mailto:" + encodeURIComponent(REPORT_TO.email)
+        + "?subject=" + encodeURIComponent(subject)
+        + "&body=" + encodeURIComponent(buildReportText());
+    });
+
+    document.getElementById("report-btn").addEventListener("click", openReportSheet);
+    document.querySelectorAll("#report-sheet [data-close-report]").forEach(el=>{
+      el.addEventListener("click", closeReportSheet);
+    });
+    document.getElementById("report-line").addEventListener("change", ()=>{
+      updateReportNow(); saveReportDraft();
+    });
+    document.getElementById("report-text").addEventListener("input", saveReportDraft);
+    document.querySelectorAll("#report-kinds .report-kind").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        const k = b.dataset.kind;
+        reportKinds.has(k) ? reportKinds.delete(k) : reportKinds.add(k);
+        paintReportKinds();
+        saveReportDraft();
+      });
+    });
+
+    window.addEventListener("online",  updateReportOnline);
+    window.addEventListener("offline", updateReportOnline);
+  }
+
+
   /* 곡 목록 시트 안 검색 — 곡 목록 화면과 동일한 규칙 */
   function applySheetFilter(){
     const input = document.getElementById("sheet-search-input");
@@ -5662,6 +6042,7 @@
 
         <div class="player-controls">
           <button class="play-toggle" id="play-toggle" aria-label="재생 / 일시정지">${PLAY_SVG}</button>
+          <button class="report-toggle" id="report-btn" aria-label="가사 제보" title="틀린 가사 제보하기">${REPORT_SVG}</button>
           <button class="venue-toggle" id="venue-btn" aria-label="단축모드 켜기/끄기">
             <span class="venue-label">단축모드</span>
             <span class="venue-switch"><span class="venue-knob"></span></span>
@@ -5691,6 +6072,45 @@
             </div>
             <p class="sheet-empty" id="sheet-empty" hidden>찾는 곡이 없어요</p>
             <ul class="song-sheet-list" id="song-sheet-list"></ul>
+          </div>
+        </div>
+
+        <!-- 가사 제보 -->
+        <div class="song-sheet report-sheet" id="report-sheet" aria-hidden="true">
+          <div class="song-sheet-backdrop" data-close-report></div>
+          <div class="song-sheet-panel" role="dialog" aria-label="가사 제보">
+            <span class="song-sheet-grip"></span>
+            <div class="song-sheet-head">
+              <span class="song-sheet-title">가사 제보</span>
+              <button class="song-sheet-close" data-close-report aria-label="닫기">${CLOSE_SVG}</button>
+            </div>
+
+            <div class="report-body">
+              <p class="report-intro">틀린 곳을 알려 주시면 고쳐서 다시 올릴게요. <b>고맙습니다!</b></p>
+
+              <div class="report-song" id="report-song"></div>
+
+              <label class="report-label" for="report-line">어느 줄인가요?</label>
+              <select class="report-select" id="report-line"></select>
+
+              <div class="report-now" id="report-now"></div>
+
+              <div class="report-label">무엇이 틀렸나요? <span>여러 개 골라도 돼요</span></div>
+              <div class="report-kinds" id="report-kinds">
+                <button type="button" class="report-kind" data-kind="일본어 가사">일본어 가사</button>
+                <button type="button" class="report-kind" data-kind="한글 발음">한글 발음</button>
+                <button type="button" class="report-kind" data-kind="해석">해석</button>
+                <button type="button" class="report-kind" data-kind="가사 타이밍">타이밍</button>
+                <button type="button" class="report-kind" data-kind="응원 표시">응원 표시</button>
+              </div>
+
+              <label class="report-label" for="report-text">올바른 내용 · 설명</label>
+              <textarea class="report-text" id="report-text" rows="4"
+                        placeholder="예) 발음이 '키미노 우타'가 아니라 '키미노 우타오' 예요"></textarea>
+
+              <div class="report-actions" id="report-actions"></div>
+              <p class="report-hint" id="report-hint"></p>
+            </div>
           </div>
         </div>
       </div>
@@ -5782,14 +6202,17 @@
     songKeyHandler = (e)=>{
       if (!isSongViewActive()) return;                      // 다른 화면이면 무시
       const sheet = document.getElementById("song-sheet");
-      if (e.key === "Escape"){ closeSongSheet(); return; }
+      if (e.key === "Escape"){ closeReportSheet(); closeSongSheet(); return; }
+      if (isReportSheetOpen()) return;                      // 제보 창이 열려 있으면 좌우키 무시
       if (sheet.classList.contains("open")) return;         // 목록이 열려 있으면 좌우키 무시
       const tag = (e.target && e.target.tagName || "").toLowerCase();
-      if (tag === "input" || tag === "textarea") return;
+      if (tag === "input" || tag === "textarea" || tag === "select") return;
       if (e.key === "ArrowLeft")  document.getElementById("prev-song").click();
       if (e.key === "ArrowRight") document.getElementById("next-song").click();
     };
     document.addEventListener("keydown", songKeyHandler);
+
+    setupReportSheet();
   }
 
   /* 사용자가 곡을 고른 "그 탭" 안에서 재생을 먼저 걸고 화면을 이동한다.
@@ -5910,6 +6333,7 @@
   function leaveSongView(){
     stopSyncTimer();
     closeSongSheet();
+    closeReportSheet();
     hideTipPic();
     if (lyricObserver){ lyricObserver.disconnect(); lyricObserver = null; }
     releaseWakeLock();
