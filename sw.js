@@ -4,7 +4,7 @@
    ★ 가사나 화면을 고쳐서 다시 올릴 때는 아래 CACHE_VERSION 숫자를 꼭 올려 주세요.
      그래야 사람들 폰에 새 내용이 내려갑니다. (v1 → v2 → v3 …)
    ───────────────────────────────────────────────────────────── */
-const CACHE_VERSION = "v70";
+const CACHE_VERSION = "v71";
 const CACHE_NAME    = `horo-guide-${CACHE_VERSION}`;
 
 /* 처음 방문할 때 미리 받아 둘 파일들.
@@ -19,7 +19,8 @@ const PRECACHE = [
   "./apple-touch-icon.png",
   "./images/poster.jpg",
   "./images/poster-guide.jpg",
-  "./images/poster-song.jpg"
+  "./images/poster-song.jpg",
+  "./images/setlist-bg.jpg"
 ];
 
 /* 구글 폰트처럼 다른 도메인에 있지만 저장해 두면 좋은 것들 */
@@ -48,9 +49,26 @@ self.addEventListener("activate", (event) => {
   })());
 });
 
+/* 페이지가 "이 파일들도 오프라인용으로 받아 둬" 하고 보내오면 하나씩 챙겨 둔다.
+   짤방 GIF 는 용량이 크므로 한꺼번에 받지 않고 순서대로,
+   이미 받아 둔 것은 건너뛴다. 하나가 실패해도 나머지는 계속 받는다. */
+async function cacheUrls(urls){
+  const cache = await caches.open(CACHE_NAME);
+  for (const url of urls){
+    try {
+      if (await cache.match(url)) continue;          // 이미 있으면 넘어감
+      const res = await fetch(url, { cache: "no-cache" });
+      if (res && res.ok) await cache.put(url, res.clone());
+    } catch (e) { /* 이 파일만 건너뛴다 */ }
+  }
+}
+
 /* 페이지에서 "지금 새 버전 적용" 을 눌렀을 때 */
 self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
+  const d = event.data;
+  if (!d) return;
+  if (d.type === "SKIP_WAITING") self.skipWaiting();
+  if (d.type === "CACHE_URLS" && Array.isArray(d.urls)) event.waitUntil(cacheUrls(d.urls));
 });
 
 self.addEventListener("fetch", (event) => {

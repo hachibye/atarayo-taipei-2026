@@ -6013,6 +6013,9 @@
   /* 서비스워커에게 "이 사진들도 오프라인용으로 저장해 둬" 라고 알려 준다 */
   function cachePicsOffline(){
     if (!("serviceWorker" in navigator)) return;
+    // '데이터 절약' 을 켜 두었거나 느린 연결이면 큰 GIF 를 몰래 받지 않는다
+    const net = navigator.connection;
+    if (net && (net.saveData || /(^|-)2g$/.test(net.effectiveType || ""))) return;
     const urls = [];
     SONGS.forEach(s => (s.lyrics || []).forEach(l => {
       const pic = resolvePic(l && l.pic);
