@@ -2697,9 +2697,23 @@
      · 둘 다 채우면 두 버튼이 모두 나옵니다.
      ───────────────────────────────────────────────────────────── */
   const REPORT_TO = {
-    url:   "",                  // 예: "https://forms.gle/XXXXXXXX"  또는 "https://open.kakao.com/o/XXXX"
+    /* ① 구글폼에 '바로 접수' — 창이 안 뜨고 그 자리에서 보내집니다 (가장 추천)
+         form  : 폼 주소 .../forms/d/e/ 뒤에 오는 긴 문자열
+         entry : '미리 채워진 링크 가져오기'로 알아낸 칸 번호
+         둘 다 채워져 있으면 이 방식이 먼저 쓰입니다. */
+    form:  "1FAIpQLSfGIpY1nBpgkSTEmpGl5o50Iy2g5mMmch-JXwvTiuZ-Ut9uOg",   // HORO 응원가이드 수정요청
+    entry: {
+      body: "entry.1610498135", // 장문형 칸 하나에 제보 내용이 통째로 들어갑니다
+      song: "",                 // (폼에 단답형 질문을 더 만들면 여기에 번호를 넣으면 됩니다)
+      line: ""
+    },
+
+    /* ② 그냥 링크를 열어 주기 — 오픈카톡·트위터 DM 등 (①이 비어 있을 때만 쓰임) */
+    url:   "",                  // 예: "https://open.kakao.com/o/XXXX"
     label: "제보 보내기",        // 위 url 버튼에 적힐 글자
-    email: "limskyy1234567@gmail.com"                   // 예: "abc@example.com"
+
+    /* ③ 메일로 받기 */
+    email: ""                   // 예: "abc@example.com"
   };
 
   const PICS = {
@@ -5846,27 +5860,135 @@
     return !!sheet && sheet.classList.contains("open");
   }
 
+  /* ── 구글폼에 바로 접수하기 ───────────────────────────────────
+     구글폼은 창을 열지 않고도 접수시킬 수 있다. 다만 답을 읽어올 수는 없어서
+     (브라우저 보안 규칙) '보냈다'는 것까지만 알 수 있다.
+     인터넷이 없거나 실패하면 폰에 저장해 두었다가 연결되면 자동으로 다시 보낸다. */
+  function reportFormReady(){
+    return !!(REPORT_TO.form && REPORT_TO.entry && REPORT_TO.entry.body);
+  }
+
+  function reportPayload(){
+    const sel = document.getElementById("report-line");
+    const i = sel ? Number(sel.value) : 0;
+    return {
+      text: buildReportText(),
+      song: currentSong ? currentSong.title : "",
+      line: String(i + 1),
+      at:   Date.now()
+    };
+  }
+
+  async function postReport(p){
+    const url = "https://docs.google.com/forms/d/e/" + REPORT_TO.form + "/formResponse";
+    const body = new URLSearchParams();
+    body.append(REPORT_TO.entry.body, p.text);
+    if (REPORT_TO.entry.song) body.append(REPORT_TO.entry.song, p.song);
+    if (REPORT_TO.entry.line) body.append(REPORT_TO.entry.line, p.line);
+    // no-cors 라서 결과를 읽을 수는 없지만, 접수는 정상적으로 된다
+    await fetch(url, { method: "POST", mode: "no-cors", body });
+  }
+
+  function reportQueue(){
+    try { const a = JSON.parse(store("horo-report-queue") || "[]"); return Array.isArray(a) ? a : []; }
+    catch(e){ return []; }
+  }
+  function setReportQueue(a){ store("horo-report-queue", JSON.stringify(a.slice(-20))); }
+  function queueReport(p){ const a = reportQueue(); a.push(p); setReportQueue(a); }
+
+  /* 저장해 둔 제보를 조용히 다시 보낸다.
+     여러 곳에서 동시에 불릴 수 있으므로(인터넷 복구·앱 시작·창 열기)
+     자물쇠를 걸고, 보내기 전에 목록을 먼저 비워 같은 제보가 두 번 가지 않게 한다. */
+  let reportFlushing = false;
+  async function flushReportQueue(){
+    if (reportFlushing) return 0;
+    if (!reportFormReady() || !navigator.onLine) return 0;
+    const list = reportQueue();
+    if (!list.length) return 0;
+
+    reportFlushing = true;
+    setReportQueue([]);                     // 먼저 비워 둔다 (두 번 보내기 방지)
+    const left = [];
+    let sent = 0;
+    for (const p of list){
+      try { await postReport(p); sent++; }
+      catch(e){ left.push(p); }
+    }
+    // 보내는 사이에 새로 쌓인 것이 있으면 함께 남겨 둔다
+    setReportQueue(reportQueue().concat(left));
+    reportFlushing = false;
+
+    if (sent && isReportSheetOpen() && !left.length)
+      reportHint("저장해 둔 제보 " + sent + "건도 방금 보냈어요.", true);
+    return sent;
+  }
+
   /* 인터넷이 없으면 '보내기'는 못 쓰고 복사만 된다 */
   function updateReportOnline(){
     const on = navigator.onLine;
-    document.querySelectorAll("#report-actions .report-btn.send").forEach(b=>{
-      b.disabled = !on;
-    });
-    if (!on) reportHint("지금은 인터넷이 없어요. 복사해 두었다가 나중에 보내 주세요.");
-    else if (!REPORT_TO.url && !REPORT_TO.email) reportHint("복사한 뒤 디엠 · 오픈카톡 등 편한 곳으로 보내 주세요.");
-    else reportHint("");
+    const waiting = reportQueue().length;
+    document.querySelectorAll("#report-actions .report-btn.link").forEach(b=>{ b.disabled = !on; });
+
+    if (!on){
+      reportHint(reportFormReady()
+        ? "지금은 인터넷이 없어요. 보내 두면 저장했다가 연결될 때 자동으로 보냅니다."
+        : "지금은 인터넷이 없어요. 복사해 두었다가 나중에 보내 주세요.");
+    } else if (waiting){
+      reportHint("아직 못 보낸 제보 " + waiting + "건이 있어요. 곧 자동으로 보낼게요.");
+      flushReportQueue();
+    } else if (!reportFormReady() && !REPORT_TO.url && !REPORT_TO.email){
+      reportHint("복사한 뒤 디엠 · 오픈카톡 등 편한 곳으로 보내 주세요.");
+    } else {
+      reportHint("");
+    }
   }
 
   function setupReportSheet(){
     const box = document.getElementById("report-actions");
     if (!box) return;
 
-    let html = `<button type="button" class="report-btn" id="report-copy">제보 내용 복사</button>`;
-    if (REPORT_TO.url)
-      html += `<button type="button" class="report-btn send" id="report-open">복사하고 ${escapeHtml(REPORT_TO.label || "보내기")}</button>`;
+    let html = "";
+    if (reportFormReady())
+      html += `<button type="button" class="report-btn send" id="report-submit">제보 보내기</button>`;
+    else if (REPORT_TO.url)
+      html += `<button type="button" class="report-btn send link" id="report-open">복사하고 ${escapeHtml(REPORT_TO.label || "보내기")}</button>`;
     if (REPORT_TO.email)
-      html += `<button type="button" class="report-btn send" id="report-mail">메일로 보내기</button>`;
+      html += `<button type="button" class="report-btn send link" id="report-mail">메일로 보내기</button>`;
+    html += `<button type="button" class="report-btn" id="report-copy">제보 내용 복사</button>`;
     box.innerHTML = html;
+
+    /* 구글폼 바로 접수 */
+    const submitBtn = document.getElementById("report-submit");
+    if (submitBtn) submitBtn.addEventListener("click", async ()=>{
+      const txt = document.getElementById("report-text");
+      if (!txt || !txt.value.trim()){
+        reportHint("어떻게 고쳐야 하는지 한 줄만 적어 주세요.");
+        txt && txt.focus();
+        return;
+      }
+      const p = reportPayload();
+      submitBtn.disabled = true;
+      reportHint("보내는 중…");
+      let ok = false;
+      if (navigator.onLine){
+        try { await postReport(p); ok = true; } catch(e){ ok = false; }
+      }
+      if (!ok) queueReport(p);
+      submitBtn.disabled = false;
+
+      // 보냈으면 창을 비워 다음 제보를 바로 쓸 수 있게 한다
+      store("horo-report-draft", "");
+      txt.value = "";
+      reportKinds = new Set();
+      paintReportKinds();
+
+      if (ok){
+        reportHint("보냈어요. 고맙습니다!", true);
+        setTimeout(()=>{ if (isReportSheetOpen()) closeReportSheet(); }, 1100);
+      } else {
+        reportHint("지금은 못 보내서 저장해 뒀어요. 인터넷이 되면 자동으로 보냅니다.", true);
+      }
+    });
 
     const copyBtn = document.getElementById("report-copy");
     copyBtn.addEventListener("click", async ()=>{
@@ -5912,6 +6034,10 @@
     window.addEventListener("online",  updateReportOnline);
     window.addEventListener("offline", updateReportOnline);
   }
+
+  /* 앱을 열 때, 그리고 인터넷이 돌아올 때 — 못 보낸 제보를 조용히 다시 보낸다 */
+  window.addEventListener("online", ()=>{ flushReportQueue(); });
+  setTimeout(()=>{ flushReportQueue(); }, 2500);
 
 
   /* 곡 목록 시트 안 검색 — 곡 목록 화면과 동일한 규칙 */
