@@ -419,6 +419,72 @@
     text-align:right;
   }
 
+  /* ── 곡 목록 응원 배지 ──────────────────────────────────────
+     가사 데이터를 그대로 세어서 "이 곡에 무엇이 있는지"를 보여 준다.
+     떼창은 줄 수까지 함께 적어 연습 우선순위를 가늠할 수 있게 했다. */
+  .song-marks{
+    flex:none;
+    display:flex;align-items:center;gap:4px;
+    margin-left:auto;
+  }
+  .song-mark{
+    display:inline-flex;align-items:center;justify-content:center;gap:3px;
+    height:21px;
+    border-radius:999px;
+    line-height:1;
+  }
+  .song-mark svg{ width:12px;height:12px; }
+  .song-mark b{
+    font-family:'Anton',sans-serif;
+    font-weight:400;
+    font-size:11px;
+    letter-spacing:.02em;
+  }
+  /* 떼창 — 숫자까지 보여 주는 알약 */
+  .song-mark.chant{
+    padding:0 8px 0 6px;
+    background:rgba(245,148,44,0.16);
+    color:var(--chant);
+  }
+  /* 나머지 — 아이콘만 있는 동그라미 */
+  .song-mark.dot{ width:21px; }
+  .song-mark.clap{ background:rgba(79,168,224,0.14);  color:var(--clap); }
+  .song-mark.wave{ background:rgba(141,224,95,0.15);  color:var(--wave); }
+  .song-mark.jump{ background:rgba(185,140,255,0.17); color:var(--jump); }
+  .song-mark.spin{ background:rgba(255,134,200,0.16); color:var(--spin); }
+
+  /* 폰 화면에서는 곡 제목이 두 줄로 밀리지 않도록,
+     거의 모든 곡에 있는 표시(박수·손 흔들기)는 감추고
+     떼창 줄 수와 드문 동작(점프·팔 돌리기)만 남긴다. */
+  @media (max-width:520px){
+    .song-mark.common{ display:none; }
+  }
+  @media (max-width:400px){
+    .song-row{ gap:9px; }
+  }
+
+  /* 곡 목록 위 배지 설명 */
+  .song-legend{
+    display:flex;flex-wrap:wrap;justify-content:center;
+    gap:10px 14px;
+    margin:14px auto 0;
+    padding:11px 12px;
+    max-width:520px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:rgba(20,6,4,0.45);
+  }
+  .song-legend .legend-item{ font-size:11.5px; }
+  .song-legend-note{
+    margin:9px 0 0;
+    font-size:11.5px;
+    color:#9c8b6e;
+    line-height:1.6;
+  }
+  @media (max-width:520px){
+    .song-legend .legend-item.common{ opacity:.45; }
+  }
+
   .credits{
     text-align:center;
     padding:30px 20px 60px;
@@ -460,6 +526,45 @@
   }
   .menu-card > * + *{ border-top:1px solid var(--line); }
 
+  /* ── 맨 아래 바깥 링크 — 두 개를 한 줄에 나란히 (줄 수를 아끼기 위해) ── */
+  .menu-links{
+    display:flex;gap:8px;
+    padding:9px 11px 11px;
+  }
+  .menu-chip{
+    flex:1;min-width:0;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    padding:9px 8px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:rgba(0,0,0,0.26);
+    color:var(--gold-soft);
+    font-family:inherit;
+    text-decoration:none;
+    cursor:pointer;
+    transition:border-color .2s ease, color .2s ease;
+  }
+  .menu-chip:hover, .menu-chip:focus-visible{
+    border-color:var(--teal); color:var(--teal); outline:none;
+  }
+  .chip-ico{ flex:none;display:flex;align-items:center; }
+  .chip-ico svg{ width:14px;height:14px; }
+  .chip-ico.warn{ color:#d9705a; }
+  .menu-chip:hover .chip-ico.warn{ color:var(--teal); }
+  .chip-label{
+    font-size:12.5px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .chip-badge{
+    flex:none;
+    padding:1px 6px;
+    border-radius:999px;
+    border:1px solid rgba(217,112,90,0.5);
+    color:#d9705a;
+    font-size:10px;
+    letter-spacing:.02em;
+  }
+
   /* 카드 안에서는 각 항목의 테두리를 없애 한 덩어리로 보이게 */
   .menu-card .info-card{
     border:none;border-radius:0;
@@ -469,8 +574,8 @@
 
   .menu-row{
     width:100%;
-    display:flex;align-items:center;gap:11px;
-    padding:14px 15px;
+    display:flex;align-items:center;gap:10px;
+    padding:10px 14px;
     background:none;border:none;
     color:var(--cream);
     font-family:inherit;
@@ -484,19 +589,19 @@
   }
   .info-toggle-icon{
     flex:none;
-    width:26px;height:26px;
+    width:23px;height:23px;
     border-radius:50%;
     display:flex;align-items:center;justify-content:center;
     background:linear-gradient(135deg, rgba(94,205,196,0.18), rgba(63,143,214,0.14));
     border:1px solid var(--line);
     color:var(--teal);
   }
-  .info-toggle-icon svg{width:14px;height:14px;}
+  .info-toggle-icon svg{width:13px;height:13px;}
   .info-toggle-label{
     flex:1;
     min-width:0;
     font-family:'Black Han Sans',sans-serif;
-    font-size:14px;
+    font-size:13.5px;
     letter-spacing:.02em;
     color:#fff;
     white-space:nowrap;
@@ -527,8 +632,13 @@
   .menu-row.ext:hover .go{ color:var(--teal); }
 
   @media (max-width:400px){
-    .menu-row{ padding:13px 13px; gap:9px; }
+    .menu-row{ padding:10px 12px; gap:9px; }
     .info-toggle-label{ font-size:13px; }
+    .menu-links{ padding:8px 10px 10px; gap:7px; }
+    .menu-chip{ padding:9px 6px; gap:5px; }
+    .chip-label{ font-size:11.5px; }
+    .chip-ico svg{ width:13px;height:13px; }
+    .chip-badge{ padding:1px 5px; font-size:9.5px; }
   }
 
   .info-panel{
@@ -1000,6 +1110,13 @@
   .legend-icon.chant{background:rgba(245,148,44,0.16);color:var(--chant);}
   .legend-icon.clap{background:rgba(79,168,224,0.16);color:var(--clap);}
   .legend-icon.wave{background:rgba(141,224,95,0.18);color:var(--wave);}
+  .legend-icon.jump{background:rgba(185,140,255,0.18);color:var(--jump);}
+  .legend-icon.spin{background:rgba(255,134,200,0.16);color:var(--spin);}
+  .legend-num{
+    font-family:'Anton',sans-serif;font-weight:400;
+    color:var(--chant);
+    margin:0 1px;
+  }
 
   .lyrics-scroll{
     flex:1;
@@ -1514,6 +1631,90 @@
   }
   .way-btns a:hover, .way-btns button:hover{ border-color:var(--teal);color:var(--teal); }
 
+  /* ── 좌석 배치도 ──────────────────────────────────────────────
+     그림 파일이 아니라 SVG 로 직접 그린다. 그래서 확대해도 깨지지 않고
+     인터넷이 없어도(공연장에서도) 그대로 열린다. */
+  .seat-wrap{
+    margin:2px 0 0;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:rgba(0,0,0,0.30);
+    padding:12px 10px 10px;
+  }
+  .seat-map{ display:block;width:100%;height:auto; }
+  .seat-map text{
+    font-family:'Noto Sans KR',sans-serif;
+    font-weight:700;
+    fill:#20100a;
+    text-anchor:middle;
+    dominant-baseline:central;
+    pointer-events:none;
+    user-select:none;
+  }
+  .seat-blk{ cursor:pointer; }
+  .seat-blk polygon{
+    stroke:rgba(20,6,4,0.6);
+    stroke-width:2;          /* 구역 사이 간격을 또렷하게 */
+    stroke-linejoin:round;
+    transition:opacity .15s ease;
+  }
+  .seat-blk:hover polygon{ opacity:.82; }
+  /* 구역 색 — 예매처 등급 구분과 같은 순서(플로어 / R석 / S석) */
+  .seat-blk.floor polygon{ fill:#e2543a; }
+  .seat-blk.r     polygon{ fill:#e0b452; }
+  .seat-blk.s     polygon{ fill:#5ecdc4; }
+  .seat-wheel     { fill:#9b7ad6; }
+  .seat-stage     { fill:#b9a98a;stroke:rgba(20,6,4,0.6);stroke-width:2;stroke-linejoin:round; }
+  .seat-stage-t   { fill:#20100a;font-size:19px;letter-spacing:.06em; }
+  /* 고른 구역 */
+  .seat-blk.selected polygon{
+    stroke:var(--cream);
+    stroke-width:3.5;
+    filter:drop-shadow(0 0 7px rgba(246,239,217,0.6));
+  }
+
+  .seat-legend{
+    display:flex;flex-wrap:wrap;justify-content:center;
+    gap:7px 13px;
+    margin:11px 2px 0;
+  }
+  .seat-legend span{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:11.5px;color:#cbb99b;
+  }
+  .seat-legend i{
+    width:11px;height:11px;border-radius:3px;flex:none;
+  }
+  .seat-readout{
+    margin:11px 0 0;
+    min-height:54px;
+    border-radius:11px;
+    border:1px solid var(--line);
+    background:rgba(0,0,0,0.32);
+    padding:10px 12px;
+    font-size:12.5px;line-height:1.65;
+    color:#b9a98a;
+  }
+  .seat-readout b{ color:var(--cream);font-size:13.5px; }
+  .seat-readout .grade{
+    display:inline-block;
+    margin-right:7px;padding:1px 8px;
+    border-radius:999px;
+    font-size:11px;font-weight:700;
+    color:#20100a;
+  }
+  .seat-readout .grade.floor{ background:#e2543a; }
+  .seat-readout .grade.r{ background:#e0b452; }
+  .seat-readout .grade.s{ background:#5ecdc4; }
+  .seat-readout .warn{ color:#e8b98c; }
+  .seat-clear{
+    margin-left:6px;
+    border:none;background:none;
+    color:#8d7d62;font-size:11.5px;
+    text-decoration:underline;cursor:pointer;
+    font-family:inherit;
+  }
+
   /* ── 홈 맨 아래 — 오프라인 준비 상태 · 공유 ─────────────────── */
   .home-foot{
     display:flex;align-items:center;justify-content:center;
@@ -1775,6 +1976,16 @@
     pointer-events:none;
   }
   .setlist-page > *{ position:relative; z-index:1; }
+  /* 목록이 길어서 '홈으로'가 화면 밖으로 밀려나므로 상단 바를 위에 붙여 둔다 */
+  .setlist-page .song-topbar{
+    position:sticky;
+    top:0;
+    z-index:20;
+    background:rgba(24,7,5,0.97);
+    backdrop-filter:blur(12px);
+  }
+  /* 고정된 상단 바에 목록 첫 줄이 가리지 않도록 */
+  .setlist-body{ scroll-margin-top:calc(68px + var(--safe-top, 0px)); }
   /* 좁은 화면에서는 cover 로 깔면 얼굴 부분만 크게 잘리므로,
      사진 전체가 보이도록 위쪽에 띠처럼 앉히고 아래로 어둠에 녹인다. */
   @media (max-width:600px){
@@ -1862,7 +2073,49 @@
   .spoiler-cue .arrow{ font-size:15px;color:var(--gold-soft);animation:spoilerBob 1.7s ease-in-out infinite; }
   @keyframes spoilerBob{ 0%,100%{transform:translateY(0);opacity:.65;} 50%{transform:translateY(5px);opacity:1;} }
 
-  /* 목록 자체 — 스크롤을 내리기 전에는 흐릿하게 가려 둔다 */
+  /* ── 보기 방식 고르기 (가림막을 걷기 전에 먼저 고른다) ────────── */
+  .spoiler-choice{
+    margin-top:14px;
+    width:100%;max-width:330px;
+    display:flex;flex-direction:column;gap:9px;
+  }
+  .spoiler-choice .spoiler-open{
+    margin-top:0;
+    width:100%;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    padding:12px 16px;
+  }
+  .spoiler-choice .spoiler-open b{
+    display:inline-flex;align-items:center;gap:7px;
+    font-weight:400;font-size:15px;
+  }
+  /* 누르는 즉시 순서가 드러나는 쪽에는 경고를 붙여 둔다 */
+  .spoiler-choice .spoiler-open .tag{
+    flex:none;
+    padding:1px 6px;
+    border-radius:999px;
+    border:1px solid rgba(217,112,90,0.55);
+    color:#d9705a;
+    font-family:'Noto Sans KR',sans-serif;
+    font-weight:700;
+    font-size:9.5px;letter-spacing:.02em;
+  }
+  .spoiler-choice .spoiler-open span{
+    font-family:'Noto Sans KR',sans-serif;
+    font-weight:500;
+    font-size:11.5px;letter-spacing:0;
+    color:#b9a98a;
+  }
+  /* 순서를 감추는 쪽을 먼저, 조금 더 눈에 띄게 */
+  .spoiler-choice .spoiler-open.soft{
+    border-color:rgba(94,205,196,0.45);
+    background:linear-gradient(180deg, rgba(94,205,196,0.17), rgba(94,205,196,0.06));
+  }
+  .spoiler-choice .spoiler-open.soft span{ color:#a8ded8; }
+
+  /* 목록 자체 — 보기 방식을 고르기 전에는 흐릿하게 가려 둔다 */
   .setlist-body{
     padding:4px 20px 30px;
     filter:blur(22px);
@@ -1889,6 +2142,70 @@
     font-family:'Anton',sans-serif;
     font-size:11.5px;letter-spacing:.08em;color:#a5947a;
   }
+  /* ── 셋리스트 보기 방식 (공연 순서 / 랜덤 순서) ────────────────
+     랜덤에서는 번호를 감춘다 — 번호가 곧 공연 순서이기 때문. */
+  .set-modes{
+    display:flex;gap:5px;
+    max-width:640px;margin:0 auto 12px;
+    padding:4px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:rgba(0,0,0,0.3);
+  }
+  .set-mode{
+    flex:1;
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    padding:9px 6px;
+    border:none;border-radius:9px;
+    background:none;
+    color:#b9a98a;
+    font-family:inherit;font-size:12.5px;font-weight:700;
+    cursor:pointer;
+    transition:background .2s ease, color .2s ease, box-shadow .2s ease;
+  }
+  /* '공연 순서'는 누르는 즉시 순서가 드러나므로 미리 알려 준다 */
+  .set-mode-badge{
+    flex:none;
+    padding:1px 5px;
+    border-radius:999px;
+    border:1px solid rgba(217,112,90,0.5);
+    color:#d9705a;
+    font-size:9.5px;
+    letter-spacing:.02em;
+  }
+  .set-mode.active .set-mode-badge{ border-color:rgba(217,112,90,0.75);color:#e8846c; }
+  .set-mode:hover{ color:var(--cream); }
+  .set-mode.active{
+    background:linear-gradient(180deg, rgba(94,205,196,0.22), rgba(94,205,196,0.10));
+    color:var(--cream);
+    box-shadow:inset 0 0 0 1px rgba(94,205,196,0.38);
+  }
+  .set-shuffle{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    max-width:640px;margin:0 auto 12px;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:11px;
+    background:rgba(0,0,0,0.24);
+    font-size:11.5px;line-height:1.65;color:#b9a98a;
+  }
+  .set-shuffle b{ color:var(--cream); }
+  .set-shuffle button{
+    flex:none;
+    padding:7px 11px;
+    border:1px solid var(--line);border-radius:999px;
+    background:none;color:var(--gold-soft);
+    font-family:inherit;font-size:11.5px;cursor:pointer;
+    transition:border-color .2s ease,color .2s ease;
+  }
+  .set-shuffle button:hover{ border-color:var(--teal);color:var(--teal); }
+  /* 랜덤일 때 번호 자리 — 순서가 드러나지 않도록 음표로 대신한다 */
+  .set-num.rand{
+    font-family:inherit;
+    font-size:13px;
+    color:#7a6a52;
+  }
+
   .set-list{
     max-width:640px;margin:0 auto;
     list-style:none;padding:0;
@@ -3884,6 +4201,8 @@
   const SHARE_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5 15.4 17.5"/><path d="M15.4 6.5 8.6 10.5"/></svg>';
   const GIFT_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="1.5"/><line x1="12" y1="9" x2="12" y2="21"/><path d="M3 13h18"/><path d="M12 9S10.6 4.5 8.2 4.5A2.2 2.2 0 0 0 8.2 9z"/><path d="M12 9s1.4-4.5 3.8-4.5A2.2 2.2 0 0 1 15.8 9z"/></svg>';
   const CHEVRON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+  const SEAT_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="4"/><rect x="9.6" y="10.2" width="4.8" height="3.6" rx="1.2"/></svg>';
+  const MANNER_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.2-4.4-7.2-9.6A3.9 3.9 0 0 1 12 8.4a3.9 3.9 0 0 1 7.2 2.5c0 5.2-7.2 9.6-7.2 9.6z"/><path d="M8.4 5.2 9.6 3"/><path d="M12 4.2V2"/><path d="M15.6 5.2 14.4 3"/></svg>';
   const WARN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.9 18.2A2 2 0 0 0 3.6 21h16.8a2 2 0 0 0 1.7-2.8L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13.5"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
 
   /* ── 도쿄(아시아 아레나 투어) 셋리스트 ──────────────────────────
@@ -3968,6 +4287,175 @@
   }
 
   /* ---------------- HOME ---------------- */
+  /* ── 좌석 배치도 ─────────────────────────────────────────────
+     인스파이어 아레나 · HORO 서울 공연 배치 (예매처 좌석배치도 기준).
+       · 무대가 한가운데 있는 360도 배치
+       · 플로어 스탠딩 A~H 가 무대를 빙 둘러싼다
+       · 2층 R석  201~220  — 고리 모양으로 한 바퀴
+       · 3층 S석  308~320  — 바깥 고리. 왼쪽 아래에는 구역이 없다
+     그림 파일이 아니라 좌표로 그리므로, 배치가 바뀌면 아래 표만 고치면 된다.
+     좌표를 하나하나 적지 않도록 "가로줄 · 세로줄 · 모서리" 세 규칙으로 만든다. */
+  const SEAT_VIEW = { w: 630, h: 421, cx: 315, cy: 210 };
+
+  /* 각 구역의 실제 도형.
+     [구역이름, 등급, 글자 x, 글자 y, "꼭짓점 x,y x,y …"]
+     예매처 좌석배치도에서 구역별 윤곽을 그대로 옮겨 온 좌표라
+     모양·비율이 실제 배치도와 같다. 배치가 바뀌면 이 표만 고치면 된다. */
+  const SEAT_BLOCKS = [
+    ["A","floor",184,178,"153,119 213,119 213,154 275,205 258,223 140,223 121,204 121,150"],
+    ["B","floor",269,149,"220,119 311,119 311,169 280,199 220,150"],
+    ["C","floor",360,149,"319,119 410,119 410,149 349,199 319,169"],
+    ["D","floor",445,178,"417,119 477,119 508,149 509,204 490,223 371,223 355,205 417,154"],
+    ["E","floor",184,280,"140,235 258,235 275,254 213,304 212,340 154,340 121,308 121,254"],
+    ["F","floor",269,308,"279,260 283,261 311,289 311,339 220,340 220,309"],
+    ["G","floor",360,309,"348,260 355,263 410,309 410,340 319,340 319,289"],
+    ["H","floor",445,280,"372,235 490,235 509,254 509,308 476,340 418,340 417,304 355,254"],
+
+    ["201","r",482,404,"456,386 495,386 519,421 456,421"],
+    ["202","r",408,398,"363,386 454,386 454,410 363,411"],
+    ["203","r",315,398,"270,386 360,386 360,411 270,411"],
+    ["204","r",221,398,"177,386 267,386 267,411 177,411"],
+    ["205","r",147,404,"135,386 174,386 174,421 111,421"],
+    ["206","r",89,370,"73,328 132,385 111,416 44,350"],
+    ["207","r",54,300,"39,262 72,262 72,327 41,349 38,348"],
+    ["208","r",55,229,"39,200 72,200 72,259 39,259"],
+    ["209","r",54,158,"39,110 72,132 72,197 39,197"],
+    ["210","r",89,87,"109,42 115,47 132,74 73,130 44,108"],
+    ["211","r",147,52,"111,37 174,37 174,72 135,72"],
+    ["212","r",221,58,"177,46 267,46 267,72 176,72"],
+    ["213","r",314,58,"270,46 360,46 360,72 270,72"],
+    ["214","r",408,58,"363,46 453,46 454,71 363,72"],
+    ["215","r",482,52,"456,37 519,38 495,72 456,72"],
+    ["216","r",540,87,"519,42 586,108 557,130 498,74"],
+    ["217","r",575,158,"589,110 591,110 591,197 558,197 558,132"],
+    ["218","r",574,229,"558,200 591,200 591,259 558,259"],
+    ["219","r",575,300,"558,262 591,262 591,349 558,327"],
+    ["220","r",539,370,"555,328 586,350 519,416 498,385"],
+
+    ["308","s",15,229,"0,178 15,178 16,200 36,200 36,259 15,259 14,281 0,281"],
+    ["309","s",16,128,"13,70 23,79 14,92 35,108 35,172 0,172 0,85"],
+    ["310","s",56,55,"65,17 95,47 47,94 18,64"],
+    ["311","s",125,14,"83,0 174,0 174,14 158,14 158,35 109,35 93,12 82,22 71,13"],
+    ["312","s",216,16,"176,0 267,0 267,14 250,14 251,35 176,35"],
+    ["313","s",315,17,"269,0 361,0 361,35 269,35"],
+    ["314","s",413,16,"363,0 454,0 454,35 379,35 379,14 363,14"],
+    ["315","s",504,14,"456,0 547,0 559,13 548,22 537,12 520,35 472,35 472,14 456,14"],
+    ["316","s",573,55,"563,17 612,64 583,94 535,47"],
+    ["317","s",613,128,"616,70 630,85 630,172 595,172 595,108 616,92 607,80"],
+    ["318","s",614,229,"615,178 630,178 630,281 615,280 614,258 594,259 594,200 614,200"],
+    ["319","s",613,330,"595,287 630,287 630,374 617,389 607,380 617,367 595,351"],
+    ["320","s",585,389,"581,365 584,365 612,393 590,416 561,388 561,385"],
+
+    /* 휠체어석 — 2층 네 모서리의 얇은 띠 (누를 수 없는 표시용) */
+    ["W1","w",0,0,"107,38 110,42 47,106 40,107"],
+    ["W2","w",0,0,"522,38 590,107 586,108 580,103 574,94 553,75 554,73 551,73 520,42"],
+    ["W3","w",0,0,"42,350 110,416 108,420 40,353"],
+    ["W4","w",0,0,"587,350 590,353 522,420 520,416"],
+
+    ["STAGE","stage",314,229,"314,180 364,228 364,231 316,279 265,230"],
+  ].map(a => ({ id: a[0], grade: a[1], x: a[2], y: a[3], pts: a[4] }));
+
+  const SEAT_GRADE = {
+    floor: { label: "플로어 스탠딩",     cls: "floor" },
+    r:     { label: "R석 · 2층 지정석",  cls: "r" },
+    s:     { label: "S석 · 3층 지정석",  cls: "s" }
+  };
+
+  const SEAT_HINT = "구역을 눌러 보세요. 어느 등급인지, 배치도에서 어디쯤인지 알려 드려요.";
+
+  function seatBlockSvg(b){
+    if (b.grade === "w")     return `<polygon class="seat-wheel" points="${b.pts}"></polygon>`;
+    if (b.grade === "stage") return `<polygon class="seat-stage" points="${b.pts}"></polygon>`
+                                  + `<text class="seat-stage-t" x="${b.x}" y="${b.y}">STAGE</text>`;
+    const fs = b.grade === "floor" ? 30 : 16;
+    return `<g class="seat-blk ${b.grade}" data-id="${b.id}" role="button" tabindex="0" aria-label="${b.id}구역">`
+         + `<polygon points="${b.pts}"></polygon>`
+         + `<text x="${b.x}" y="${b.y}" font-size="${fs}">${b.id}</text>`
+         + `</g>`;
+  }
+
+  function seatMapSvg(){
+    // 휠체어석·무대는 구역 위에 겹쳐 그린다
+    const order = (g) => g === "w" || g === "stage" ? 1 : 0;
+    const list = SEAT_BLOCKS.slice().sort((a, b) => order(a.grade) - order(b.grade));
+    return `<svg class="seat-map" viewBox="-5 -5 ${SEAT_VIEW.w + 10} ${SEAT_VIEW.h + 10}"`
+         + ` role="img" aria-label="인스파이어 아레나 좌석 배치도">`
+         + list.map(seatBlockSvg).join("")
+         + `</svg>`;
+  }
+
+  /* 고른 구역이 배치도에서 어디쯤인지 말로 알려 준다 —
+     무대가 한가운데라 '앞뒤'가 없으므로, 배치도 기준 여덟 방향으로 알려 준다. */
+  const SEAT_DIRS = ["위쪽","위쪽 오른편","오른편","아래쪽 오른편","아래쪽","아래쪽 왼편","왼편","위쪽 왼편"];
+  function seatWhere(b){
+    const dx = b.x - SEAT_VIEW.cx, dy = b.y - SEAT_VIEW.cy;
+    const deg = (Math.atan2(dy, dx) * 180 / Math.PI + 450) % 360;   // 0 = 위쪽, 시계 방향
+    return "배치도 " + SEAT_DIRS[Math.round(deg / 45) % 8];
+  }
+
+  function seatReadoutHtml(b){
+    const g = SEAT_GRADE[b.grade];
+    const tail = b.grade === "floor"
+      ? "무대를 둘러싼 스탠딩 구역이에요. 입장 순서와 자리 잡는 방법은 공연 당일 현장 안내를 따라 주세요."
+      : `<span class="warn">A열 · B열은 안전 난간 때문에 시야가 조금 가릴 수 있어요.</span>`;
+    return `<span class="grade ${g.cls}">${g.label}</span><b>${escapeHtml(b.id)}구역</b> · ${seatWhere(b)}`
+         + `<br>${tail} <button type="button" class="seat-clear">선택 해제</button>`;
+  }
+
+  /* 카드 안 내용이 바뀌면 펼쳐진 높이를 다시 잡아 준다.
+     (이걸 안 하면 구역을 눌렀을 때 늘어난 글이 카드 아래로 잘린다) */
+  function refreshAccordion(el){
+    const card = el && el.closest ? el.closest(".info-card") : null;
+    if (!card || !card.classList.contains("open")) return;
+    const panel = card.querySelector(".info-panel");
+    if (panel) panel.style.maxHeight = panel.scrollHeight + "px";
+  }
+
+  function setupSeatMap(){
+    const svg = document.querySelector(".seat-map");
+    const out = document.getElementById("seat-readout");
+    if (!svg || !out) return;
+
+    const blocks = [...svg.querySelectorAll(".seat-blk")];
+
+    const show = (id, save) => {
+      blocks.forEach(el => el.classList.remove("selected"));
+      const b = id ? SEAT_BLOCKS.find(x => x.id === id) : null;
+      if (!b){
+        out.textContent = SEAT_HINT;
+        if (save) store("horo-seat", "");
+        refreshAccordion(out);
+        return;
+      }
+      const g = blocks.find(el => el.dataset.id === id);
+      if (g) g.classList.add("selected");
+      out.innerHTML = seatReadoutHtml(b);
+      if (save) store("horo-seat", id);
+      refreshAccordion(out);
+    };
+
+    svg.addEventListener("click", (e)=>{
+      const g = e.target.closest && e.target.closest(".seat-blk");
+      if (!g) return;
+      // 같은 구역을 다시 누르면 선택이 풀린다
+      show(g.classList.contains("selected") ? null : g.dataset.id, true);
+    });
+    svg.addEventListener("keydown", (e)=>{
+      if (e.key !== "Enter" && e.key !== " ") return;
+      const g = e.target.closest && e.target.closest(".seat-blk");
+      if (!g) return;
+      e.preventDefault();
+      show(g.classList.contains("selected") ? null : g.dataset.id, true);
+    });
+    out.addEventListener("click", (e)=>{
+      if (e.target.closest(".seat-clear")) show(null, true);
+    });
+
+    const saved = store("horo-seat");
+    if (saved && SEAT_BLOCKS.some(b => b.id === saved)) show(saved, false);
+    else out.textContent = SEAT_HINT;
+  }
+
   function renderHome(){
     app.innerHTML = `
       <section class="hero">
@@ -4138,60 +4626,30 @@
           </div>
         </div>
 
-        <div class="info-card" id="vaws-card">
+        <div class="info-card" id="seat-card">
           <button class="menu-row info-toggle" aria-expanded="false">
-            <span class="info-toggle-icon">${GIFT_SVG}</span>
-            <span class="info-toggle-label">VAWS 회원 티켓 카드</span>
+            <span class="info-toggle-icon">${SEAT_SVG}</span>
+            <span class="info-toggle-label">좌석 배치도</span>
             <span class="info-toggle-chevron">${CHEVRON_SVG}</span>
           </button>
           <div class="info-panel">
             <div class="info-panel-inner">
-              <div class="info-panel-title"><span class="bar">|</span> 공연장 한정 특전 <span class="bar">|</span></div>
+              <div class="info-panel-title"><span class="bar">|</span> 인스파이어 아레나 <span class="bar">|</span></div>
 
-              <p class="way-note">Vaundy 공식 팬클럽 <b>VAWS MEMBERS</b> 회원에게 <b>공연별 오리지널 티켓 카드</b>를 현장에서 무료로 나눠 줍니다. 공연일마다 디자인이 다른 공연장 한정 특전입니다.</p>
+              <p class="way-note">무대가 <b>한가운데</b> 있는 360도 배치입니다. 플로어 스탠딩 <b>A~H</b> 구역이 무대를 빙 둘러싸고, 그 바깥을 <b>2층 R석(201~220)</b> 과 <b>3층 S석(308~320)</b> 이 감쌉니다.</p>
 
-              <dl class="info-facts">
-                <dt>특전</dt>
-                <dd>
-                  공연별 오리지널 티켓 카드 1매
-                  <span class="sub">공연일마다 디자인 상이 · 공연장 한정</span>
-                </dd>
-
-                <dt>대상</dt>
-                <dd>
-                  <span class="em">VAWS MEMBERS 회원</span>
-                  <span class="sub">공연 티켓이 없어도 받을 수 있음 / 당일 현장에서 새로 가입해도 대상</span>
-                </dd>
-
-                <dt>교환 시간</dt>
-                <dd>
-                  MD(굿즈) 판매 시작 ~ 공연 종료 후 30분
-                  <span class="sub">서울 공연 부스 위치·운영 시간은 추후 공식 공지 예정</span>
-                </dd>
-              </dl>
-
-              <div class="way-sec">
-                <h4>받는 방법 <span>공연 당일 현장에서만</span></h4>
-                <ul class="way-ul">
-                  <li>부스 근처에 붙어 있는 <b>교환용 QR코드</b>를 스마트폰으로 스캔</li>
-                  <li>화면에 뜬 <b>교환 화면을 웹브라우저에 띄운 채</b> VAWS MEMBERS 부스 방문
-                    <span class="way-hint">스크린샷 이미지는 인정되지 않습니다</span></li>
-                  <li>회원 확인 후 그 자리에서 티켓 카드 수령</li>
-                </ul>
+              <div class="seat-wrap">
+                ${seatMapSvg()}
+                <div class="seat-legend">
+                  <span><i style="background:#e2543a"></i>플로어 스탠딩</span>
+                  <span><i style="background:#e0b452"></i>R석 (2층)</span>
+                  <span><i style="background:#5ecdc4"></i>S석 (3층)</span>
+                  <span><i style="background:#9b7ad6"></i>휠체어석 (2층)</span>
+                </div>
+                <div class="seat-readout" id="seat-readout"></div>
               </div>
 
-              <ul class="way-ul warn">
-                <li>1인당 공연일별 1매 — 이틀 모두 참석하면 각각 1매씩 받을 수 있습니다.</li>
-                <li>준비된 수량이 소진되면 예정보다 일찍 종료될 수 있습니다.</li>
-                <li>불량품 교환은 해당 공연 당일 현장에서만 가능합니다.</li>
-                <li>재판매·양도 및 경매 출품은 금지되어 있습니다.</li>
-              </ul>
-
-              <a class="info-book-link" href="https://member.vaundy.jp/news/detail/11267?lang=ko" target="_blank" rel="noopener">
-                ${EXT_LINK_SVG} VAWS 공식 공지 원문 보기
-              </a>
-
-              <p class="info-footnote">※ 위 내용은 VAWS MEMBERS 공식 공지 기준이며, 서울 공연장의 부스 위치·시간 등 세부 사항은 추후 안내될 예정입니다.</p>
+              <p class="info-footnote">※ 예매처 좌석배치도의 구역 모양을 그대로 옮겨 사이트 색으로 다시 그린 그림입니다.<br>※ 무대 구성은 사전 공지 없이 변경될 수 있습니다. 정확한 내 좌석은 예매 내역에서 확인해 주세요.</p>
             </div>
           </div>
         </div>
@@ -4260,18 +4718,126 @@
           </div>
         </div>
 
-        <a class="menu-row ext" href="https://vaundy.jp/?lang=ko" target="_blank" rel="noopener">
-          <span class="info-toggle-icon">${EXT_LINK_SVG}</span>
-          <span class="info-toggle-label">Vaundy 공식사이트</span>
-          <span class="go">↗</span>
-        </a>
+        <div class="info-card" id="manner-card">
+          <button class="menu-row info-toggle" aria-expanded="false">
+            <span class="info-toggle-icon">${MANNER_SVG}</span>
+            <span class="info-toggle-label">응원 매너 · 처음이라면</span>
+            <span class="info-toggle-chevron">${CHEVRON_SVG}</span>
+          </button>
+          <div class="info-panel">
+            <div class="info-panel-inner">
 
-        <button class="menu-row spoiler" type="button" id="setlist-btn">
-          <span class="info-toggle-icon">${WARN_SVG}</span>
-          <span class="info-toggle-label">도쿄 공연 셋리스트</span>
-          <span class="spoiler-badge">스포주의</span>
-          <span class="go">›</span>
-        </button>
+              <p class="way-note">콜을 몰라도 괜찮습니다. <b>응원은 의무가 아니에요.</b> 이 가이드는 &ldquo;알면 더 재미있는 것&rdquo;을 모아 둔 것이지, 외워 가야 하는 숙제가 아닙니다. 가만히 서서 들어도 훌륭한 관람이에요.</p>
+
+              <div class="way-sec">
+                <h4>처음이라면 <span>이것만 알면 충분</span></h4>
+                <ul class="way-ul">
+                  <li><b>다 따라 하지 않아도 됩니다.</b> 아는 곡의 아는 부분만 함께해도 충분히 즐거워요</li>
+                  <li>일본어를 못해도 괜찮습니다 — 떼창은 대부분 <b>&ldquo;Hu Hu&rdquo;, &ldquo;DA-DA-DA&rdquo;</b> 같은 소리라 발음만 알면 됩니다</li>
+                  <li>이 가이드의 동작은 전부 <b>맨손</b>으로 하는 것들입니다. 따로 챙길 응원 도구는 없어요</li>
+                  <li>주변에서 하는 걸 한 박자 늦게 따라가도 전혀 이상하지 않습니다</li>
+                  <li>공연장은 데이터가 잘 안 터집니다. <b>집에서 이 페이지를 미리 한 번 열어 두세요</b> — 가사가 폰에 저장돼 인터넷 없이도 열립니다</li>
+                </ul>
+              </div>
+
+              <div class="way-sec">
+                <h4>함께 지켜요 <span>모두의 관람을 위해</span></h4>
+                <ul class="way-ul warn">
+                  <li><b>촬영 · 녹음 · 녹화는 금지</b>입니다. 촬영 허용 구간이 있으면 현장에서 따로 안내됩니다</li>
+                  <li>공연 중 <b>휴대폰 화면 밝기를 낮춰</b> 주세요. 어두운 객석에서 밝은 화면은 뒷사람에게 매우 잘 보입니다</li>
+                  <li>조용한 곡 · 어쿠스틱 구간에서는 <b>콜과 함성을 자제</b>해 주세요. 노래를 듣고 싶어 온 사람도 많습니다</li>
+                  <li>손을 머리 위로 크게 흔들 때는 <b>옆·뒷사람 시야</b>를 한 번 살펴 주세요</li>
+                  <li>공연 중 옆 사람과의 대화, 곡 해설은 끝나고 나눠 주세요</li>
+                  <li>높은 모자 · 부풀린 머리는 뒷사람 시야를 가립니다</li>
+                  <li>향이 강한 향수는 밀집된 공간에서 힘들어하는 사람이 있습니다</li>
+                </ul>
+              </div>
+
+              <div class="way-sec">
+                <h4>스탠딩석이라면</h4>
+                <ul class="way-ul">
+                  <li><b>앞으로 밀지 않기.</b> 뒤에서 미는 힘은 앞줄에 그대로 쌓입니다</li>
+                  <li>큰 가방은 <b>물품보관소</b>에 — 발밑에 두면 넘어짐 사고로 이어집니다</li>
+                  <li>주변에서 누가 넘어지면 밀지 말고 <b>멈춰서 일으켜</b> 주세요</li>
+                  <li>입장 전에 물 한 번, 화장실 한 번. 2시간 동안 서 있습니다</li>
+                  <li>숨이 차거나 어지러우면 참지 말고 <b>가까운 스태프</b>에게 알려 주세요</li>
+                </ul>
+              </div>
+
+              <p class="info-footnote">※ 팬이 만든 안내입니다. 촬영·반입·재입장 등 공식 규정은 예매처(NOL 티켓) 공지와 <b>공연 당일 현장 안내</b>가 우선합니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-card" id="vaws-card">
+          <button class="menu-row info-toggle" aria-expanded="false">
+            <span class="info-toggle-icon">${GIFT_SVG}</span>
+            <span class="info-toggle-label">VAWS 회원 티켓 카드</span>
+            <span class="info-toggle-chevron">${CHEVRON_SVG}</span>
+          </button>
+          <div class="info-panel">
+            <div class="info-panel-inner">
+              <div class="info-panel-title"><span class="bar">|</span> 공연장 한정 특전 <span class="bar">|</span></div>
+
+              <p class="way-note">Vaundy 공식 팬클럽 <b>VAWS MEMBERS</b> 회원에게 <b>공연별 오리지널 티켓 카드</b>를 현장에서 무료로 나눠 줍니다. 공연일마다 디자인이 다른 공연장 한정 특전입니다.</p>
+
+              <dl class="info-facts">
+                <dt>특전</dt>
+                <dd>
+                  공연별 오리지널 티켓 카드 1매
+                  <span class="sub">공연일마다 디자인 상이 · 공연장 한정</span>
+                </dd>
+
+                <dt>대상</dt>
+                <dd>
+                  <span class="em">VAWS MEMBERS 회원</span>
+                  <span class="sub">공연 티켓이 없어도 받을 수 있음 / 당일 현장에서 새로 가입해도 대상</span>
+                </dd>
+
+                <dt>교환 시간</dt>
+                <dd>
+                  MD(굿즈) 판매 시작 ~ 공연 종료 후 30분
+                  <span class="sub">서울 공연 부스 위치·운영 시간은 추후 공식 공지 예정</span>
+                </dd>
+              </dl>
+
+              <div class="way-sec">
+                <h4>받는 방법 <span>공연 당일 현장에서만</span></h4>
+                <ul class="way-ul">
+                  <li>부스 근처에 붙어 있는 <b>교환용 QR코드</b>를 스마트폰으로 스캔</li>
+                  <li>화면에 뜬 <b>교환 화면을 웹브라우저에 띄운 채</b> VAWS MEMBERS 부스 방문
+                    <span class="way-hint">스크린샷 이미지는 인정되지 않습니다</span></li>
+                  <li>회원 확인 후 그 자리에서 티켓 카드 수령</li>
+                </ul>
+              </div>
+
+              <ul class="way-ul warn">
+                <li>1인당 공연일별 1매 — 이틀 모두 참석하면 각각 1매씩 받을 수 있습니다.</li>
+                <li>준비된 수량이 소진되면 예정보다 일찍 종료될 수 있습니다.</li>
+                <li>불량품 교환은 해당 공연 당일 현장에서만 가능합니다.</li>
+                <li>재판매·양도 및 경매 출품은 금지되어 있습니다.</li>
+              </ul>
+
+              <a class="info-book-link" href="https://member.vaundy.jp/news/detail/11267?lang=ko" target="_blank" rel="noopener">
+                ${EXT_LINK_SVG} VAWS 공식 공지 원문 보기
+              </a>
+
+              <p class="info-footnote">※ 위 내용은 VAWS MEMBERS 공식 공지 기준이며, 서울 공연장의 부스 위치·시간 등 세부 사항은 추후 안내될 예정입니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="menu-links">
+          <a class="menu-chip" href="https://vaundy.jp/?lang=ko" target="_blank" rel="noopener">
+            <span class="chip-ico">${EXT_LINK_SVG}</span>
+            <span class="chip-label">공식사이트</span>
+          </a>
+          <button class="menu-chip spoiler" type="button" id="setlist-btn">
+            <span class="chip-ico warn">${WARN_SVG}</span>
+            <span class="chip-label">도쿄 셋리스트</span>
+            <span class="chip-badge">스포</span>
+          </button>
+        </div>
         </div>
 
         <div class="home-foot">
@@ -4288,6 +4854,7 @@
     document.getElementById("guide-btn").addEventListener("click", ()=>{ location.hash = "#/guide"; });
     document.getElementById("setlist-btn").addEventListener("click", ()=>{ location.hash = "#/setlist"; });
     setupAccordions();
+    setupSeatMap();
     setupHomeExtras();
     startCountdown();
 
@@ -4372,6 +4939,14 @@
           <div class="songs-head">
             <h2>응원가이드</h2>
             <p>곡을 선택하면 영상에 맞춰 가사 · 떼창 포인트를 확인할 수 있어요</p>
+            <div class="song-legend">
+              <span class="legend-item"><span class="legend-icon chant">${INLINE_ICONS.mic}</span>떼창 <b class="legend-num">12</b>줄</span>
+              <span class="legend-item common"><span class="legend-icon clap">${INLINE_ICONS.clap}</span>박수</span>
+              <span class="legend-item common"><span class="legend-icon wave">${INLINE_ICONS.wave}</span>손 흔들기</span>
+              <span class="legend-item"><span class="legend-icon jump">${INLINE_ICONS.jump}</span>점프</span>
+              <span class="legend-item"><span class="legend-icon spin">${INLINE_ICONS.spin}</span>팔 돌리기</span>
+            </div>
+            <p class="song-legend-note">숫자는 떼창이 나오는 가사 줄 수예요. 숫자가 큰 곡부터 연습하면 좋습니다.<br>박수 · 손 흔들기는 거의 모든 곡에 있어 폰 화면에서는 생략했어요.</p>
           </div>
           <div class="song-search-sentinel" id="song-search-sentinel"></div>
           <div class="song-search">
@@ -4390,6 +4965,7 @@
                 <button class="song-row" data-id="${s.id}">
                   <span class="song-num">${pad(i+1)}</span>
                   <span class="song-title">${escapeHtml(s.title)}</span>
+                  ${songMarksHtml(s)}
                 </button>
               </li>`).join("")}
           </ul>
@@ -4407,7 +4983,9 @@
     app.querySelectorAll(".song-row").forEach(btn=>{
       btn.addEventListener("click", ()=>{
         const target = SONGS.find(s => s.id === btn.dataset.id);
-        if (target) gotoSong(target);
+        if (!target) return;
+        setSongFrom("guide");     // 여기서 들어왔으니 '뒤로'는 곡 목록으로
+        gotoSong(target);
       });
     });
   }
@@ -4416,6 +4994,16 @@
      첫 화면에는 경고만 보이고, 스크롤을 내려야 목록이 드러난다.
      곡을 보지 않고 내한을 즐기려는 사람이 실수로 보는 일이 없게 하기 위한 장치. */
   let setlistScrollHandler = null;
+
+  /* ── 곡 화면에서 '뒤로'를 눌렀을 때 돌아갈 곳 ──────────────────
+     곡 목록에서 들어왔으면 곡 목록으로, 셋리스트에서 들어왔으면 셋리스트로.
+     새로고침해도 유지되도록 저장해 둔다. */
+  let songFrom = store("horo-song-from") === "setlist" ? "setlist" : "guide";
+  function setSongFrom(v){
+    songFrom = (v === "setlist") ? "setlist" : "guide";
+    store("horo-song-from", songFrom);
+  }
+  function songBackHash(){ return songFrom === "setlist" ? "#/setlist" : "#/guide"; }
 
   function teardownSetlistReveal(){
     if (setlistScrollHandler){
@@ -4429,43 +5017,163 @@
     return s ? s.title : (entry.title || entry.id);
   }
 
-  function renderSetlist(){
-    const rows = SETLIST_TOKYO.items.map(item => {
-      if (item.songs.length === 1){
-        const e = item.songs[0];
-        const exists = SONGS.some(s => s.id === e.id);
-        return `
-          <li class="set-item">
-            <button class="set-row" data-id="${escapeHtml(e.id)}" ${exists ? "" : "disabled"}>
-              <span class="set-num">${pad(item.n)}</span>
-              <span class="set-title">${escapeHtml(setlistTitle(e))}</span>
-              <span class="set-go">${exists ? "›" : ""}</span>
-            </button>
-          </li>`;
-      }
-      // 토·일 곡이 달랐던 자리
+  /* ── 셋리스트 보기 상태 ──────────────────────────────────────
+     mode "order"  : 실제 공연 순서 (번호 있음, 토·일로 갈린 자리도 그대로)
+     mode "random" : 순서를 감추고 곡을 하나씩 섞어서 보여 줌
+                     (번호 없음, 토·일 구분도 없음 — 둘 다 순서 단서가 되므로)
+
+     보기 방식은 가림막을 걷기 '전에' 고른다. 스크롤만 내려도 목록이 드러나면
+     랜덤을 고르기 전에 실제 순서를 보게 되어 스포가 되기 때문이다.
+
+     섞은 순서는 저장해 둔다. 곡을 보고 뒤로 돌아와도 같은 화면이 다시 나오므로
+     실제 순서가 드러나지 않는다. */
+  let setlistMode     = store("horo-set-mode") === "random" ? "random" : "order";
+  let setlistShuffle  = null;   // 섞은 순서 (곡 키 배열)
+  let setlistRevealed = false;  // 가림막을 이미 걷었는지 (이번 방문 동안)
+  let setlistScrollY  = 0;      // 곡을 보러 가기 전 스크롤 위치
+
+  /* 토·일로 갈린 자리까지 풀어서 곡 하나하나를 낱개로 만든다.
+     랜덤에서는 이 낱개들을 통째로 섞기 때문에 "몇 번째 자리에서 곡이 갈렸는지"가
+     드러나지 않는다. */
+  function setlistFlat(){
+    const out = [];
+    SETLIST_TOKYO.items.forEach(it =>
+      it.songs.forEach((e, i) => out.push({ key: it.n + ":" + i, id: e.id }))
+    );
+    return out;
+  }
+
+  function makeSetlistShuffle(){
+    const keys = setlistFlat().map(x => x.key);
+    for (let i = keys.length - 1; i > 0; i--){          // 피셔–예이츠 섞기
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = keys[i]; keys[i] = keys[j]; keys[j] = t;
+    }
+    setlistShuffle = keys;
+    store("horo-set-shuffle2", JSON.stringify(keys));
+  }
+
+  function ensureSetlistShuffle(){
+    const flat = setlistFlat();
+    if (setlistShuffle && setlistShuffle.length === flat.length) return;
+    const saved = store("horo-set-shuffle2");
+    if (saved){
+      try {
+        const arr = JSON.parse(saved);
+        if (Array.isArray(arr) && arr.length === flat.length){
+          setlistShuffle = arr;
+          return;
+        }
+      } catch(e){ /* 저장값이 깨졌으면 새로 섞는다 */ }
+    }
+    makeSetlistShuffle();
+  }
+
+  function setlistRandomSongs(){
+    ensureSetlistShuffle();
+    const byKey = new Map(setlistFlat().map(x => [x.key, x]));
+    return setlistShuffle.map(k => byKey.get(k)).filter(Boolean);
+  }
+
+  /* 공연 순서 한 줄 — 번호 + 제목. 토·일로 갈린 자리는 둘을 묶어서 보여 준다. */
+  function setlistRowHtml(item){
+    if (item.songs.length === 1){
+      const e = item.songs[0];
+      const exists = SONGS.some(s => s.id === e.id);
       return `
         <li class="set-item">
-          <div class="set-split">
-            <div class="set-split-head">
-              <span class="set-num">${pad(item.n)}</span>
-              <span class="set-split-note">날짜별로 다른 곡</span>
-            </div>
-            ${item.songs.map(e=>{
-              const exists = SONGS.some(s => s.id === e.id);
-              return `
-              <button class="set-row sub" data-id="${escapeHtml(e.id)}" ${exists ? "" : "disabled"}>
-                <span class="day-chip ${e.day === "일" ? "sun" : ""}">${e.day}</span>
-                <span class="set-title">${escapeHtml(setlistTitle(e))}</span>
-                <span class="set-go">${exists ? "›" : ""}</span>
-              </button>`;
-            }).join("")}
-          </div>
+          <button class="set-row" data-id="${escapeHtml(e.id)}" ${exists ? "" : "disabled"}>
+            <span class="set-num">${pad(item.n)}</span>
+            <span class="set-title">${escapeHtml(setlistTitle(e))}</span>
+            <span class="set-go">${exists ? "›" : ""}</span>
+          </button>
         </li>`;
-    }).join("");
+    }
+    return `
+      <li class="set-item">
+        <div class="set-split">
+          <div class="set-split-head">
+            <span class="set-num">${pad(item.n)}</span>
+            <span class="set-split-note">날짜별로 다른 곡</span>
+          </div>
+          ${item.songs.map(e=>{
+            const exists = SONGS.some(s => s.id === e.id);
+            return `
+            <button class="set-row sub" data-id="${escapeHtml(e.id)}" ${exists ? "" : "disabled"}>
+              <span class="day-chip ${e.day === "일" ? "sun" : ""}">${e.day}</span>
+              <span class="set-title">${escapeHtml(setlistTitle(e))}</span>
+              <span class="set-go">${exists ? "›" : ""}</span>
+            </button>`;
+          }).join("")}
+        </div>
+      </li>`;
+  }
 
-    const total = SETLIST_TOKYO.items.reduce((n,i)=> n + i.songs.length, 0);
+  /* 랜덤 한 줄 — 번호도 날짜 표시도 없이 곡 제목만 */
+  function setlistRandomRowHtml(x){
+    const exists = SONGS.some(s => s.id === x.id);
+    return `
+      <li class="set-item">
+        <button class="set-row" data-id="${escapeHtml(x.id)}" ${exists ? "" : "disabled"}>
+          <span class="set-num rand">♪</span>
+          <span class="set-title">${escapeHtml(setlistTitle(x))}</span>
+          <span class="set-go">${exists ? "›" : ""}</span>
+        </button>
+      </li>`;
+  }
 
+  /* 목록만 다시 그린다 (보기 방식을 바꿀 때 화면 전체를 새로 그리지 않도록) */
+  function paintSetlist(){
+    const listEl = document.getElementById("set-list");
+    if (!listEl) return;
+    const isOrder = setlistMode === "order";
+    const total = setlistFlat().length;
+
+    listEl.innerHTML = isOrder
+      ? SETLIST_TOKYO.items.map(setlistRowHtml).join("")
+      : setlistRandomSongs().map(setlistRandomRowHtml).join("");
+
+    const countEl = document.getElementById("setlist-count");
+    if (countEl) countEl.textContent = isOrder
+      ? `본편 ${SETLIST_TOKYO.items.length}곡 · 총 ${total}곡`
+      : `총 ${total}곡`;
+
+    const metaEl = document.getElementById("setlist-mode-meta");
+    if (metaEl) metaEl.textContent = isOrder ? "SPOILER" : "RANDOM";
+
+    const shufEl = document.getElementById("set-shuffle");
+    if (shufEl) shufEl.hidden = isOrder;
+
+    const desc = document.getElementById("setlist-desc");
+    if (desc) desc.innerHTML = isOrder
+      ? `${escapeHtml(SETLIST_TOKYO.dates)}<br>곡을 누르면 응원가이드로 넘어가요`
+      : `${escapeHtml(SETLIST_TOKYO.dates)}<br><b>공연 순서는 감춘 채</b> 섞어서 보여 주고 있어요`;
+
+    const note = document.getElementById("setlist-note");
+    if (note) note.innerHTML = isOrder
+      ? `※ 팬 기록을 정리한 비공식 셋리스트입니다. 서울 공연은 다를 수 있어요.<br>
+         ※ 날짜별로 다른 곡이 있었던 자리는 <b>토</b> · <b>일</b>로 나눠 두었습니다.`
+      : `※ 팬 기록을 정리한 비공식 셋리스트입니다. 서울 공연은 다를 수 있어요.<br>
+         ※ 순서도, 날짜별로 갈린 자리도 감춰 두었습니다. 전부 보려면 위에서 <b>공연 순서</b>를 눌러 주세요.`;
+
+    app.querySelectorAll(".set-mode").forEach(b=>{
+      const on = b.dataset.mode === setlistMode;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+
+    listEl.querySelectorAll(".set-row").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const target = SONGS.find(s => s.id === btn.dataset.id);
+        if (!target) return;
+        setlistScrollY = window.scrollY;   // 돌아왔을 때 보던 자리로
+        setSongFrom("setlist");
+        gotoSong(target);
+      });
+    });
+  }
+
+  function renderSetlist(){
     app.innerHTML = `
       <div class="setlist-page">
         <div class="song-topbar">
@@ -4481,21 +5189,43 @@
             아래에는 <b>${SETLIST_TOKYO.label} 셋리스트</b>가 있어요.<br>
             곡을 모르는 채로 내한 공연을 즐기고 싶다면<br>여기서 뒤로 가 주세요.
           </p>
-          <button class="spoiler-open" type="button" id="spoiler-open">셋리스트 보기</button>
-          <div class="spoiler-cue"><span class="arrow">↓</span><span>스크롤을 내리면 나타납니다</span></div>
+
+          <div class="spoiler-choice">
+            <button class="spoiler-open soft" type="button" data-mode="random">
+              <b>랜덤 순서로 보기</b>
+              <span>어떤 곡을 하는지만 · 순서는 감춤</span>
+            </button>
+            <button class="spoiler-open" type="button" data-mode="order">
+              <b>공연 순서로 보기<span class="tag">스포주의</span></b>
+              <span>순서까지 전부</span>
+            </button>
+          </div>
         </section>
 
         <section class="setlist-body" id="setlist-body">
           <div class="setlist-head">
             <h2>${escapeHtml(SETLIST_TOKYO.label)} 셋리스트</h2>
-            <p>${escapeHtml(SETLIST_TOKYO.dates)}<br>곡을 누르면 응원가이드로 넘어가요</p>
+            <p id="setlist-desc"></p>
           </div>
-          <div class="setlist-meta"><span>본편 ${SETLIST_TOKYO.items.length}곡 · 총 ${total}곡</span><span>SPOILER</span></div>
-          <ul class="set-list">${rows}</ul>
-          <p class="setlist-note">
-            ※ 팬 기록을 정리한 비공식 셋리스트입니다. 서울 공연은 다를 수 있어요.<br>
-            ※ 날짜별로 다른 곡이 있었던 자리는 <b>토</b> · <b>일</b>로 나눠 두었습니다.
-          </p>
+
+          <div class="set-modes" role="tablist" aria-label="셋리스트 보기 방식">
+            <button class="set-mode" type="button" role="tab" data-mode="order">공연 순서<span class="set-mode-badge">스포</span></button>
+            <button class="set-mode" type="button" role="tab" data-mode="random">랜덤 순서</button>
+          </div>
+
+          <div class="set-shuffle" id="set-shuffle" hidden>
+            <span><b>순서를 섞어 두었어요.</b> 어떤 곡을 하는지만 보고, 순서는 공연 당일의 즐거움으로 남겨 두세요.</span>
+            <button type="button" id="set-reshuffle">다시 섞기</button>
+          </div>
+
+          <div class="setlist-meta">
+            <span id="setlist-count"></span>
+            <span id="setlist-mode-meta">SPOILER</span>
+          </div>
+
+          <ul class="set-list" id="set-list"></ul>
+
+          <p class="setlist-note" id="setlist-note"></p>
         </section>
       </div>
     `;
@@ -4503,31 +5233,56 @@
     document.getElementById("setlist-back-btn").addEventListener("click", ()=>{ location.hash = "#/"; });
 
     const body = document.getElementById("setlist-body");
-    const hero = app.querySelector(".spoiler-hero");
 
-    // 스크롤을 히어로 절반쯤 내렸을 때 목록의 가림을 푼다.
-    const reveal = ()=>{
-      if (!body.classList.contains("revealed")) body.classList.add("revealed");
-    };
-    setlistScrollHandler = ()=>{
-      const el = document.getElementById("setlist-body");
-      if (!el){ teardownSetlistReveal(); return; }   // 다른 화면으로 넘어간 경우
-      const trigger = (hero ? hero.offsetHeight : window.innerHeight) * 0.45;
-      if (window.scrollY > trigger) reveal();
-    };
-    window.addEventListener("scroll", setlistScrollHandler, { passive:true });
-
-    document.getElementById("spoiler-open").addEventListener("click", ()=>{
-      reveal();
+    /* 가림막은 '보기 방식을 고른 순간'에만 걷는다.
+       스크롤만으로 열리면 랜덤을 고르기 전에 실제 순서를 보게 되므로 그 장치는 두지 않는다. */
+    const reveal = (mode)=>{
+      if (mode){
+        setlistMode = (mode === "random") ? "random" : "order";
+        store("horo-set-mode", setlistMode);
+      }
+      setlistRevealed = true;
+      paintSetlist();
+      body.classList.add("revealed");
       body.scrollIntoView({ behavior:"smooth", block:"start" });
+    };
+
+    app.querySelectorAll(".spoiler-choice .spoiler-open").forEach(b=>{
+      b.addEventListener("click", ()=> reveal(b.dataset.mode));
     });
 
-    app.querySelectorAll(".set-row").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const target = SONGS.find(s => s.id === btn.dataset.id);
-        if (target) gotoSong(target);
+    // 이미 펼친 뒤 보기 방식을 바꿀 때
+    app.querySelectorAll(".set-mode").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        if (setlistMode === b.dataset.mode) return;
+        setlistMode = b.dataset.mode === "random" ? "random" : "order";
+        store("horo-set-mode", setlistMode);
+        paintSetlist();
       });
     });
+    document.getElementById("set-reshuffle").addEventListener("click", ()=>{
+      makeSetlistShuffle();
+      paintSetlist();
+    });
+
+    paintSetlist();
+
+    // 곡을 보고 돌아온 경우 — 가림막과 스크롤 위치를 그대로 되살린다.
+    // (보기 방식도 그대로라 실제 순서가 잠깐이라도 비치지 않는다)
+    if (setlistRevealed){
+      body.classList.add("revealed");
+      if (setlistScrollY > 0){
+        const y = setlistScrollY;
+        // 글꼴·레이아웃이 늦게 잡히면 페이지가 짧아 위치가 잘리므로 몇 번 더 맞춘다
+        const restore = ()=>{
+          const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+          window.scrollTo(0, Math.min(y, max));
+        };
+        requestAnimationFrame(restore);
+        setTimeout(restore, 80);
+        setTimeout(restore, 260);
+      }
+    }
   }
 
   /* 알약 안의 두 글자를 바꿔 준다. clock 을 비우면 왼쪽 글자만 크게 보인다. */
@@ -4941,7 +5696,7 @@
       </div>
     `;
 
-    document.getElementById("song-back-btn").addEventListener("click", ()=>{ location.hash = "#/guide"; });
+    document.getElementById("song-back-btn").addEventListener("click", ()=>{ location.hash = songBackHash(); });
 
     // 이전/다음 곡 — 탭한 그 순간(사용자 제스처 안에서) 바로 재생을 시작시킨다
     document.getElementById("prev-song").addEventListener("click", ()=>{
@@ -5064,6 +5819,13 @@
     else            page.style.removeProperty("--song-cover");
 
     document.getElementById("song-picker-title").textContent = song.title;
+    // 어디서 들어왔는지에 따라 '뒤로' 버튼의 안내 글을 바꾼다
+    const backBtn = document.getElementById("song-back-btn");
+    if (backBtn){
+      const label = songFrom === "setlist" ? "셋리스트로" : "곡 목록으로";
+      backBtn.title = label;
+      backBtn.setAttribute("aria-label", label);
+    }
     document.getElementById("prev-song").title = `이전 곡: ${prev.title}`;
     document.getElementById("next-song").title = `다음 곡: ${next.title}`;
     document.getElementById("watch-on-yt").href =
@@ -5325,6 +6087,63 @@
     // 왼쪽 종류 표시에는 떼창만 남긴다.
     if (hasChant) html += `<span class="lyric-type-icon chant" title="떼창">${INLINE_ICONS.mic}</span>`;
     return html;
+  }
+
+  /* ── 곡 목록 응원 배지 ───────────────────────────────────────
+     곡의 가사 데이터를 한 번 훑어서 떼창이 몇 줄인지, 박수·손 흔들기·
+     점프·팔 돌리기가 들어 있는지 세어 둔다. 가사를 고치면 배지도 저절로
+     따라 바뀌므로 따로 관리할 표가 없다. */
+  const songMarksCache = new Map();
+
+  function songMarks(song){
+    if (songMarksCache.has(song.id)) return songMarksCache.get(song.id);
+
+    const mark = { chant: 0, clap: false, wave: false, jump: false, spin: false };
+
+    (song.lyrics || []).forEach(line => {
+      let lineChant = false;
+
+      const scanText = (t) => {
+        if (typeof t !== "string") return;
+        if (hasIconToken(t, "wave")) mark.wave = true;
+        if (hasIconToken(t, "clap")) mark.clap = true;
+        if (hasIconToken(t, "jump")) mark.jump = true;
+        if (hasIconToken(t, "spin") || hasIconToken(t, "turn")) mark.spin = true;
+        if (hasIconToken(t, "mic")  || hasIconToken(t, "chant")) lineChant = true;
+      };
+      const scanPart = (part) => {
+        if (typeof part === "string"){ scanText(part); return; }
+        if (!Array.isArray(part)) return;
+        part.forEach(seg => {
+          if (seg.tag === "chant") lineChant = true;
+          if (seg.tag === "clap")  mark.clap = true;
+          scanText(seg.text);
+        });
+      };
+
+      scanPart(line.ko);
+      scanText(line.jp);
+      scanText(line.tr);
+      if (line.bg){ lineChant = true; scanPart(line.bg); }   // 뒤에 깔리는 코러스도 떼창
+
+      if (lineChant) mark.chant++;
+    });
+
+    songMarksCache.set(song.id, mark);
+    return mark;
+  }
+
+  /* 곡 목록 한 줄의 오른쪽에 붙는 배지들.
+     흔한 표시(박수·손 흔들기)에는 common 을 달아 좁은 화면에서 숨긴다. */
+  function songMarksHtml(song){
+    const m = songMarks(song);
+    let html = "";
+    if (m.chant) html += `<span class="song-mark chant" title="떼창 ${m.chant}줄" aria-label="떼창 ${m.chant}줄">${useSvg("i-mic")}<b>${m.chant}</b></span>`;
+    if (m.clap)  html += `<span class="song-mark dot clap common" title="박수" aria-label="박수">${useSvg("i-hand")}</span>`;
+    if (m.wave)  html += `<span class="song-mark dot wave common" title="손 흔들기" aria-label="손 흔들기">${useSvg("i-wave")}</span>`;
+    if (m.jump)  html += `<span class="song-mark dot jump" title="점프" aria-label="점프">${useSvg("i-jump")}</span>`;
+    if (m.spin)  html += `<span class="song-mark dot spin" title="머리 위로 팔 돌리기" aria-label="팔 돌리기">${useSvg("i-cheer")}</span>`;
+    return html ? `<span class="song-marks">${html}</span>` : "";
   }
 
   /* ── 화면 꺼짐 방지 ───────────────────────────────────────────
