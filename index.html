@@ -1663,6 +1663,115 @@
   }
   .way-btns a:hover, .way-btns button:hover{ border-color:var(--teal);color:var(--teal); }
 
+  /* ── 공지 · 안내 이미지 ───────────────────────────────────── */
+  body.no-scroll{ overflow:hidden; }
+  .notice-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:10px;
+    margin-bottom:12px;
+  }
+  .notice-item{
+    display:block;width:100%;
+    padding:0;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:rgba(0,0,0,0.28);
+    overflow:hidden;
+    cursor:zoom-in;
+    text-align:left;
+    font-family:inherit;
+    transition:border-color .18s ease, transform .12s ease;
+  }
+  .notice-item:hover, .notice-item:focus-visible{ border-color:var(--teal);outline:none; }
+  .notice-item:active{ transform:scale(0.985); }
+  .notice-item img{
+    display:block;width:100%;
+    aspect-ratio:4 / 5;
+    object-fit:cover;
+    object-position:top center;
+    background:#2a0f0a;
+  }
+  .notice-item .cap{
+    display:block;
+    padding:8px 9px 9px;
+    font-size:11.5px;font-weight:700;line-height:1.4;
+    color:var(--cream);
+  }
+  .notice-empty{
+    margin:0 0 12px;
+    padding:22px 14px;
+    border:1px dashed var(--line);
+    border-radius:12px;
+    text-align:center;
+    font-size:12.5px;line-height:1.7;
+    color:#8d7d62;
+  }
+  .notice-empty b{ color:var(--gold-soft); }
+
+  /* 크게 보기 */
+  .notice-view{
+    position:fixed;inset:0;z-index:80;
+    display:flex;flex-direction:column;
+    background:#0a0302;
+    opacity:0;pointer-events:none;
+    transition:opacity .2s ease;
+  }
+  .notice-view.open{ opacity:1;pointer-events:auto; }
+  .nv-head{
+    flex:none;
+    display:flex;align-items:center;gap:10px;
+    padding:calc(12px + var(--safe-top, 0px)) 14px 12px;
+    border-bottom:1px solid var(--line);
+  }
+  .nv-title{
+    flex:1;min-width:0;
+    font-family:'Black Han Sans',sans-serif;
+    font-size:14px;color:var(--cream);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .nv-count{
+    flex:none;
+    font-family:'Anton',sans-serif;
+    font-size:11px;letter-spacing:.08em;color:#8d7d62;
+  }
+  .nv-scroll{
+    flex:1;min-height:0;
+    overflow:auto;overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    padding:10px;
+  }
+  .nv-scroll img{
+    display:block;
+    width:100%;max-width:640px;
+    margin:0 auto;
+    border-radius:8px;
+  }
+  .notice-view.zoom .nv-scroll img{ width:230%;max-width:none;margin:0; }
+  .nv-nav{
+    flex:none;
+    display:flex;gap:8px;
+    padding:10px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+    border-top:1px solid var(--line);
+  }
+  .nv-btn{
+    flex:1;
+    padding:11px 8px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:rgba(0,0,0,0.3);
+    color:var(--cream);
+    font-family:inherit;font-size:12.5px;font-weight:700;
+    cursor:pointer;
+    transition:border-color .18s ease,color .18s ease;
+  }
+  .nv-btn:hover{ border-color:var(--teal);color:var(--teal); }
+  .nv-btn[disabled]{ opacity:.4;cursor:default; }
+  .nv-btn.close{
+    flex:none;width:34px;height:34px;padding:0;
+    border-radius:50%;font-size:14px;
+  }
+
   /* ── 좌석 배치도 ──────────────────────────────────────────────
      그림 파일이 아니라 SVG 로 직접 그린다. 그래서 확대해도 깨지지 않고
      인터넷이 없어도(공연장에서도) 그대로 열린다. */
@@ -1739,6 +1848,7 @@
   .seat-readout .grade.r{ background:#e0b452; }
   .seat-readout .grade.s{ background:#5ecdc4; }
   .seat-readout .warn{ color:#e8b98c; }
+  .seat-readout .hi{ color:var(--cream);font-weight:700; }
   .seat-clear{
     margin-left:6px;
     border:none;background:none;
@@ -2496,6 +2606,23 @@
 <div id="song-view" class="song-view offstage"></div>
 
 <!-- 새 버전 안내 / 오프라인 안내 / 홈 화면 추가 안내가 여기에 뜹니다 -->
+<!-- 공지 이미지 크게 보기 -->
+<div class="notice-view" id="notice-view" aria-hidden="true">
+  <div class="nv-head">
+    <span class="nv-title" id="nv-title"></span>
+    <span class="nv-count" id="nv-count"></span>
+    <button class="nv-btn close" id="nv-close" aria-label="닫기">✕</button>
+  </div>
+  <div class="nv-scroll" id="nv-scroll">
+    <img id="nv-img" alt="" decoding="async">
+  </div>
+  <div class="nv-nav">
+    <button class="nv-btn" id="nv-prev">‹ 이전</button>
+    <button class="nv-btn" id="nv-zoom">확대</button>
+    <button class="nv-btn" id="nv-next">다음 ›</button>
+  </div>
+</div>
+
 <div class="app-banner" id="app-banner" role="status">
   <span class="msg" id="app-banner-msg"></span>
   <button type="button" id="app-banner-action"></button>
@@ -2582,6 +2709,27 @@
      · 사진을 없애고 싶은 줄에는 아무것도 적지 않으면 됩니다 — 자동으로 사라집니다.
      · 파일이 아직 없으면 그냥 조용히 넘어갑니다. (화면이 깨지지 않아요)
      ───────────────────────────────────────────────────────────── */
+  /* ─────────────────────────────────────────────────────────────
+     ★ 공지 · 안내 이미지 — 파일 이름만 적으면 됩니다
+     ─────────────────────────────────────────────────────────────
+     · 이미지는  images/notice/  폴더에 넣어 주세요.
+     · 파일이 없는 줄은 화면에서 조용히 빠집니다. (깨지지 않아요)
+     · 보여 줄 순서를 바꾸려면 아래 줄 순서를 바꾸면 됩니다.
+     · 새 공지가 나오면 한 줄만 더 적으면 됩니다.
+     ───────────────────────────────────────────────────────────── */
+  const NOTICES = [
+    { src: "./images/notice/01-venue-map.jpg",  title: "공연장 맵" },
+    { src: "./images/notice/02-id-check.jpg",   title: "본인확인" },
+    { src: "./images/notice/03-camera.jpg",     title: "카메라 반입 제한" },
+    { src: "./images/notice/04-md-sales.jpg",   title: "MD 현장판매" },
+    { src: "./images/notice/05-md-list.jpg",    title: "MD 목록" },
+    { src: "./images/notice/06-md-notice.jpg",  title: "현장 구매 유의사항" },
+    { src: "./images/notice/07-cd-sales.jpg",   title: "CD 현장판매" },
+    { src: "./images/notice/08-cd-bonus.jpg",   title: "CD 구매 특전" },
+    { src: "./images/notice/09-vaws-booth.jpg", title: "VAWS 부스 위치" },
+    { src: "./images/notice/10-vaws-card.jpg",  title: "VAWS 티켓 카드" },
+  ];
+
   const PICS = {
     /* 이름            파일 경로                              사진 아래 설명(없어도 됨) */
     "wave_jump":  { src: "./images/tips/wave_jump.gif",  caption: "jump" },
@@ -4231,6 +4379,8 @@
   const PLAY_SVG  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.2v13.6a1 1 0 0 0 1.5.87l11-6.8a1 1 0 0 0 0-1.74l-11-6.8A1 1 0 0 0 8 5.2z"/></svg>';
   const PAUSE_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="4.5" width="4" height="15" rx="1.4"/><rect x="13.5" y="4.5" width="4" height="15" rx="1.4"/></svg>';
   const SHARE_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5 15.4 17.5"/><path d="M15.4 6.5 8.6 10.5"/></svg>';
+  const MD_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16l-1.3 12.2a1.6 1.6 0 0 1-1.6 1.3H6.9a1.6 1.6 0 0 1-1.6-1.3z"/><path d="M8.6 8V6.3a3.4 3.4 0 0 1 6.8 0V8"/></svg>';
+  const NOTICE_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3.5h9l4.5 4.5v12a1 1 0 0 1-1 1h-12.5a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1z"/><path d="M14 3.5V8h4.5"/><path d="M8.5 13h7"/><path d="M8.5 16.5h5"/></svg>';
   const GIFT_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="1.5"/><line x1="12" y1="9" x2="12" y2="21"/><path d="M3 13h18"/><path d="M12 9S10.6 4.5 8.2 4.5A2.2 2.2 0 0 0 8.2 9z"/><path d="M12 9s1.4-4.5 3.8-4.5A2.2 2.2 0 0 1 15.8 9z"/></svg>';
   const CHEVRON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
   const SEAT_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="4"/><rect x="9.6" y="10.2" width="4.8" height="3.6" rx="1.2"/></svg>';
@@ -4425,10 +4575,17 @@
     return "배치도 " + SEAT_DIRS[Math.round(deg / 45) % 8];
   }
 
+  /* 플로어 구역별 스탠딩 대기장소 (공연장 맵 기준) */
+  const FLOOR_WAIT = { A:"서쪽", B:"서쪽", E:"서쪽", F:"서쪽",
+                       C:"북쪽", D:"북쪽", G:"북쪽", H:"북쪽" };
+
   function seatReadoutHtml(b){
     const g = SEAT_GRADE[b.grade];
+    const wait = FLOOR_WAIT[b.id];
     const tail = b.grade === "floor"
-      ? "무대를 둘러싼 스탠딩 구역이에요. 입장 순서와 자리 잡는 방법은 공연 당일 현장 안내를 따라 주세요."
+      ? (wait
+          ? `입장 전에는 <span class="hi">리조트 ${wait} 스탠딩 대기장소</span>로 가시면 돼요. 자세한 위치는 '공지 · 안내'의 공연장 맵을 봐 주세요.`
+          : "무대를 둘러싼 스탠딩 구역이에요. 입장 순서는 공연 당일 현장 안내를 따라 주세요.")
       : `<span class="warn">A열 · B열은 안전 난간 때문에 시야가 조금 가릴 수 있어요.</span>`;
     return `<span class="grade ${g.cls}">${g.label}</span><b>${escapeHtml(b.id)}구역</b> · ${seatWhere(b)}`
          + `<br>${tail} <button type="button" class="seat-clear">선택 해제</button>`;
@@ -4441,6 +4598,167 @@
     if (!card || !card.classList.contains("open")) return;
     const panel = card.querySelector(".info-panel");
     if (panel) panel.style.maxHeight = panel.scrollHeight + "px";
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     공지 · 안내 이미지
+     · images/notice/ 에 실제로 들어 있는 파일만 화면에 나옵니다.
+       (파일이 없으면 그 칸은 조용히 사라집니다)
+     · 탭하면 전체화면으로 크게 볼 수 있어요.
+     ───────────────────────────────────────────────────────────── */
+  let noticeReady = [];   // 실제로 불러와진 공지들만 모아 둔다
+  let noticeIdx   = 0;
+
+  function setupNotices(){
+    const grid  = document.getElementById("notice-grid");
+    const empty = document.getElementById("notice-empty");
+    if (!grid) return;
+
+    grid.innerHTML = "";
+    noticeReady = [];
+
+    let pending = NOTICES.length;
+    const done = ()=>{
+      if (--pending > 0) return;
+      if (empty) empty.hidden = noticeReady.length > 0;
+      refreshAccordion(grid);
+      cacheNoticesOffline();
+    };
+    if (!pending){ if (empty) empty.hidden = false; return; }
+
+    NOTICES.forEach((n)=>{
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "notice-item";
+      btn.hidden = true;
+      btn.innerHTML = `<img alt="${escapeHtml(n.title)}" decoding="async" loading="lazy">`
+                    + `<span class="cap">${escapeHtml(n.title)}</span>`;
+      const img = btn.querySelector("img");
+
+      img.addEventListener("load", ()=>{
+        btn.hidden = false;
+        noticeReady.push(n);
+        // 등록한 순서대로 보이도록 정렬
+        noticeReady.sort((a,b)=> NOTICES.indexOf(a) - NOTICES.indexOf(b));
+        btn.addEventListener("click", ()=> openNotice(noticeReady.indexOf(n)));
+        refreshAccordion(grid);
+        done();
+      }, { once:true });
+
+      img.addEventListener("error", ()=>{ btn.remove(); done(); }, { once:true });
+      img.src = n.src;
+      grid.appendChild(btn);
+    });
+  }
+
+  /* 공지 이미지도 오프라인용으로 저장해 둔다 (공연장에서 데이터가 안 터져도 보이도록) */
+  function cacheNoticesOffline(){
+    if (!("serviceWorker" in navigator) || !noticeReady.length) return;
+    const urls = noticeReady.map(n => n.src);
+    navigator.serviceWorker.ready
+      .then(reg => reg.active && reg.active.postMessage({ type:"CACHE_URLS", urls }))
+      .catch(()=>{});
+  }
+
+  function openNotice(i){
+    if (!noticeReady.length) return;
+    const view = document.getElementById("notice-view");
+    if (!view) return;
+    noticeIdx = Math.max(0, Math.min(noticeReady.length - 1, i));
+    paintNotice();
+    view.classList.add("open");
+    view.setAttribute("aria-hidden", "false");
+    document.body.classList.add("no-scroll");
+    const close = document.getElementById("nv-close");
+    if (close) close.focus();
+  }
+
+  function closeNotice(){
+    const view = document.getElementById("notice-view");
+    if (!view) return;
+    view.classList.remove("open", "zoom");
+    view.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("no-scroll");
+  }
+
+  function paintNotice(){
+    const n = noticeReady[noticeIdx];
+    if (!n) return;
+    const view  = document.getElementById("notice-view");
+    const img   = document.getElementById("nv-img");
+    const title = document.getElementById("nv-title");
+    const count = document.getElementById("nv-count");
+    const prev  = document.getElementById("nv-prev");
+    const next  = document.getElementById("nv-next");
+    const zoom  = document.getElementById("nv-zoom");
+    const scr   = document.getElementById("nv-scroll");
+
+    if (img){ img.src = n.src; img.alt = n.title; }
+    if (title) title.textContent = n.title;
+    if (count) count.textContent = (noticeIdx + 1) + " / " + noticeReady.length;
+    if (prev) prev.disabled = noticeIdx === 0;
+    if (next) next.disabled = noticeIdx === noticeReady.length - 1;
+    if (view) view.classList.remove("zoom");
+    if (zoom) zoom.textContent = "확대";
+    if (scr){ scr.scrollTop = 0; scr.scrollLeft = 0; }
+  }
+
+  function noticeStep(d){
+    const i = noticeIdx + d;
+    if (i < 0 || i >= noticeReady.length) return;
+    noticeIdx = i;
+    paintNotice();
+  }
+
+  function setupNoticeViewer(){
+    const view = document.getElementById("notice-view");
+    if (!view || view.dataset.wired) return;
+    view.dataset.wired = "1";
+
+    const zoom = document.getElementById("nv-zoom");
+    const scr  = document.getElementById("nv-scroll");
+
+    const toggleZoom = ()=>{
+      const on = view.classList.toggle("zoom");
+      if (zoom) zoom.textContent = on ? "축소" : "확대";
+      if (scr && on){
+        // 확대하면 가운데가 보이도록
+        scr.scrollLeft = (scr.scrollWidth - scr.clientWidth) / 2;
+      }
+    };
+
+    const close = document.getElementById("nv-close");
+    const prev  = document.getElementById("nv-prev");
+    const next  = document.getElementById("nv-next");
+    if (close) close.addEventListener("click", closeNotice);
+    if (prev)  prev.addEventListener("click", ()=> noticeStep(-1));
+    if (next)  next.addEventListener("click", ()=> noticeStep(1));
+    if (zoom)  zoom.addEventListener("click", toggleZoom);
+    const nvImg = document.getElementById("nv-img");
+    if (nvImg) nvImg.addEventListener("click", toggleZoom);
+
+    // 사진 바깥(빈 곳)을 누르면 닫힌다
+    if (scr) scr.addEventListener("click", (e)=>{ if (e.target === scr) closeNotice(); });
+
+    document.addEventListener("keydown", (e)=>{
+      if (!view.classList.contains("open")) return;
+      if (e.key === "Escape"){ e.preventDefault(); closeNotice(); }
+      else if (e.key === "ArrowLeft")  { e.preventDefault(); noticeStep(-1); }
+      else if (e.key === "ArrowRight") { e.preventDefault(); noticeStep(1); }
+    });
+
+    // 좌우로 밀어서 넘기기
+    let sx = 0, sy = 0, moved = false;
+    view.addEventListener("touchstart", (e)=>{
+      if (view.classList.contains("zoom")) return;
+      const t = e.touches[0]; sx = t.clientX; sy = t.clientY; moved = false;
+    }, { passive:true });
+    view.addEventListener("touchend", (e)=>{
+      if (view.classList.contains("zoom") || moved) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - sx, dy = t.clientY - sy;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) noticeStep(dx < 0 ? 1 : -1);
+    }, { passive:true });
   }
 
   function setupSeatMap(){
@@ -4654,6 +4972,27 @@
                 </table>
               </div>
               <p class="info-footnote">※ 운영 시간은 당일 현장 상황에 따라 변동될 수 있습니다.<br>※ 공연 정보는 예매처(NOL 티켓) 기준이며, 최신 내용은 예매 페이지에서 확인해 주세요.</p>
+
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="info-card" id="notice-card">
+          <button class="menu-row info-toggle" aria-expanded="false">
+            <span class="info-toggle-icon">${NOTICE_SVG}</span>
+            <span class="info-toggle-label">공지 · 안내</span>
+            <span class="info-toggle-chevron">${CHEVRON_SVG}</span>
+          </button>
+          <div class="info-panel">
+            <div class="info-panel-inner">
+              <p class="way-note">공연장 맵 · MD · 본인확인 등 <b>공식 공지</b>입니다. <b>탭하면 크게</b> 볼 수 있어요.</p>
+              <div class="notice-grid" id="notice-grid"></div>
+              <p class="notice-empty" id="notice-empty" hidden>
+                공지 이미지가 아직 없어요.<br><b>images/notice/</b> 폴더에 파일을 넣어 주세요.
+              </p>
+              <p class="info-footnote">※ 공식 공지 이미지 그대로입니다. 운영은 당일 현장 상황에 따라 달라질 수 있습니다.</p>
             </div>
           </div>
         </div>
@@ -4826,10 +5165,16 @@
                   <span class="sub">공연 티켓이 없어도 받을 수 있음 / 당일 현장에서 새로 가입해도 대상</span>
                 </dd>
 
+                <dt>부스 위치</dt>
+                <dd>
+                  <span class="em">인스파이어 디스커버리파크 야외</span>
+                  <span class="sub">'포토 부스' 옆 — 서쪽 스탠딩 대기장소 쪽입니다</span>
+                </dd>
+
                 <dt>교환 시간</dt>
                 <dd>
                   MD(굿즈) 판매 시작 ~ 공연 종료 후 30분
-                  <span class="sub">서울 공연 부스 위치·운영 시간은 추후 공식 공지 예정</span>
+                  <span class="sub">MD 부스 운영 시작과 같은 시각 — 9/19 12:00 · 9/20 11:00</span>
                 </dd>
               </dl>
 
@@ -4854,7 +5199,7 @@
                 ${EXT_LINK_SVG} VAWS 공식 공지 원문 보기
               </a>
 
-              <p class="info-footnote">※ 위 내용은 VAWS MEMBERS 공식 공지 기준이며, 서울 공연장의 부스 위치·시간 등 세부 사항은 추후 안내될 예정입니다.</p>
+              <p class="info-footnote">※ 위 내용은 VAWS MEMBERS 공식 공지 기준입니다. 세부 운영은 당일 현장 상황에 따라 달라질 수 있습니다.</p>
             </div>
           </div>
         </div>
@@ -4886,6 +5231,8 @@
     document.getElementById("guide-btn").addEventListener("click", ()=>{ location.hash = "#/guide"; });
     document.getElementById("setlist-btn").addEventListener("click", ()=>{ location.hash = "#/setlist"; });
     setupAccordions();
+    setupNotices();
+    setupNoticeViewer();
     setupSeatMap();
     setupHomeExtras();
     startCountdown();
