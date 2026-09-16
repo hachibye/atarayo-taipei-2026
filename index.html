@@ -2728,6 +2728,9 @@
     { src: "./images/notice/08-cd-bonus.jpg",   title: "CD 구매 특전" },
     { src: "./images/notice/09-vaws-booth.jpg", title: "VAWS 부스 위치" },
     { src: "./images/notice/10-vaws-card.jpg",  title: "VAWS 티켓 카드" },
+    { src: "./images/notice/11-photo-booth.jpg", title: "포토 부스" },
+    { src: "./images/notice/12-quick-bites.jpg", title: "F&B · VAUNDY CUP" },
+    { src: "./images/notice/13-sns-event.jpg",  title: "SNS 후기 이벤트" },
   ];
 
   const PICS = {
@@ -4632,7 +4635,9 @@
       btn.type = "button";
       btn.className = "notice-item";
       btn.hidden = true;
-      btn.innerHTML = `<img alt="${escapeHtml(n.title)}" decoding="async" loading="lazy">`
+      // loading="lazy" 를 쓰면 접혀 있는 동안 아래쪽 사진이 안 불러와져서
+      // 목록에도 안 잡히고 오프라인 저장에서도 빠진다. 그래서 전부 바로 불러온다.
+      btn.innerHTML = `<img alt="${escapeHtml(n.title)}" decoding="async">`
                     + `<span class="cap">${escapeHtml(n.title)}</span>`;
       const img = btn.querySelector("img");
 
