@@ -4463,6 +4463,7 @@
       renderSetlist();
     } else {
       leaveSongView();
+      resetSetlistSpoiler();   // 홈에 나온 순간 셋리스트는 처음 상태로
       renderHome();
     }
     window.scrollTo(0,0);
@@ -5410,6 +5411,15 @@
   let setlistShuffle  = null;   // 섞은 순서 (곡 키 배열)
   let setlistRevealed = false;  // 가림막을 이미 걷었는지 (이번 방문 동안)
   let setlistScrollY  = 0;      // 곡을 보러 가기 전 스크롤 위치
+
+  /* 홈으로 나가면 셋리스트를 처음 상태로 되돌린다.
+     · 곡을 보러 갔다 '뒤로' 오는 건 보던 화면 그대로 (중간에 끊기면 불편하므로)
+     · 홈까지 나갔다가 다시 들어오면 → 스포주의 가림막부터 다시
+     옆 사람에게 폰을 건네줬을 때 실수로 순서가 보이는 일을 막아 준다. */
+  function resetSetlistSpoiler(){
+    setlistRevealed = false;
+    setlistScrollY  = 0;
+  }
   /* 셋리스트에서 곡을 눌러 들어갔을 때, 그 곡이 셋리스트의 몇 번째였는지.
      이전/다음 곡이 셋리스트 순서를 그대로 따라가게 하려고 기억해 둔다. */
   let setlistPos = (()=>{
