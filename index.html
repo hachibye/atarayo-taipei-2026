@@ -2739,11 +2739,15 @@
     { src: "./images/notice/06-md-notice.jpg",  title: "현장 구매 유의사항" },
     { src: "./images/notice/07-cd-sales.jpg",   title: "CD 현장판매" },
     { src: "./images/notice/08-cd-bonus.jpg",   title: "CD 구매 특전" },
-    { src: "./images/notice/09-vaws-booth.jpg", title: "VAWS 부스 위치" },
-    { src: "./images/notice/10-vaws-card.jpg",  title: "VAWS 티켓 카드" },
     { src: "./images/notice/11-photo-booth.jpg", title: "포토 부스" },
     { src: "./images/notice/12-quick-bites.jpg", title: "F&B · VAUNDY CUP" },
     { src: "./images/notice/13-sns-event.jpg",  title: "SNS 후기 이벤트" },
+  ];
+
+  /* VAWS 회원 티켓 카드 카드 안에서 보여 줄 사진 — 같은 images/notice/ 폴더를 씁니다 */
+  const VAWS_PICS = [
+    { src: "./images/notice/10-vaws-card.jpg",  title: "VAWS 티켓 카드" },
+    { src: "./images/notice/09-vaws-booth.jpg", title: "VAWS 부스 위치" },
   ];
 
   const PICS = {
@@ -4623,27 +4627,30 @@
        (파일이 없으면 그 칸은 조용히 사라집니다)
      · 탭하면 전체화면으로 크게 볼 수 있어요.
      ───────────────────────────────────────────────────────────── */
-  let noticeReady = [];   // 실제로 불러와진 공지들만 모아 둔다
-  let noticeIdx   = 0;
+  let noticeReady = [];   // 실제로 불러와진 공지들 (공지 · 안내 카드)
+  let vawsReady   = [];   // VAWS 카드 안에 들어가는 사진들
+  let viewList    = [];   // 크게 보기가 지금 넘기고 있는 목록
+  let viewIdx     = 0;
 
-  function setupNotices(){
-    const grid  = document.getElementById("notice-grid");
-    const empty = document.getElementById("notice-empty");
+  /* 사진 목록을 받아 눌러서 크게 볼 수 있는 격자를 만든다.
+     · 파일이 없는 칸은 조용히 사라진다 (깨지지 않음)
+     · 다 불러오면 카드 높이를 다시 재고, 오프라인용으로도 저장해 둔다
+     같은 코드를 '공지 · 안내' 와 'VAWS 회원 티켓 카드' 두 곳에서 같이 쓴다. */
+  function buildPicGrid(grid, list, ready, emptyEl){
     if (!grid) return;
-
     grid.innerHTML = "";
-    noticeReady = [];
+    ready.length = 0;
 
-    let pending = NOTICES.length;
+    let pending = list.length;
     const done = ()=>{
       if (--pending > 0) return;
-      if (empty) empty.hidden = noticeReady.length > 0;
+      if (emptyEl) emptyEl.hidden = ready.length > 0;
       refreshAccordion(grid);
-      cacheNoticesOffline();
+      cachePicsForOffline(ready);
     };
-    if (!pending){ if (empty) empty.hidden = false; return; }
+    if (!pending){ if (emptyEl) emptyEl.hidden = false; return; }
 
-    NOTICES.forEach((n)=>{
+    list.forEach((n)=>{
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "notice-item";
@@ -4658,10 +4665,10 @@
         btn.hidden = false;
         // 가로로 긴 사진이면 한 줄을 통째로 쓴다 (잘리지 않도록)
         if (img.naturalWidth > img.naturalHeight * 1.05) btn.classList.add("wide");
-        noticeReady.push(n);
+        ready.push(n);
         // 등록한 순서대로 보이도록 정렬
-        noticeReady.sort((a,b)=> NOTICES.indexOf(a) - NOTICES.indexOf(b));
-        btn.addEventListener("click", ()=> openNotice(noticeReady.indexOf(n)));
+        ready.sort((a,b)=> list.indexOf(a) - list.indexOf(b));
+        btn.addEventListener("click", ()=> openViewer(ready, ready.indexOf(n)));
         refreshAccordion(grid);
         done();
       }, { once:true });
@@ -4672,20 +4679,30 @@
     });
   }
 
+  function setupNotices(){
+    buildPicGrid(document.getElementById("notice-grid"), NOTICES, noticeReady,
+                 document.getElementById("notice-empty"));
+  }
+
+  function setupVawsPics(){
+    buildPicGrid(document.getElementById("vaws-grid"), VAWS_PICS, vawsReady, null);
+  }
+
   /* 공지 이미지도 오프라인용으로 저장해 둔다 (공연장에서 데이터가 안 터져도 보이도록) */
-  function cacheNoticesOffline(){
-    if (!("serviceWorker" in navigator) || !noticeReady.length) return;
-    const urls = noticeReady.map(n => n.src);
+  function cachePicsForOffline(ready){
+    if (!("serviceWorker" in navigator) || !ready.length) return;
+    const urls = ready.map(n => n.src);
     navigator.serviceWorker.ready
       .then(reg => reg.active && reg.active.postMessage({ type:"CACHE_URLS", urls }))
       .catch(()=>{});
   }
 
-  function openNotice(i){
-    if (!noticeReady.length) return;
+  function openViewer(list, i){
+    if (!list || !list.length) return;
     const view = document.getElementById("notice-view");
     if (!view) return;
-    noticeIdx = Math.max(0, Math.min(noticeReady.length - 1, i));
+    viewList = list;
+    viewIdx  = Math.max(0, Math.min(list.length - 1, i));
     paintNotice();
     view.classList.add("open");
     view.setAttribute("aria-hidden", "false");
@@ -4703,7 +4720,7 @@
   }
 
   function paintNotice(){
-    const n = noticeReady[noticeIdx];
+    const n = viewList[viewIdx];
     if (!n) return;
     const view  = document.getElementById("notice-view");
     const img   = document.getElementById("nv-img");
@@ -4716,18 +4733,18 @@
 
     if (img){ img.src = n.src; img.alt = n.title; }
     if (title) title.textContent = n.title;
-    if (count) count.textContent = (noticeIdx + 1) + " / " + noticeReady.length;
-    if (prev) prev.disabled = noticeIdx === 0;
-    if (next) next.disabled = noticeIdx === noticeReady.length - 1;
+    if (count) count.textContent = (viewIdx + 1) + " / " + viewList.length;
+    if (prev) prev.disabled = viewIdx === 0;
+    if (next) next.disabled = viewIdx === viewList.length - 1;
     if (view) view.classList.remove("zoom");
     if (zoom) zoom.textContent = "확대";
     if (scr){ scr.scrollTop = 0; scr.scrollLeft = 0; }
   }
 
   function noticeStep(d){
-    const i = noticeIdx + d;
-    if (i < 0 || i >= noticeReady.length) return;
-    noticeIdx = i;
+    const i = viewIdx + d;
+    if (i < 0 || i >= viewList.length) return;
+    viewIdx = i;
     paintNotice();
   }
 
@@ -5240,6 +5257,10 @@
                 <li>재판매·양도 및 경매 사이트·중고거래 앱 출품은 금지되어 있습니다.</li>
               </ul>
 
+              <div class="info-panel-title"><span class="bar">|</span> 티켓 카드 · 부스 위치 <span class="bar">|</span></div>
+              <p class="way-note">공식 이미지입니다. <b>탭하면 크게</b> 볼 수 있어요.</p>
+              <div class="notice-grid" id="vaws-grid"></div>
+
               <a class="info-book-link" href="https://member.vaundy.jp/news/detail/11291?lang=ko" target="_blank" rel="noopener">
                 ${EXT_LINK_SVG} VAWS 공식 공지 원문 보기
               </a>
@@ -5277,6 +5298,7 @@
     document.getElementById("setlist-btn").addEventListener("click", ()=>{ location.hash = "#/setlist"; });
     setupAccordions();
     setupNotices();
+    setupVawsPics();
     setupNoticeViewer();
     setupSeatMap();
     setupHomeExtras();
