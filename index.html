@@ -1591,6 +1591,11 @@
     color:#e2d4b8;
   }
   .way-note b{ color:#fff; }
+  /* 놓치면 곤란한 안내 — 조금 더 눈에 띄게 */
+  .way-note.warn-note{
+    border-left-color:var(--red, #e0523c);
+    background:rgba(224,82,60,0.12);
+  }
   .way-sec{ margin-top:18px; }
   .way-sec h4{
     margin:0 0 8px;
@@ -1691,6 +1696,14 @@
     object-fit:cover;
     object-position:top center;
     background:#2a0f0a;
+  }
+  /* 가로로 긴 공지(공연장 맵·티켓 카드 등)는 잘라내면 못 알아보므로
+     한 줄을 통째로 쓰고 사진 전체를 그대로 보여 준다. */
+  .notice-item.wide{ grid-column:1 / -1; }
+  .notice-item.wide img{
+    aspect-ratio:auto;
+    object-fit:contain;
+    background:#fff;
   }
   .notice-item .cap{
     display:block;
@@ -4643,6 +4656,8 @@
 
       img.addEventListener("load", ()=>{
         btn.hidden = false;
+        // 가로로 긴 사진이면 한 줄을 통째로 쓴다 (잘리지 않도록)
+        if (img.naturalWidth > img.naturalHeight * 1.05) btn.classList.add("wide");
         noticeReady.push(n);
         // 등록한 순서대로 보이도록 정렬
         noticeReady.sort((a,b)=> NOTICES.indexOf(a) - NOTICES.indexOf(b));
@@ -5174,15 +5189,37 @@
                 <dt>부스 위치</dt>
                 <dd>
                   <span class="em">인스파이어 디스커버리파크 야외</span>
-                  <span class="sub">'포토 부스' 옆 — 서쪽 스탠딩 대기장소 쪽입니다</span>
+                  <span class="sub">INSPIRE DISCOVERY PARK 야외 &#39;포토 부스&#39; 옆 — 서쪽 스탠딩 대기장소 쪽입니다</span>
                 </dd>
 
-                <dt>교환 시간</dt>
-                <dd>
-                  MD(굿즈) 판매 시작 ~ 공연 종료 후 30분
-                  <span class="sub">MD 부스 운영 시작과 같은 시각 — 9/19 12:00 · 9/20 11:00</span>
-                </dd>
               </dl>
+
+              <div class="info-panel-title"><span class="bar">|</span> 부스 운영 시간 <span class="bar">|</span></div>
+
+              <div class="info-table-wrap">
+                <table class="info-table">
+                  <colgroup>
+                    <col class="info-col-label"><col class="info-col-day"><col class="info-col-day">
+                  </colgroup>
+                  <thead>
+                    <tr><th>구분</th><th>9/19(토)</th><th>9/20(일)</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="label" data-label="구분">VAWS 부스</td>
+                      <td data-label="9/19(토)">12:00 ~ 20:00</td>
+                      <td data-label="9/20(일)">11:00 ~ 15:30</td>
+                    </tr>
+                    <tr>
+                      <td class="label" data-label="구분">공연 시작</td>
+                      <td data-label="9/19(토)">17:00</td>
+                      <td data-label="9/20(일)">16:00</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p class="way-note warn-note"><b>일요일(9/20)은 부스가 공연 시작 전에 닫습니다.</b> 15:30에 마감이라 <b>공연 시작(16:00) 전에</b> 미리 받아 두셔야 해요. 토요일은 공연이 끝난 뒤에도 20:00까지 열려 있습니다.</p>
 
               <div class="way-sec">
                 <h4>받는 방법 <span>공연 당일 현장에서만</span></h4>
@@ -5197,11 +5234,13 @@
               <ul class="way-ul warn">
                 <li>1인당 공연일별 1매 — 이틀 모두 참석하면 각각 1매씩 받을 수 있습니다.</li>
                 <li>준비된 수량이 소진되면 예정보다 일찍 종료될 수 있습니다.</li>
+                <li><b>개장 직전과 공연 시작 전후로는 많이 붐빕니다.</b> 시간 여유를 두고 가 주세요.</li>
+                <li>날씨나 현장 설치 상황에 따라 운영 시간·장소가 바뀔 수 있습니다.</li>
                 <li>불량품 교환은 해당 공연 당일 현장에서만 가능합니다.</li>
-                <li>재판매·양도 및 경매 출품은 금지되어 있습니다.</li>
+                <li>재판매·양도 및 경매 사이트·중고거래 앱 출품은 금지되어 있습니다.</li>
               </ul>
 
-              <a class="info-book-link" href="https://member.vaundy.jp/news/detail/11267?lang=ko" target="_blank" rel="noopener">
+              <a class="info-book-link" href="https://member.vaundy.jp/news/detail/11291?lang=ko" target="_blank" rel="noopener">
                 ${EXT_LINK_SVG} VAWS 공식 공지 원문 보기
               </a>
 
