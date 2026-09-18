@@ -632,3 +632,18 @@ button{touch-action:manipulation;}
 }
 .app-banner button:hover{color:var(--ui-text);background:var(--ui-hover);}
 .app-banner .close{min-width:var(--touch-height);background:transparent;color:var(--ui-muted);}
+
+
+/* ── 곡 화면 위쪽 여백 줄이기 ─────────────────────────────────────
+   영상 위·아래로 낭비되던 공간을 좁혀서 가사가 한 줄이라도 더 보이게 한다.
+   가사 목록의 padding-top 은 자동 스크롤이 첫 줄을 화면 가운데로
+   올리기 위한 공간이므로 건드리지 않는다. */
+.song-page .song-topbar{
+  padding-top:calc(8px + var(--safe-top,0px));
+  padding-bottom:8px;
+}
+.song-page .video-wrap{margin-top:6px;}
+.song-page .watch-on-yt{margin-top:4px;}
+.song-page .lyrics-note{margin-top:8px;}
+.song-page .lyrics-legend{margin-top:8px;}
+.song-page .lyrics-list{margin-top:4px;}
