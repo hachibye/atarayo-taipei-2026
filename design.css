@@ -677,3 +677,27 @@ button{touch-action:manipulation;}
 /* 아래쪽에 곡 선택 바 자리를 비워 둘 필요가 없어졌다 */
 .song-page{padding-bottom:0;}
 .song-page .player-controls{justify-content:center;}
+
+
+/* ── 재생 중인 가사 줄이 여러 개로 보이던 문제 ───────────────────
+   ① 터치 화면에서는 한 번 탭한 요소에 :hover 가 그대로 남는다.
+      가사를 눌러 구간을 옮기면 눌렀던 줄마다 배경이 남아, 재생 중인
+      줄과 똑같아 보였다. 마우스가 있는 기기에서만 hover 를 준다.
+   ② 재생 중인 줄의 표시가 배경색뿐이었는데 그 색이 hover 와 거의
+      같았다. 왼쪽 금색 띠를 다시 붙여 한눈에 구분되게 한다. */
+@media (hover: none){
+  .lyric-line:hover{background:none;}
+  .lyrics-list:has(.lyric-line.active) .lyric-line:not(.active):hover{opacity:.5;}
+  :root[data-theme="light"] .lyrics-list:has(.lyric-line.active) .lyric-line:not(.active):hover{opacity:.62;}
+}
+.lyrics-list .lyric-line.active,
+.song-page .lyrics-list .lyric-line.active{
+  background-color:rgba(255,255,255,.07);
+  box-shadow:inset 3px 0 0 var(--ui-accent,#e9d9a3);
+}
+:root[data-theme="light"] .lyrics-list .lyric-line.active{
+  background-color:rgba(29,29,31,.055);
+}
+/* 재생 중이 아닌 줄은 확실히 흐리게 — 한 줄만 도드라지도록 */
+.lyrics-list:has(.lyric-line.active) .lyric-line:not(.active){opacity:.45;}
+:root[data-theme="light"] .lyrics-list:has(.lyric-line.active) .lyric-line:not(.active){opacity:.55;}
