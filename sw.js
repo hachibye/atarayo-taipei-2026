@@ -4,7 +4,7 @@
    ★ 가사나 화면을 고쳐서 다시 올릴 때는 아래 CACHE_VERSION 숫자를 꼭 올려 주세요.
      그래야 사람들 폰에 새 내용이 내려갑니다. (v1 → v2 → v3 …)
    ───────────────────────────────────────────────────────────── */
-const CACHE_VERSION = "v10";
+const CACHE_VERSION = "v103";
 const CACHE_NAME    = `horo-guide-${CACHE_VERSION}`;
 
 /* 처음 방문할 때 미리 받아 둘 파일들.
@@ -117,10 +117,18 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  /* 나머지 파일 — 저장해 둔 걸 즉시 보여 주고, 뒤에서 조용히 최신본으로 갱신 */
+  /* 사진·글꼴·GIF 는 한 번 받아 두면 내용이 바뀌지 않는다.
+     (내용을 바꿀 때는 위의 CACHE_VERSION 을 올리므로 그때 전부 새로 받는다)
+     그래서 저장해 둔 게 있으면 네트워크를 아예 건드리지 않는다.
+     이렇게 안 하면 앱을 열 때마다 뒤에서 글꼴·사진 수 MB 를 다시 받아
+     공연장처럼 데이터가 느린 곳에서 손해가 크다. */
+  const isStatic = /\.(woff2?|ttf|otf|jpe?g|png|gif|webp|svg|ico)$/i.test(url.pathname);
+
   event.respondWith((async () => {
     const cache  = await caches.open(CACHE_NAME);
     const cached = await cache.match(req);
+
+    if (isStatic && cached) return cached;          // 이미 있으면 그걸로 끝
 
     const network = fetch(req).then((res) => {
       if (res && (res.ok || res.type === "opaque")) cache.put(req, res.clone());
