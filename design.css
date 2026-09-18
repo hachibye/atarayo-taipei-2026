@@ -298,10 +298,11 @@ button{touch-action:manipulation;}
   align-items:center;
   justify-content:flex-end;
   gap:8px;
-  padding:8px 16px calc(8px + env(safe-area-inset-bottom, 0px));
+  /* 가사를 덜 가리도록 위아래 여백만 줄인다 (버튼 크기는 그대로 — 공연 중 한 손으로 누르므로) */
+  padding:5px 12px calc(5px + env(safe-area-inset-bottom, 0px));
   background:var(--stage);
 }
-.song-page .lyrics-list{padding-bottom:32px;}
+.song-page .lyrics-list{padding-bottom:20px;}
 .song-page .lyric-line.active{background:rgba(255,255,255,.075);box-shadow:none;}
 .song-page .lyric-line.active .ico-spin,
 .song-page .lyric-line.active .ico-wave,
@@ -544,7 +545,7 @@ button{touch-action:manipulation;}
 
 .song-page{
   position:relative;
-  padding-bottom:calc(72px + env(safe-area-inset-bottom,0px));
+  padding-bottom:calc(58px + env(safe-area-inset-bottom,0px));
 }
 .song-page .song-topbar{justify-content:space-between;}
 .song-page .player-controls{background:var(--ui-bg);}
@@ -553,9 +554,12 @@ button{touch-action:manipulation;}
   left:50%;
   bottom:calc(var(--space-3) + env(safe-area-inset-bottom,0px));
   z-index:20;
-  width:min(560px,calc(100% - var(--space-3) - var(--space-3)));
-  min-height:var(--dock-height);
-  padding:var(--dock-padding);
+  /* 가사를 최대한 덜 가리도록, 곡 제목 길이에 맞춰 줄어드는 알약 모양.
+     화면 폭을 다 쓰지 않으므로 좌우로 가사가 비쳐 보인다. */
+  width:auto;
+  max-width:calc(100% - var(--space-3) - var(--space-3));
+  min-height:auto;
+  padding:3px;
   transform:translateX(-50%);
   border-radius:var(--radius-pill);
   background:var(--dock-surface);
@@ -563,27 +567,31 @@ button{touch-action:manipulation;}
   -webkit-backdrop-filter:blur(18px) saturate(1.3);
   box-shadow:var(--elevation-float),inset 0 1px 0 var(--dock-highlight);
 }
-.song-dock .song-nav{width:100%;gap:var(--space-1);}
+.song-dock .song-nav{width:auto;gap:2px;}
 .song-dock .song-nav-btn{
-  width:var(--touch-height);
-  height:var(--touch-height);
+  width:40px;
+  height:40px;
+  flex:none;
   border:0;
   background:transparent;
   color:var(--ui-text);
 }
 .song-dock .song-nav-btn:hover,
 .song-dock .song-nav-btn:focus-visible{background:var(--ui-hover);color:var(--ui-text);}
-.song-dock .song-picker-h{flex:1;min-width:0;margin:0;padding:0;}
+.song-dock .song-picker-h{flex:0 1 auto;min-width:0;margin:0;padding:0;}
 .song-dock .song-picker-btn{
-  min-height:var(--touch-height);
-  padding:var(--space-2) var(--space-3);
+  min-height:40px;
+  padding:var(--space-1) var(--space-2);
   border:0;
   background:transparent;
   color:var(--ui-text);
 }
 .song-dock .song-picker-btn:hover,
 .song-dock .song-picker-btn:focus-visible{background:var(--ui-hover);}
-.song-dock .song-picker-title{font-size:var(--type-dock-size);}
+.song-dock .song-picker-title{
+  font-size:clamp(13px,3.6vw,15px);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
 .song-dock .song-picker-caret{color:var(--ui-muted);}
 
 .song-page .lyric-jp,.song-page .lyric-tr{color:var(--ui-muted);}
