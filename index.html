@@ -6103,6 +6103,21 @@
      페이지에 딱 한 번만 만들어 두고, 곡이 바뀌면 내용만 갈아끼운다. */
   let songShellBuilt = false;
 
+  /* 곡 선택 목록에 보여 줄 곡들.
+     셋리스트에서 들어왔으면 전체 곡이 아니라 셋리스트에 있는 곡만,
+     셋리스트 화면에서 보던 그 순서 그대로 보여 준다.
+     (랜덤 모드면 섞여 있던 그 순서) */
+  function sheetSongs(){
+    if (songFrom === "setlist"){
+      const list = setlistNavList();
+      if (list.length){
+        const out = list.map(x => SONGS.find(s => s.id === x.id)).filter(Boolean);
+        if (out.length) return out;
+      }
+    }
+    return sortedSongs();
+  }
+
   /* 이전/다음 곡의 순서는 "어디서 들어왔는지"에 따라 달라진다.
      · 셋리스트에서 들어왔으면 → 셋리스트에서 보던 그 순서 그대로
        (공연 순서 모드면 공연 순서, 랜덤 모드면 섞여 있던 그 순서)
@@ -6154,6 +6169,18 @@
         <div class="song-topbar">
           <button class="back-btn" id="song-back-btn" aria-label="곡 목록으로" title="곡 목록으로">←</button>
           <h1 class="visually-hidden" id="song-page-heading"></h1>
+          <nav class="song-dock" aria-label="곡 이동">
+          <div class="song-nav">
+            <button class="song-nav-btn" id="prev-song" aria-label="이전 곡">${CHEV_LEFT_SVG}</button>
+            <div class="song-picker-h">
+              <button class="song-picker-btn" id="song-picker-btn" aria-expanded="false" aria-haspopup="dialog" title="곡 목록 열기">
+                <span class="song-picker-title" id="song-picker-title"></span>
+                <span class="song-picker-caret">${CHEVRON_SVG}</span>
+              </button>
+            </div>
+            <button class="song-nav-btn" id="next-song" aria-label="다음 곡">${CHEV_RIGHT_SVG}</button>
+          </div>
+          </nav>
           ${themeToggleHtml()}
         </div>
 
@@ -6203,25 +6230,12 @@
           </button>
         </div>
 
-        <nav class="song-dock" aria-label="곡 이동">
-          <div class="song-nav">
-            <button class="song-nav-btn" id="prev-song" aria-label="이전 곡">${CHEV_LEFT_SVG}</button>
-            <div class="song-picker-h">
-              <button class="song-picker-btn" id="song-picker-btn" aria-expanded="false" aria-haspopup="dialog" title="곡 목록 열기">
-                <span class="song-picker-title" id="song-picker-title"></span>
-                <span class="song-picker-caret">${CHEVRON_SVG}</span>
-              </button>
-            </div>
-            <button class="song-nav-btn" id="next-song" aria-label="다음 곡">${CHEV_RIGHT_SVG}</button>
-          </div>
-        </nav>
-
         <div class="song-sheet" id="song-sheet" aria-hidden="true" inert>
           <div class="song-sheet-backdrop" data-close-sheet></div>
           <div class="song-sheet-panel" role="dialog" aria-modal="true" aria-label="곡 선택">
             <span class="song-sheet-grip"></span>
             <div class="song-sheet-head">
-              <span class="song-sheet-title">곡 선택</span>
+              <span class="song-sheet-title" id="song-sheet-title">곡 선택</span>
               <span class="song-sheet-count">${SONGS.length}곡</span>
               <button class="song-sheet-close" data-close-sheet aria-label="닫기">${CLOSE_SVG}</button>
             </div>
@@ -6261,6 +6275,12 @@
       const target = SONGS.find(s => s.id === item.dataset.id);
       closeSongSheet();
       if (!target || (currentSong && target.id === currentSong.id)) return;
+      // 셋리스트에서 들어온 경우, 목록 순서가 곧 셋리스트 순서이므로
+      // 지금 몇 번째인지도 같이 옮겨 둔다 (이전/다음 곡이 이어지도록)
+      if (songFrom === "setlist"){
+        const pos = parseInt(item.dataset.pos, 10);
+        if (Number.isFinite(pos)) setSetlistPos(pos);
+      }
       gotoSong(target);
     });
 
@@ -6393,14 +6413,18 @@
         </button>
       </li>`).join("");
 
-    document.getElementById("song-sheet-list").innerHTML = sortedSongs().map((s)=>`
+    document.getElementById("song-sheet-list").innerHTML = sheetSongs().map((s, i)=>`
       <li data-no="${songNo(s)}">
-        <button class="song-sheet-item${s.id === song.id ? " current" : ""}" data-id="${s.id}"${s.id === song.id ? ' aria-current="true"' : ""}>
+        <button class="song-sheet-item${s.id === song.id ? " current" : ""}" data-id="${s.id}" data-pos="${i}"${s.id === song.id ? ' aria-current="true"' : ""}>
           <span class="song-sheet-num">${pad(songNo(s))}</span>
           <span class="song-sheet-name">${escapeHtml(s.title)}</span>
           ${s.id === song.id ? `<span class="song-sheet-now">현재 곡</span>` : ""}
         </button>
       </li>`).join("");
+
+    const sheetTitle = document.getElementById("song-sheet-title");
+    if (sheetTitle) sheetTitle.textContent =
+      songFrom === "setlist" ? "셋리스트 곡" : "곡 선택";
 
     closeSongSheet();
     applySheetFilter();
