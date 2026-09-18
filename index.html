@@ -4345,6 +4345,8 @@
   let autoScrollEnabled = true;
   let venueMode = false;          // 단축모드 (첫 실행 때 저장값을 읽어 옴)
   let lastActiveIdx = -1;
+  let syncTicks = 0;      // 동기화가 몇 번 돌았는지 (진단용)
+  let syncErr   = "";     // 재생 위치 읽기 실패 메시지 (진단용)
 
   /* ── 가사 넘어가는 속도 조절값 (이 세 값만 바꾸면 됨) ──────────────
      SYNC_INTERVAL_MS : 재생 위치를 확인하는 주기(ms). 작을수록 빨리 반응.
@@ -4356,7 +4358,33 @@
   /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
      새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
      sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-  const BUILD = "v109";
+  const BUILD = "v110";
+
+  /* 주소 뒤에 ?debug=1 을 붙이면 화면 위에 상태가 뜬다.
+     "재생 중인 줄이 여러 개" 같은 문제가 폰에서만 날 때 원인을 보기 위한 것. */
+  const DEBUG = /[?&]debug=1/.test(location.search);
+  function setupDebugBadge(){
+    if (!DEBUG) return;
+    const el = document.createElement("div");
+    el.id = "dbg";
+    el.style.cssText = "position:fixed;left:6px;top:6px;z-index:9999;padding:5px 8px;"
+      + "background:rgba(0,0,0,.82);color:#7CFF9B;font:11px/1.45 ui-monospace,monospace;"
+      + "border-radius:7px;white-space:pre;pointer-events:none;max-width:92vw;";
+    document.body.appendChild(el);
+    setInterval(()=>{
+      const lit = document.querySelectorAll(".lyric-line.active").length;
+      const lists = document.querySelectorAll("#lyrics-list, .lyrics-list").length;
+      let t = "-";
+      try { if (player && player.getCurrentTime) t = player.getCurrentTime().toFixed(1); }
+      catch(e){ t = "ERR"; }
+      el.textContent =
+        BUILD + "  틱 " + syncTicks + "\n"
+        + "켜진 줄 " + lit + " (하나여야 정상)\n"
+        + "idx " + lastActiveIdx + "  시간 " + t + "  목록 " + lists + "\n"
+        + "타이머 " + (syncTimer ? "O" : "X") + "  감시 " + (activeGuardTimer ? "O" : "X")
+        + (syncErr ? "\n오류 " + syncErr.slice(0,40) : "");
+    }, 400);
+  }
   const LYRIC_LEAD_SEC     = 0.35;
   const SCROLL_DURATION_MS = 260;
 
@@ -6382,6 +6410,7 @@
 
     currentSong = song;
     lastActiveIdx = -1;
+    startActiveGuard();          // 여러 줄이 켜지는 일이 없도록 지켜본다
     hideTipPic();                 // 곡을 바꾸면 짤방도 초기화
     preloadSongPics(song);        // 이 곡에서 쓰는 짤방 미리 받아 두기
     if (scrollRafId !== null) { cancelAnimationFrame(scrollRafId); scrollRafId = null; }
@@ -6489,6 +6518,7 @@
      (iframe 을 없앴다 다시 만들면 모바일에서 소리 권한이 초기화됨) */
   function leaveSongView(){
     stopSyncTimer();
+    stopActiveGuard();
     closeSongSheet();
     hideTipPic();
     if (lyricObserver){ lyricObserver.disconnect(); lyricObserver = null; }
@@ -6951,33 +6981,59 @@
     }
   }
 
+  /* ★ 재생 중인 줄은 화면 전체에서 "항상 딱 한 줄"이어야 한다.
+     어떤 이유로 여러 줄이 켜지더라도 이 함수가 군더더기를 지운다.
+     플레이어 상태와 무관하게 돌 수 있도록 따로 떼어 두었다. */
+  function pruneActiveLines(keep){
+    const lit = document.querySelectorAll(".lyric-line.active");
+    if (!lit.length) return 0;
+    // 남길 줄을 못 정했으면 마지막 하나만 남긴다
+    const target = keep || lit[lit.length - 1];
+    let removed = 0;
+    lit.forEach(el => { if (el !== target){ el.classList.remove("active"); removed++; } });
+    return removed;
+  }
+
+  /* 동기화가 멈추거나 튕겨도 화면이 지저분해지지 않도록 지켜보는 타이머 */
+  let activeGuardTimer = null;
+  function startActiveGuard(){
+    if (activeGuardTimer) return;
+    activeGuardTimer = setInterval(()=>{ try { pruneActiveLines(null); } catch(e){} }, 300);
+  }
+  function stopActiveGuard(){
+    if (activeGuardTimer){ clearInterval(activeGuardTimer); activeGuardTimer = null; }
+  }
+
   function updateLyricsSync(force) {
-    if (!player || typeof player.getCurrentTime !== 'function') return;
     const list = document.getElementById("lyrics-list");
     if (!list) return;
-
-    // 실제 재생 위치보다 조금 앞선 시점을 기준으로 판단해 가사를 먼저 넘김
-    const cur = player.getCurrentTime() + LYRIC_LEAD_SEC;
     const lines = list.querySelectorAll(".lyric-line");
 
-    let activeIdx = -1;
-    for (let i = 0; i < lines.length; i++) {
-      if (cur >= Number(lines[i].dataset.time)) activeIdx = i;
-      else break;                       // time 순서대로이므로 더 볼 필요 없음
+    let cur = null;
+    try {
+      if (player && typeof player.getCurrentTime === 'function'){
+        // 실제 재생 위치보다 조금 앞선 시점을 기준으로 판단해 가사를 먼저 넘김
+        cur = player.getCurrentTime() + LYRIC_LEAD_SEC;
+      }
+    } catch(e){ cur = null; syncErr = String(e && e.message || e); }
+
+    let activeIdx = lastActiveIdx;
+    if (cur !== null && isFinite(cur)){
+      activeIdx = -1;
+      for (let i = 0; i < lines.length; i++) {
+        if (cur >= Number(lines[i].dataset.time)) activeIdx = i;
+        else break;                     // time 순서대로이므로 더 볼 필요 없음
+      }
     }
 
-    const target = activeIdx >= 0 ? lines[activeIdx] : null;
+    const target = (activeIdx >= 0 && lines[activeIdx]) ? lines[activeIdx] : null;
 
-    /* ★ 재생 중인 줄은 "항상 딱 한 줄"이어야 한다.
-       예전에는 번호(lastActiveIdx)로 옛 줄을 껐는데, 그 번호가 한 번이라도
-       어긋나면 옛 줄이 켜진 채 남아 재생 중인 줄이 여러 개로 보였다.
-       그래서 매 확인마다 실제로 켜져 있는 줄을 직접 찾아 정리한다.
-       (보통 0~1개라 비용은 사실상 없다) */
-    const lit = list.querySelectorAll(".lyric-line.active");
-    if (lit.length > 1 || (lit.length === 1 && lit[0] !== target)){
-      lit.forEach(el => { if (el !== target) el.classList.remove("active"); });
-    }
+    // 재생 위치를 못 읽었어도 군더더기 정리는 반드시 한다
+    pruneActiveLines(target);
     if (target && !target.classList.contains("active")) target.classList.add("active");
+    syncTicks++;
+
+    if (cur === null) return;           // 재생 위치를 모르면 여기까지
 
     // 소절이 그대로면 나머지(짤방·스크롤)는 건드리지 않는다.
     // (매 틱마다 전부 갱신하고 smooth 스크롤을 다시 시작하던 것이 버벅임의 원인)
@@ -7174,6 +7230,7 @@
   // (곡을 탭한 순간 곧바로 재생을 걸 수 있어야 모바일에서 소리가 난다)
   if (window.YT && window.YT.Player) ensurePlayer();
   else window.onYouTubeIframeAPIReady = ensurePlayer;
+  setupDebugBadge();
 
   router();
 </script>
