@@ -6967,8 +6967,14 @@
 
     updateTipPic(activeIdx);          // 짤방도 이 줄에 맞춰 바꿔 준다
 
-    if (lastActiveIdx >= 0 && lines[lastActiveIdx]) lines[lastActiveIdx].classList.remove("active");
-    if (activeIdx >= 0 && lines[activeIdx]) lines[activeIdx].classList.add("active");
+    /* 지금 켜져 있는 줄을 "번호"로 찾아 끄면, 어떤 이유로든 번호가 어긋났을 때
+       옛 줄이 켜진 채 남아 재생 중인 줄이 여러 개로 보인다.
+       그래서 실제로 켜져 있는 줄을 직접 찾아 전부 끈다. (보통 한 개뿐이라 가볍다) */
+    const target = activeIdx >= 0 ? lines[activeIdx] : null;
+    list.querySelectorAll(".lyric-line.active").forEach(el => {
+      if (el !== target) el.classList.remove("active");
+    });
+    if (target) target.classList.add("active");
     lastActiveIdx = activeIdx;
 
     if (activeIdx >= 0 && autoScrollEnabled) {
