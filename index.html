@@ -4352,6 +4352,11 @@
                         떼창은 미리 보여야 따라 부르기 쉬우므로 살짝 앞당김.
      SCROLL_DURATION_MS : 스크롤 애니메이션 길이(ms). 작을수록 빠르게 이동. */
   const SYNC_INTERVAL_MS   = 100;
+
+  /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
+     새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
+     sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
+  const BUILD = "v109";
   const LYRIC_LEAD_SEC     = 0.35;
   const SCROLL_DURATION_MS = 260;
 
@@ -5240,7 +5245,7 @@
         </div>
       </section>
 
-      <div class="credits">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo; · SEOUL FAN CHANT GUIDE (비공식 팬 제작)</div>
+      <div class="credits">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo; · SEOUL FAN CHANT GUIDE (비공식 팬 제작) <span class="build">${BUILD}</span></div>
     `;
 
     document.getElementById("guide-btn").addEventListener("click", ()=>{ location.hash = "#/guide"; });
@@ -5367,7 +5372,7 @@
           <ul class="song-list" id="song-list"></ul>
         </section>
 
-        <div class="credits">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo; · SEOUL FAN CHANT GUIDE (비공식 팬 제작)</div>
+        <div class="credits">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo; · SEOUL FAN CHANT GUIDE (비공식 팬 제작) <span class="build">${BUILD}</span></div>
       </div>
     `;
 
@@ -6961,20 +6966,24 @@
       else break;                       // time 순서대로이므로 더 볼 필요 없음
     }
 
-    // 활성 소절이 그대로면 DOM을 건드리지 않는다.
-    // (매 틱마다 전체 줄을 갱신하고 smooth 스크롤을 다시 시작하던 것이 버벅임의 원인)
+    const target = activeIdx >= 0 ? lines[activeIdx] : null;
+
+    /* ★ 재생 중인 줄은 "항상 딱 한 줄"이어야 한다.
+       예전에는 번호(lastActiveIdx)로 옛 줄을 껐는데, 그 번호가 한 번이라도
+       어긋나면 옛 줄이 켜진 채 남아 재생 중인 줄이 여러 개로 보였다.
+       그래서 매 확인마다 실제로 켜져 있는 줄을 직접 찾아 정리한다.
+       (보통 0~1개라 비용은 사실상 없다) */
+    const lit = list.querySelectorAll(".lyric-line.active");
+    if (lit.length > 1 || (lit.length === 1 && lit[0] !== target)){
+      lit.forEach(el => { if (el !== target) el.classList.remove("active"); });
+    }
+    if (target && !target.classList.contains("active")) target.classList.add("active");
+
+    // 소절이 그대로면 나머지(짤방·스크롤)는 건드리지 않는다.
+    // (매 틱마다 전부 갱신하고 smooth 스크롤을 다시 시작하던 것이 버벅임의 원인)
     if (activeIdx === lastActiveIdx && !force) return;
 
     updateTipPic(activeIdx);          // 짤방도 이 줄에 맞춰 바꿔 준다
-
-    /* 지금 켜져 있는 줄을 "번호"로 찾아 끄면, 어떤 이유로든 번호가 어긋났을 때
-       옛 줄이 켜진 채 남아 재생 중인 줄이 여러 개로 보인다.
-       그래서 실제로 켜져 있는 줄을 직접 찾아 전부 끈다. (보통 한 개뿐이라 가볍다) */
-    const target = activeIdx >= 0 ? lines[activeIdx] : null;
-    list.querySelectorAll(".lyric-line.active").forEach(el => {
-      if (el !== target) el.classList.remove("active");
-    });
-    if (target) target.classList.add("active");
     lastActiveIdx = activeIdx;
 
     if (activeIdx >= 0 && autoScrollEnabled) {

@@ -701,3 +701,6 @@ button{touch-action:manipulation;}
 /* 재생 중이 아닌 줄은 확실히 흐리게 — 한 줄만 도드라지도록 */
 .lyrics-list:has(.lyric-line.active) .lyric-line:not(.active){opacity:.45;}
 :root[data-theme="light"] .lyrics-list:has(.lyric-line.active) .lyric-line:not(.active){opacity:.55;}
+
+/* 화면 판 번호 — 아주 작게, 눈에 거슬리지 않게 */
+.credits .build{opacity:.45;font-variant-numeric:tabular-nums;}
