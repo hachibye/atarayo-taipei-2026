@@ -4468,7 +4468,7 @@
   /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
      새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
      sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-  const BUILD = "v117";
+  const BUILD = "v118";
 
   /* 주소 뒤에 ?debug=1 을 붙이면 화면 위에 상태가 뜬다.
      "재생 중인 줄이 여러 개" 같은 문제가 폰에서만 날 때 원인을 보기 위한 것. */
@@ -6496,7 +6496,7 @@
       let st = -1;
       try { st = player.getPlayerState(); } catch(e){}
       try {
-        if (st === YT.PlayerState.PLAYING || st === YT.PlayerState.BUFFERING) player.pauseVideo();
+        if (st === YT.PlayerState.PLAYING || st === YT.PlayerState.BUFFERING){ lastSelfPause = Date.now(); player.pauseVideo(); }
         else player.playVideo();
       } catch(e){}
     });
@@ -6520,10 +6520,16 @@
       if (autoScrollEnabled) updateLyricsSync(true);   // 켜는 즉시 현재 위치로 이동
     });
 
+    setupMediaKeys();
+
     // ESC 로 시트 닫기 / ← → 로 이전·다음 곡 (PC 키보드)
     if (songKeyHandler) document.removeEventListener("keydown", songKeyHandler);
     songKeyHandler = (e)=>{
       if (!isSongViewActive()) return;                      // 다른 화면이면 무시
+      // 키보드·일부 블루투스 기기가 보내는 미디어 키 (시트가 열려 있어도 받는다)
+      if (e.key === "MediaTrackNext"){     e.preventDefault(); mediaSkip(1);  return; }
+      if (e.key === "MediaTrackPrevious"){ e.preventDefault(); mediaSkip(-1); return; }
+      if (e.key === "MediaPlayPause"){     e.preventDefault(); mediaPlayPause(); return; }
       const sheet = document.getElementById("song-sheet");
       if (e.key === "Escape" && sheet.classList.contains("open")){ e.preventDefault(); closeSongSheet(); return; }
       if (sheet.classList.contains("open")){
@@ -6652,6 +6658,7 @@
     chantDone = true;
     chantIdx  = blocks.length - 1;
     paintChantBar();
+    lastSelfPause = Date.now();
     if (player && typeof player.pauseVideo === "function"){ try { player.pauseVideo(); } catch(e){} }
     return true;
   }
@@ -6669,6 +6676,103 @@
     } else {
       updateLyricsSync(true);
     }
+  }
+
+  /* ── 이어폰 · 블루투스 버튼 ───────────────────────────────────
+     이어폰이나 차량·이어버드의 "다음 곡 / 이전 곡" 버튼을 받아 쓴다.
+
+     쉽지 않은 이유: 소리를 내는 것은 이 페이지가 아니라 그 안에 들어 있는
+     유튜브 화면(iframe)이다. 폰은 "지금 소리를 내는 쪽"에게 버튼을 넘기므로,
+     그냥 두면 버튼을 눌러도 이 페이지에는 아무것도 오지 않는다.
+     그래서 들리지 않는 아주 작은 소리를 이 페이지에서 같이 틀어
+     "여기도 재생 중" 이라고 알린 뒤 버튼을 받아 온다.
+
+     · 아이폰은 한 번에 한 쪽만 소리를 내는 편이라 이 방법이 오히려
+       유튜브 소리를 끊을 수 있다. 그래서 아이폰에서는 시도하지 않는다.
+     · 다른 폰에서도 무음을 켠 직후 영상이 멈추면(부딪힌 것) 곧바로
+       물러나고, 그 뒤로는 다시 시도하지 않는다. 소리가 나는 것이 먼저다. */
+  const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent)
+              || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const SILENT_LOOP = "data:audio/wav;base64,UklGRsQPAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YaAPAACAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCB";
+
+  let mediaKeysOk   = true;    // 부딪힌 적이 있으면 false 로 내려간다
+  let silentAudio   = null;
+  let silentStarted = 0;       // 무음을 켠 시각 (부딪힘 판단용)
+  let lastSelfPause = 0;       // 우리가 일부러 멈춘 시각
+
+  function claimMediaKeys(){
+    if (IS_IOS || !mediaKeysOk) return;
+    try {
+      if (!silentAudio){
+        silentAudio = new Audio(SILENT_LOOP);
+        silentAudio.loop = true;
+        silentAudio.volume = 0.05;     // 1/128 크기의 떨림이라 이 값에서도 들리지 않는다
+      }
+      if (!silentAudio.paused) return;
+      silentStarted = Date.now();
+      const r = silentAudio.play();
+      if (r && r.catch) r.catch(()=>{});
+    } catch(e){}
+  }
+  function releaseMediaKeys(){
+    try { if (silentAudio && !silentAudio.paused) silentAudio.pause(); } catch(e){}
+  }
+  /* 무음을 켜자마자 영상이 멈췄다면 서로 부딪힌 것 — 즉시 되돌린다 */
+  function mediaKeysConflictCheck(){
+    if (!silentStarted || !mediaKeysOk) return;
+    if (Date.now() - silentStarted > 2500) return;        // 한참 뒤에 멈춘 건 사용자가 누른 것
+    if (Date.now() - lastSelfPause < 1500) return;        // 우리가 멈춘 것
+    mediaKeysOk = false;
+    releaseMediaKeys();
+  }
+
+  /* 잠금화면 · 이어폰에 곡 이름이 뜨도록 */
+  function updateMediaMetadata(song){
+    if (!("mediaSession" in navigator) || typeof window.MediaMetadata !== "function") return;
+    try {
+      const art = [];
+      if (song && song.cover) art.push({ src: new URL(song.cover, location.href).href, sizes:"512x512", type:"image/jpeg" });
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: song ? song.title : "HORO",
+        artist: "Vaundy",
+        album: "HORO 응원가이드",
+        artwork: art
+      });
+    } catch(e){}
+  }
+
+  /* 버튼 하나를 눌렀을 때 어디로 갈지.
+     떼창만 듣기가 켜져 있으면 화면의 ‹ › 와 똑같이 떼창 구간을 옮기고,
+     그 끝에서 한 번 더 누르면 앞뒤 곡으로 넘어간다. */
+  function mediaSkip(d){
+    if (!isSongViewActive()) return;
+    const blocks = currentChantBlocks();
+    if (chantOnly && blocks.length){
+      const at = chantIdx + d;
+      if (d > 0 && !chantDone && at <= blocks.length - 1){ jumpToChant(at); return; }
+      if (d < 0 && chantDone){ jumpToChant(blocks.length - 1); return; }
+      if (d < 0 && at >= 0){ jumpToChant(at); return; }
+    }
+    goNeighbor(d);
+  }
+  function mediaPlayPause(){
+    if (!player || !playerReady) return;
+    if (chantOnly && chantDone){ jumpToChant(0); return; }
+    let st = -1;
+    try { st = player.getPlayerState(); } catch(e){}
+    try {
+      if (st === YT.PlayerState.PLAYING || st === YT.PlayerState.BUFFERING){ lastSelfPause = Date.now(); player.pauseVideo(); }
+      else player.playVideo();
+    } catch(e){}
+  }
+
+  function setupMediaKeys(){
+    if (!("mediaSession" in navigator) || !navigator.mediaSession.setActionHandler) return;
+    const set = (name, fn)=>{ try { navigator.mediaSession.setActionHandler(name, fn); } catch(e){} };
+    set("play",           ()=>{ try { player && player.playVideo(); } catch(e){} });
+    set("pause",          ()=>{ lastSelfPause = Date.now(); try { player && player.pauseVideo(); } catch(e){} });
+    set("nexttrack",      ()=> mediaSkip(1));
+    set("previoustrack",  ()=> mediaSkip(-1));
   }
 
   /* 사용자가 곡을 고른 "그 탭" 안에서 재생을 먼저 걸고 화면을 이동한다.
@@ -6748,6 +6852,7 @@
     songView.inert = false;
     app.style.display = "none";
 
+    updateMediaMetadata(song);             // 잠금화면 · 이어폰에 뜨는 곡 이름
     syncChantUi();                         // 떼창만 듣기 상태 반영
     paintChantBar();
     applyVenueMode();                      // 단축모드 상태 반영 (글자 크기 등)
@@ -6805,9 +6910,11 @@
     hideTipPic();
     if (lyricObserver){ lyricObserver.disconnect(); lyricObserver = null; }
     releaseWakeLock();
+    lastSelfPause = Date.now();
     if (player && typeof player.pauseVideo === 'function') {
       try { player.pauseVideo(); } catch(e){}
     }
+    releaseMediaKeys();
     if (songShellBuilt) songView.classList.add("offstage");
     songView.inert = true;
     app.style.display = "";
@@ -7287,8 +7394,13 @@
     // 재생 중(PLAYING = 1)일 때만 동기화 타이머 가동
     if (event.data === YT.PlayerState.PLAYING) {
       startSyncTimer();
+      if ("mediaSession" in navigator) { try { navigator.mediaSession.playbackState = "playing"; } catch(e){} }
+      claimMediaKeys();                 // 이어폰 버튼을 이쪽으로 받아 온다
     } else {
       stopSyncTimer();
+      if ("mediaSession" in navigator) { try { navigator.mediaSession.playbackState = "paused"; } catch(e){} }
+      if (event.data === YT.PlayerState.PAUSED) mediaKeysConflictCheck();
+      releaseMediaKeys();
       // 일시정지/탐색 시에도 위치에 맞춰 현재 가사 하이라이트 1회 갱신
       updateLyricsSync();
     }
