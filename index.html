@@ -1416,6 +1416,71 @@
   }
 
 
+  /* ── 떼창만 듣기 ─────────────────────────────────────────────
+     떼창 구간만 이어서 들려주는 연습 모드.
+     켜져 있는 동안에만 가사 위에 얇은 띠가 하나 생긴다. */
+  .chant-bar{
+    flex:none;
+    display:flex;align-items:center;gap:7px;
+    margin:0 12px 6px;
+    padding:5px 6px 5px 10px;
+    border:1px solid var(--gold-soft);
+    border-radius:8px;
+    background:var(--surface-raised);
+  }
+  .chant-bar[hidden]{ display:none; }
+  .chant-ico{
+    flex:none;display:flex;
+    width:14px;height:14px;
+    color:var(--chant, var(--gold));
+  }
+  .chant-ico svg{ width:100%;height:100%; }
+  .chant-toggle .chant-ico{ margin-right:-1px; }
+  .chant-toggle:not(.active) .chant-ico{ opacity:.7; }
+  .chant-toggle.active{ background:var(--gold-soft); }
+  .chant-toggle.active .venue-label, .chant-toggle.active .chant-ico{ color:#1b1109; }
+  .chant-bar-label{
+    font-family:'Gmarket Sans',sans-serif;
+    font-size:11.5px;letter-spacing:.02em;
+    color:var(--gold);white-space:nowrap;
+  }
+  .chant-bar-msg{
+    flex:1 1 auto;min-width:0;
+    font-size:11.5px;color:var(--cream);opacity:.66;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .chant-bar-count{
+    flex:none;
+    font-size:11.5px;font-variant-numeric:tabular-nums;
+    color:var(--gold-soft);white-space:nowrap;
+  }
+  .chant-step, .chant-bar-off{
+    flex:none;
+    width:34px;height:34px;
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:none;
+    color:var(--gold);
+    cursor:pointer;
+    transition:opacity .15s ease, transform .12s ease;
+  }
+  .chant-step:active, .chant-bar-off:active{ transform:scale(0.94); }
+  .chant-step:disabled{ opacity:.28;cursor:default; }
+  .chant-step svg{ width:15px;height:15px; }
+  .chant-bar-off{ border:0;color:var(--gold-soft);opacity:.75; }
+  .chant-bar-off svg{ width:14px;height:14px; }
+
+  /* 폭이 좁은 폰에서 아래 버튼 셋이 두 줄로 접히면 가사가 그만큼 가려진다.
+     버튼 크기는 그대로 두고 사이 여백만 줄여 한 줄에 들어가게 한다. */
+  @media (max-width:380px){
+    .chant-bar{ margin-left:8px;margin-right:8px;gap:6px; }
+  }
+
+  /* 켜져 있는 동안 떼창이 아닌 줄은 뒤로 물러나 있게 */
+  .song-page.chant-only .lyric-line:not(.is-chant){ opacity:.3; }
+  .song-page.chant-only .lyric-line:not(.is-chant).active{ opacity:.6; }
+
   /* ── 앱 안내 배너 (새 버전 / 오프라인 / 홈 화면 추가) ───────── */
   .app-banner{
     position:fixed;
@@ -4403,7 +4468,7 @@
   /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
      새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
      sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-  const BUILD = "v116";
+  const BUILD = "v117";
 
   /* 주소 뒤에 ?debug=1 을 붙이면 화면 위에 상태가 뜬다.
      "재생 중인 줄이 여러 개" 같은 문제가 폰에서만 날 때 원인을 보기 위한 것. */
@@ -6118,6 +6183,9 @@
   INLINE_ICONS.turn = INLINE_ICONS.spin;   // [turn] 으로 써도 동일
   INLINE_ICONS.chant = INLINE_ICONS.mic;   // [chant] 로 써도 동일
 
+  /* 가사 안의 [mic] 은 통통 튀지만, 버튼·띠에서는 가만히 있는 편이 낫다 */
+  const STATIC_MIC_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mic"/></svg>';
+
   const CHEV_LEFT_SVG  ='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
   const CHEV_RIGHT_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
   const CLOSE_SVG      = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
@@ -6294,6 +6362,17 @@
           </div>
 
           <div class="lyrics-pane">
+            <!-- 떼창만 듣기 — 켜져 있을 때만 보이는 띠 -->
+            <div class="chant-bar" id="chant-bar" hidden role="status">
+              <span class="chant-ico">${STATIC_MIC_SVG}</span>
+              <span class="chant-bar-label">떼창만</span>
+              <span class="chant-bar-msg" id="chant-msg"></span>
+              <span class="chant-bar-count" id="chant-count"></span>
+              <button class="chant-step" id="chant-prev" aria-label="이전 떼창 구간">${CHEV_LEFT_SVG}</button>
+              <button class="chant-step" id="chant-next" aria-label="다음 떼창 구간">${CHEV_RIGHT_SVG}</button>
+              <button class="chant-bar-off" id="chant-off" aria-label="떼창만 듣기 끄기">${CLOSE_SVG}</button>
+            </div>
+
             <!-- 짤방(동작 사진) — 지정한 가사에서만 떴다가 사라집니다 -->
             <div class="tip-pic at-below-video" id="tip-pic" aria-live="polite">
               <figure class="tip-pic-card" id="tip-pic-card" title="탭하면 크게 보여요">
@@ -6310,6 +6389,10 @@
 
         <div class="player-controls">
           <button class="play-toggle" id="play-toggle" aria-label="재생 / 일시정지">${PLAY_SVG}</button>
+          <button class="venue-toggle chant-toggle" id="chant-btn" aria-pressed="false" aria-label="떼창 부분만 듣기 켜기/끄기">
+            <span class="chant-ico">${STATIC_MIC_SVG}</span>
+            <span class="venue-label">떼창만</span>
+          </button>
           <button class="venue-toggle" id="venue-btn" aria-label="단축모드 켜기/끄기">
             <span class="venue-label">단축모드</span>
             <span class="venue-switch"><span class="venue-knob"></span></span>
@@ -6399,6 +6482,8 @@
       const btn = e.target.closest(".lyric-line");
       if (!btn) return;
       seekTo(Number(btn.dataset.time));
+      // 떼창만 듣기 중에는 탭한 자리에서 판단을 다시 하도록 잠깐 여유를 준다
+      if (chantOnly){ chantDone = false; chantExpect(Number(btn.dataset.time)); }
     });
 
     /* 단축모드 — 영상을 감추고 발음 가사만 크게.
@@ -6406,6 +6491,8 @@
     /* 재생 / 일시정지 — 단축모드에서 영상이 안 보일 때 소리를 멈추는 수단 */
     document.getElementById("play-toggle").addEventListener("click", ()=>{
       if (!player || !playerReady) return;
+      // 떼창을 마지막까지 들은 뒤라면 처음 구간부터 다시
+      if (chantOnly && chantDone){ jumpToChant(0); return; }
       let st = -1;
       try { st = player.getPlayerState(); } catch(e){}
       try {
@@ -6413,6 +6500,13 @@
         else player.playVideo();
       } catch(e){}
     });
+
+    document.getElementById("chant-btn").addEventListener("click", ()=>{
+      setChantOnly(!chantOnly);
+    });
+    document.getElementById("chant-off").addEventListener("click", ()=>{ setChantOnly(false); });
+    document.getElementById("chant-prev").addEventListener("click", ()=>{ chantStep(-1); });
+    document.getElementById("chant-next").addEventListener("click", ()=>{ chantStep(1);  });
 
     document.getElementById("venue-btn").addEventListener("click", (e)=>{
       venueMode = !venueMode;
@@ -6450,6 +6544,133 @@
     document.addEventListener("keydown", songKeyHandler);
   }
 
+  /* ── 떼창만 듣기 ─────────────────────────────────────────────
+     켜 두면 떼창 구간만 이어서 들려준다. 구간이 끝나면 다음 떼창으로
+     건너뛰고, 마지막까지 들으면 멈춘다(재생을 누르면 처음 구간부터 다시).
+     곡을 옮겨도 켜진 상태는 그대로 — 여러 곡의 떼창만 연습할 수 있게.
+     새로 고치면 꺼진다(모르고 켜 둔 채 공연장에서 헤매지 않도록). */
+  let chantOnly       = false;
+  let chantIdx        = -1;      // 지금 듣고 있는 구간 번호
+  let chantDone       = false;   // 마지막 구간까지 다 들었는지
+  /* 구간을 옮기라고 시킨 뒤, 실제로 그 자리에 도착할 때까지는 판단을 멈춘다.
+     유튜브는 seekTo 를 시켜도 잠깐 동안 옛 위치를 알려 주기 때문에,
+     시간만 재고 넘어가면 회선이 느릴 때 구간을 연달아 건너뛰게 된다. */
+  let chantWantSec    = null;    // 지금 도착하려는 위치(초)
+  let chantWaitUntil  = 0;       // 여기까지도 못 가면 포기하고 그냥 진행
+
+  function currentChantBlocks(){ return chantBlocks(currentSong); }
+
+  /* 화면(버튼·흐리게 처리)을 지금 상태에 맞춘다.
+     떼창이 아예 없는 곡에서는 흐리게 처리를 하지 않는다 — 안 그러면
+     가사 전체가 흐려져서 읽을 수가 없다. */
+  function syncChantUi(){
+    const page = document.getElementById("song-page");
+    if (page) page.classList.toggle("chant-only", chantOnly && currentChantBlocks().length > 0);
+    const btn = document.getElementById("chant-btn");
+    if (btn){
+      btn.classList.toggle("active", chantOnly);
+      btn.setAttribute("aria-pressed", chantOnly ? "true" : "false");
+    }
+  }
+
+  /* 띠의 글자와 버튼 상태를 지금 상황에 맞춘다 */
+  function paintChantBar(){
+    const bar = document.getElementById("chant-bar");
+    if (!bar) return;
+    bar.hidden = !chantOnly;
+    if (!chantOnly) return;
+
+    const blocks = currentChantBlocks();
+    const msg    = document.getElementById("chant-msg");
+    const count  = document.getElementById("chant-count");
+    const prev   = document.getElementById("chant-prev");
+    const next   = document.getElementById("chant-next");
+
+    if (!blocks.length){
+      if (msg)   msg.textContent = "이 곡엔 떼창 구간이 없어요";
+      if (count) count.textContent = "";
+      if (prev)  prev.disabled = true;
+      if (next)  next.disabled = true;
+      return;
+    }
+    if (msg) msg.textContent = chantDone ? "끝 — 재생을 누르면 처음부터" : "";
+    if (count) count.textContent = Math.max(1, chantIdx + 1) + " / " + blocks.length;
+    if (prev) prev.disabled = chantIdx <= 0;
+    if (next) next.disabled = chantIdx >= blocks.length - 1;
+  }
+
+  /* i 번째 떼창 구간의 시작으로 옮겨 재생한다 */
+  function jumpToChant(i){
+    const blocks = currentChantBlocks();
+    if (!blocks.length) return;
+    chantIdx  = Math.max(0, Math.min(blocks.length - 1, i));
+    chantDone = false;
+    chantExpect(blocks[chantIdx].start);     // 도착할 때까지 판단 보류
+    paintChantBar();
+    if (player && typeof player.seekTo === "function"){
+      try { player.seekTo(blocks[chantIdx].start, true); player.playVideo(); } catch(e){}
+    }
+  }
+
+  /* "이 위치로 갈 거야" 라고 적어 둔다 — 도착하면 판단을 다시 시작한다 */
+  function chantExpect(sec){
+    chantWantSec   = sec;
+    chantWaitUntil = Date.now() + 4000;      // 4초까지 기다려 보고 포기
+  }
+
+  function chantStep(d){
+    const blocks = currentChantBlocks();
+    if (!blocks.length) return;
+    if (chantDone && d < 0) { jumpToChant(blocks.length - 1); return; }
+    jumpToChant(chantIdx + d);
+  }
+
+  /* 재생 위치를 보고 구간을 벗어났으면 다음 떼창으로 옮긴다.
+     (updateLyricsSync 가 0.1초마다 불러 준다)
+     옮겼으면 true 를 돌려준다. */
+  function chantOnlyTick(cur){
+    if (!chantOnly || cur === null || !isFinite(cur)) return false;
+    const blocks = currentChantBlocks();
+    if (!blocks.length) return false;
+
+    const t = cur - LYRIC_LEAD_SEC;                 // 실제 재생 위치
+
+    // 옮겨 달라고 한 자리에 아직 도착하지 않았으면 기다린다
+    if (chantWantSec !== null){
+      if (Math.abs(t - chantWantSec) < 1.6 || Date.now() > chantWaitUntil) chantWantSec = null;
+      else return false;
+    }
+    const inside = blocks.findIndex(b => t >= b.start - 0.35 && t <= b.end);
+    if (inside >= 0){
+      if (inside !== chantIdx || chantDone){ chantIdx = inside; chantDone = false; paintChantBar(); }
+      return false;
+    }
+    const next = blocks.findIndex(b => b.start > t);
+    if (next >= 0){ jumpToChant(next); return true; }
+
+    // 마지막 떼창까지 다 들었다 — 여기서 멈춘다
+    chantDone = true;
+    chantIdx  = blocks.length - 1;
+    paintChantBar();
+    if (player && typeof player.pauseVideo === "function"){ try { player.pauseVideo(); } catch(e){} }
+    return true;
+  }
+
+  /* 스위치를 켜고 끌 때 */
+  function setChantOnly(on){
+    chantOnly = !!on;
+    chantDone = false;
+    chantIdx  = -1;
+    syncChantUi();
+    paintChantBar();
+    if (chantOnly){
+      const blocks = currentChantBlocks();
+      if (blocks.length) jumpToChant(0);
+    } else {
+      updateLyricsSync(true);
+    }
+  }
+
   /* 사용자가 곡을 고른 "그 탭" 안에서 재생을 먼저 걸고 화면을 이동한다.
      (모바일은 사용자 제스처 안에서 시작한 재생만 소리를 허용하기 때문) */
   function gotoSong(song){
@@ -6467,6 +6688,8 @@
 
     currentSong = song;
     lastActiveIdx = -1;
+    // 떼창만 듣기는 곡을 옮겨도 켜진 채로 — 구간 번호만 새 곡 기준으로 다시
+    chantIdx = -1; chantDone = false; chantWantSec = null; chantWaitUntil = 0;
     startActiveGuard();          // 여러 줄이 켜지는 일이 없도록 지켜본다
     hideTipPic();                 // 곡을 바꾸면 짤방도 초기화
     preloadSongPics(song);        // 이 곡에서 쓰는 짤방 미리 받아 두기
@@ -6493,7 +6716,7 @@
 
     document.getElementById("lyrics-list").innerHTML = song.lyrics.map((l,i)=>`
       <li>
-        <button class="lyric-line" data-time="${l.time}" data-idx="${i}">
+        <button class="lyric-line${lineIsChant(l) ? " is-chant" : ""}" data-time="${l.time}" data-idx="${i}">
           <span class="lyric-icons">${lyricIconsHtml(l)}</span>
           <span class="lyric-body">
             <span class="lyric-jp">${withIcons(l.jp || "")}</span>
@@ -6525,6 +6748,8 @@
     songView.inert = false;
     app.style.display = "none";
 
+    syncChantUi();                         // 떼창만 듣기 상태 반영
+    paintChantBar();
     applyVenueMode();                      // 단축모드 상태 반영 (글자 크기 등)
     updateLyricsPadding();                 // 첫 소절도 가운데 오도록 여백 계산
     observeLyricLines();                   // 보이는 줄의 아이콘만 움직이게
@@ -6760,6 +6985,63 @@
     return html;
   }
 
+  /* ── 떼창 구간 ───────────────────────────────────────────────
+     "떼창만 듣기" 가 쓰는 계산. 한 줄이 떼창인지 판단하는 기준은
+     곡 목록 배지(songMarks)와 똑같다 — 기준이 갈리면 배지에는 떼창이
+     있다고 뜨는데 재생은 건너뛰는 일이 생기므로 여기 한 곳에 모아 둔다.
+       · ko/jp/tr 어디든 [mic] · [chant] 아이콘이 있거나
+       · ko 조각에 tag:"chant" 가 붙어 있거나
+       · bg(뒤에 깔리는 코러스)가 있는 줄 */
+  function lineIsChant(line){
+    if (!line) return false;
+    if (line.bg) return true;
+    const hit = (part)=>{
+      if (typeof part === "string")
+        return hasIconToken(part, "mic") || hasIconToken(part, "chant");
+      if (!Array.isArray(part)) return false;
+      return part.some(seg => seg && (seg.tag === "chant"
+        || hasIconToken(seg.text, "mic") || hasIconToken(seg.text, "chant")));
+    };
+    return hit(line.ko) || hit(line.jp) || hit(line.tr);
+  }
+
+  const CHANT_LEAD_SEC  = 1.2;   // 떼창 직전 한 박자 먼저 들어가 준비할 시간
+  const CHANT_TAIL_SEC  = 0.6;   // 마지막 글자가 잘리지 않도록 뒤에 남기는 여유
+  const CHANT_GAP_MERGE = 7;     // 떼창 사이가 이보다 짧으면 끊지 않고 이어서 듣는다
+  const chantBlockCache = new Map();
+
+  /* 곡을 훑어 떼창 구간 목록을 만든다. [{from,to,start,end}, …]
+     from/to 는 가사 줄 번호, start/end 는 영상에서의 초. */
+  function chantBlocks(song){
+    if (!song) return [];
+    if (chantBlockCache.has(song.id)) return chantBlockCache.get(song.id);
+
+    const lines = song.lyrics || [];
+    const lineEnd = (i)=> lines[i + 1] ? Number(lines[i + 1].time)
+                                       : Number(lines[i].time) + 8;
+    const raw = [];
+    for (let i = 0; i < lines.length; i++){
+      if (!lineIsChant(lines[i])) continue;
+      let e = i;
+      while (e + 1 < lines.length && lineIsChant(lines[e + 1])) e++;
+      raw.push({
+        from: i, to: e,
+        start: Math.max(0, Number(lines[i].time) - CHANT_LEAD_SEC),
+        end:   lineEnd(e) + CHANT_TAIL_SEC
+      });
+      i = e;
+    }
+    // 몇 초 듣자고 끊으면 오히려 어수선하므로 가까운 구간끼리 묶는다
+    const out = [];
+    raw.forEach(b => {
+      const last = out[out.length - 1];
+      if (last && b.start - last.end < CHANT_GAP_MERGE){ last.end = b.end; last.to = b.to; }
+      else out.push({ from:b.from, to:b.to, start:b.start, end:b.end });
+    });
+    chantBlockCache.set(song.id, out);
+    return out;
+  }
+
   /* ── 곡 목록 응원 배지 ───────────────────────────────────────
      곡의 가사 데이터를 한 번 훑어서 떼창이 몇 줄인지, 박수·손 흔들기·
      점프·팔 돌리기가 들어 있는지 세어 둔다. 가사를 고치면 배지도 저절로
@@ -6797,7 +7079,8 @@
       scanText(line.tr);
       if (line.bg){ lineChant = true; scanPart(line.bg); }   // 뒤에 깔리는 코러스도 떼창
 
-      if (lineChant) mark.chant++;
+      // 판단 기준은 lineIsChant 한 곳에서만 (떼창만 듣기와 어긋나지 않도록)
+      if (lineChant || lineIsChant(line)) mark.chant++;
     });
 
     songMarksCache.set(song.id, mark);
@@ -7080,6 +7363,9 @@
         cur = player.getCurrentTime() + LYRIC_LEAD_SEC;
       }
     } catch(e){ cur = null; syncErr = String(e && e.message || e); }
+
+    // 떼창만 듣기 — 구간을 벗어났으면 다음 떼창으로 옮긴다
+    chantOnlyTick(cur);
 
     let activeIdx = lastActiveIdx;
     if (cur !== null && isFinite(cur)){
