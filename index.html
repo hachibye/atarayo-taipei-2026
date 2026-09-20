@@ -1335,6 +1335,20 @@
     color:#a99a80;
     line-height:1.5;
   }
+  /* 歌詞內的逐字 Karaoke 進度：未唱到的字維持暗色，唱到後沿用字幕藍。 */
+  .lyric-jp .karaoke-unit{
+    color:rgba(169,154,128,0.62);
+    transition:color .08s linear, text-shadow .08s linear;
+  }
+  .lyric-line.active .lyric-jp .karaoke-unit.karaoke-lit{
+    color:var(--clap);
+  }
+  .lyric-line.active .lyric-jp .karaoke-unit.karaoke-current{
+    text-shadow:0 0 7px rgba(79,168,224,0.55);
+  }
+  .lyric-line.active .lyric-jp .karaoke-unit.karaoke-lit rt{
+    color:rgba(126,205,247,0.9);
+  }
   .lyric-jp ruby{
     ruby-position:over;
     ruby-align:center;
@@ -4512,6 +4526,7 @@
   let venueMode = false;          // 단축모드 (첫 실행 때 저장값을 읽어 옴)
   let readingMode = store("horo-reading") === "romaji" ? "romaji" : "kana";
   let lastActiveIdx = -1;
+  let karaokeActiveLine = null;
   let syncTicks = 0;      // 동기화가 몇 번 돌았는지 (진단용)
   let syncErr   = "";     // 재생 위치 읽기 실패 메시지 (진단용)
   let iconClockStartedAt = performance.now();
@@ -4526,7 +4541,7 @@
   /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
      새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
      sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-  const BUILD = "v136";
+  const BUILD = "v137";
 
   /* 주소 뒤에 ?debug=1 을 붙이면 화면 위에 상태가 뜬다.
      "재생 중인 줄이 여러 개" 같은 문제가 폰에서만 날 때 원인을 보기 위한 것. */
@@ -4555,6 +4570,8 @@
   }
   const LYRIC_LEAD_SEC     = 0.35;
   const SCROLL_DURATION_MS = 260;
+  const KARAOKE_TAIL_SEC   = 0.08;
+  const KARAOKE_UNIT_BEATS  = 0.65;
 
   let scrollRafId = null;
   let currentSong = null;
@@ -6744,6 +6761,7 @@
 
     currentSong = song;
     lastActiveIdx = -1;
+    karaokeActiveLine = null;
     // 떼창만 듣기는 곡을 옮겨도 켜진 채로 — 구간 번호만 새 곡 기준으로 다시
     chantIdx = -1; chantDone = false; chantWantSec = null; chantWaitUntil = 0;
     startActiveGuard();          // 여러 줄이 켜지는 일이 없도록 지켜본다
@@ -6781,6 +6799,7 @@
           </span>
         </button>
       </li>`).join("");
+    decorateKaraokeLines(song);
 
     document.getElementById("song-sheet-list").innerHTML = sheetSongs().map((s, i)=>`
       <li data-no="${songNo(s)}">
@@ -6903,8 +6922,10 @@
       const target = line.querySelector(".lyric-jp");
       if (!lyric || !target) return;
       target.innerHTML = renderJapaneseLine(lyric.jp || "");
+      decorateKaraokeLine(target);
       syncIconAnimationPhase(line, now);
     });
+    updateKaraokeProgress(document.querySelector(".lyric-line.active"), getPlayerTime());
   }
   window.addEventListener("online",  ()=>{ if (songShellBuilt) applyVenueMode(); });
   window.addEventListener("offline", ()=>{ if (songShellBuilt) applyVenueMode(); });
@@ -7055,6 +7076,178 @@
     if (!ruby) return withIcons(source);
     return ruby.replace(ICON_TOKEN_RE, (m, key)=> INLINE_ICONS[key.toLowerCase()] || m);
   }
+
+  /*
+   * Karaoke 逐字高亮
+   *
+   * 每句歌詞原本就有人工填入的影片起始秒數。這裡把「本句起點」到
+   * 「下一句起點」視為本句的人工校正時間窗，再依照日文詞／假名／
+   * 羅馬拼音的可見單位分配進度。這樣不靠 BPM 猜整句速度，也不會讓
+   * 每個圖示各自從第 0 拍開始；播放中的每 100ms 只更新目前這一句。
+   */
+  function getPlayerTime(){
+    try {
+      if (player && typeof player.getCurrentTime === "function"){
+        const t = Number(player.getCurrentTime());
+        return Number.isFinite(t) ? t : null;
+      }
+    } catch(e){}
+    return null;
+  }
+
+  function karaokeRange(song, index){
+    const lines = song && Array.isArray(song.lyrics) ? song.lyrics : [];
+    const line = lines[index];
+    const start = Number(line && line.time);
+    if (!Number.isFinite(start)) return null;
+
+    // 歌詞錨點之間常常包含前奏／間奏，不能把整段空白也平均塗成歌詞。
+    // 以歌曲 BPM 與本句字數估出「唱完本句」的上限；若下一句更早，
+    // 仍以現有人工錨點為準。這只決定句內高亮的收尾，不會改動原始 time。
+    const source = String(line.jp || "").replace(ICON_TOKEN_RE, "");
+    const weight = karaokeUnitWeight(source) || 1;
+    const bpm = Number(SONG_BPM[song.id]) || 120;
+    const estimatedDuration = Math.max(0.8, Math.min(12, weight * (60 / bpm) * KARAOKE_UNIT_BEATS));
+
+    let next = null;
+    for (let i = index + 1; i < lines.length; i++){
+      const t = Number(lines[i] && lines[i].time);
+      if (Number.isFinite(t) && t > start){ next = t; break; }
+    }
+    // 最後一句沒有下一個錨點，留一個依句長估出的收尾時間。
+    const end = next === null
+      ? start + estimatedDuration
+      : Math.min(start + estimatedDuration,
+          Math.max(start + 0.25, next - KARAOKE_TAIL_SEC));
+    return { start, end };
+  }
+
+  function karaokeUnitWeight(text){
+    const value = String(text || "");
+    const visible = Array.from(value).filter(ch => !/\s/u.test(ch));
+    if (!visible.length) return 0;
+    if (visible.every(ch => /[A-Za-z0-9]/.test(ch))) return Math.max(1, visible.length * 0.75);
+    if (visible.every(ch => /[、。！？!?.,，。]/u.test(ch))) return 0.45;
+    return Math.max(1, visible.length);
+  }
+
+  function appendKaraokeUnit(fragment, units, text, weight){
+    const span = document.createElement("span");
+    span.className = "karaoke-unit";
+    span.textContent = text;
+    span.dataset.karaokeWeight = String(weight);
+    fragment.appendChild(span);
+    units.push({ el: span, weight });
+  }
+
+  function decorateKaraokeTextNode(node, units){
+    const text = node.nodeValue || "";
+    if (!text.trim()) return;
+    const fragment = document.createDocumentFragment();
+    const chars = Array.from(text);
+    for (let i = 0; i < chars.length; ){
+      const ch = chars[i];
+      if (/\s/u.test(ch)){
+        fragment.appendChild(document.createTextNode(ch));
+        i++;
+        continue;
+      }
+      // 羅馬拼音／英文以單字為一個單位，避免加上 span 後英文被拆得太碎。
+      if (/[A-Za-z0-9]/.test(ch)){
+        let j = i + 1;
+        while (j < chars.length && /[A-Za-z0-9'’_-]/.test(chars[j])) j++;
+        const word = chars.slice(i, j).join("");
+        appendKaraokeUnit(fragment, units, word, karaokeUnitWeight(word));
+        i = j;
+        continue;
+      }
+      appendKaraokeUnit(fragment, units, ch, karaokeUnitWeight(ch));
+      i++;
+    }
+    if (fragment.childNodes.length) node.replaceWith(fragment);
+  }
+
+  function decorateKaraokeLine(target){
+    if (!target) return;
+    const units = [];
+    const visit = (parent)=>{
+      [...parent.childNodes].forEach(node => {
+        if (node.nodeType === Node.TEXT_NODE){
+          decorateKaraokeTextNode(node, units);
+          return;
+        }
+        if (node.nodeType !== Node.ELEMENT_NODE) return;
+        if (node.classList.contains("ico")) return;
+        // ruby 整體作為一個可讀詞單位，避免把 rt 假名也當成第二次歌詞進度。
+        if (node.tagName === "RUBY"){
+          const base = [...node.childNodes]
+            .filter(child => child.nodeType === Node.TEXT_NODE)
+            .map(child => child.nodeValue || "")
+            .join("");
+          const wrapper = document.createElement("span");
+          wrapper.className = "karaoke-unit";
+          wrapper.dataset.karaokeWeight = String(karaokeUnitWeight(base));
+          node.parentNode.insertBefore(wrapper, node);
+          wrapper.appendChild(node);
+          units.push({ el: wrapper, weight: karaokeUnitWeight(base) });
+          return;
+        }
+        if (node.tagName === "RT" || node.tagName === "RP") return;
+        visit(node);
+      });
+    };
+    visit(target);
+    target._karaokeUnits = units;
+  }
+
+  function decorateKaraokeLines(song){
+    karaokeActiveLine = null;
+    const list = document.getElementById("lyrics-list");
+    if (!list || !song) return;
+    list.querySelectorAll(".lyric-line").forEach(line => {
+      const index = Number(line.dataset.idx);
+      const target = line.querySelector(".lyric-jp");
+      const range = karaokeRange(song, index);
+      if (range){
+        line.dataset.karaokeStart = String(range.start);
+        line.dataset.karaokeEnd = String(range.end);
+      }
+      decorateKaraokeLine(target);
+    });
+  }
+
+  function clearKaraokeLine(line){
+    if (!line) return;
+    const target = line.querySelector(".lyric-jp");
+    const units = target && target._karaokeUnits || [];
+    units.forEach(unit => unit.el.classList.remove("karaoke-lit", "karaoke-current"));
+  }
+
+  function updateKaraokeProgress(line, time){
+    if (karaokeActiveLine && karaokeActiveLine !== line) clearKaraokeLine(karaokeActiveLine);
+    karaokeActiveLine = line || null;
+    if (!line || !Number.isFinite(time)) return;
+
+    const target = line.querySelector(".lyric-jp");
+    const units = target && target._karaokeUnits || [];
+    const start = Number(line.dataset.karaokeStart);
+    const end = Number(line.dataset.karaokeEnd);
+    if (!units.length || !Number.isFinite(start) || !Number.isFinite(end)) return;
+
+    const progress = Math.max(0, Math.min(1, (time - start) / Math.max(0.01, end - start)));
+    const total = units.reduce((sum, unit) => sum + unit.weight, 0) || units.length;
+    const reached = progress * total;
+    let passed = 0;
+    units.forEach(unit => {
+      const was = passed;
+      passed += unit.weight;
+      const lit = reached >= passed;
+      const current = !lit && reached > was;
+      unit.el.classList.toggle("karaoke-lit", lit);
+      unit.el.classList.toggle("karaoke-current", current);
+    });
+  }
+
   function hasIconToken(str, name){
     if (typeof str !== "string") return false;
     return new RegExp(`[\\[(]${name}[\\])]`, "i").test(str);
@@ -7500,6 +7693,8 @@
     }
 
     const target = (activeIdx >= 0 && lines[activeIdx]) ? lines[activeIdx] : null;
+    // line-level focus 與逐字 Karaoke 同時更新；後者不能等到 activeIdx 改變才刷新。
+    updateKaraokeProgress(target, cur === null ? null : cur - LYRIC_LEAD_SEC);
 
     // 재생 위치를 못 읽었어도 군더더기 정리는 반드시 한다
     pruneActiveLines(target);
