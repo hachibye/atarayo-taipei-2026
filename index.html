@@ -4526,7 +4526,7 @@
   /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
      새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
      sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-  const BUILD = "v135";
+  const BUILD = "v136";
 
   /* 주소 뒤에 ?debug=1 을 붙이면 화면 위에 상태가 뜬다.
      "재생 중인 줄이 여러 개" 같은 문제가 폰에서만 날 때 원인을 보기 위한 것. */
@@ -7602,19 +7602,28 @@
   const bannerBtn = document.getElementById("app-banner-action");
   const bannerX   = document.getElementById("app-banner-close");
   let bannerAction = null;
+  let bannerDismissAction = null;
 
-  function showBanner(html, btnLabel, onClick, kind){
+  function showBanner(html, btnLabel, onClick, kind, onDismiss){
     if (!banner) return;
     bannerMsg.innerHTML = html;
     bannerAction = onClick || null;
+    bannerDismissAction = onDismiss || null;
     bannerBtn.textContent = btnLabel || "";
     bannerBtn.style.display = btnLabel ? "" : "none";
     banner.classList.toggle("offline", kind === "offline");
     banner.classList.add("show");
   }
-  function hideBanner(){ if (banner) banner.classList.remove("show"); }
+  function hideBanner(){
+    if (banner) banner.classList.remove("show");
+    bannerAction = null;
+    bannerDismissAction = null;
+  }
   if (bannerBtn) bannerBtn.addEventListener("click", ()=>{ if (bannerAction) bannerAction(); });
-  if (bannerX)   bannerX.addEventListener("click", hideBanner);
+  if (bannerX) bannerX.addEventListener("click", ()=>{
+    if (bannerDismissAction) bannerDismissAction();
+    else hideBanner();
+  });
 
   /* 저장해 둔 값 읽고 쓰기 (사파리 프라이빗 모드 등에서 막혀도 문제없게) */
   function store(key, value){
@@ -7622,6 +7631,33 @@
       if (value === undefined) return localStorage.getItem(key);
       localStorage.setItem(key, value);
     } catch(e){ return null; }
+  }
+
+  const INSTALL_HINT_KEY = "horo-install-hint";
+  function isStandaloneApp(){
+    return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  }
+  function installDeviceType(){
+    const ua = navigator.userAgent || "";
+    const ios = /iphone|ipad|ipod/i.test(ua)
+      || (/macintosh/i.test(ua) && Number(navigator.maxTouchPoints) > 1);
+    const android = /android/i.test(ua)
+      && (/mobile/i.test(ua) || (navigator.userAgentData && navigator.userAgentData.mobile === true));
+    return { ios, android };
+  }
+  function canShowInstallHint(){
+    if (!navigator.onLine || isStandaloneApp()) return false;
+    const device = installDeviceType();
+    return device.ios || device.android;
+  }
+  function installHintDismissed(){ return store(INSTALL_HINT_KEY) === "done"; }
+  function dismissInstallHint(){
+    store(INSTALL_HINT_KEY, "done");
+    hideBanner();
+  }
+  function showInstallHint(html, btnLabel, onClick){
+    if (!canShowInstallHint() || installHintDismissed()) return;
+    showBanner(html, btnLabel, onClick, "install", dismissInstallHint);
   }
 
   /* 1) 서비스워커 등록 — 오프라인에서도 가사가 열리게 */
@@ -7667,33 +7703,30 @@
 
   /* 3) 아이폰은 설치 안내가 자동으로 뜨지 않으므로 한 번만 알려 줌 */
   function maybeShowInstallHint(){
-    if (!navigator.onLine) return;                      // 오프라인 안내가 우선
-    if (store("horo-install-hint") === "done") return;  // 이미 본 사람
-    const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
-    if (standalone) return;                             // 이미 홈 화면에서 실행 중
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    if (!isIOS) return;
-    showBanner("點選分享按鈕 <b>⎋</b> → <b>加入主畫面</b>，即可像 App 一樣使用。",
-               "知道了",
-               ()=>{ store("horo-install-hint", "done"); hideBanner(); });
+    const device = installDeviceType();
+    if (!device.ios || !canShowInstallHint() || installHintDismissed()) return;
+    showInstallHint("點選分享按鈕 <b>⎋</b> → <b>加入主畫面</b>，即可像 App 一樣使用。",
+                    "知道了",
+                    dismissInstallHint);
   }
 
   /* 안드로이드 크롬 — 설치 배너를 직접 띄움 */
   let deferredInstall = null;
   window.addEventListener("beforeinstallprompt", (e)=>{
     e.preventDefault();
+    if (!canShowInstallHint() || installHintDismissed()) return;
     deferredInstall = e;
-    if (store("horo-install-hint") === "done") return;
-    showBanner("<b>安裝</b>到主畫面後，就能在場館直接開啟。",
-               "安裝",
-               async ()=>{
-                 hideBanner();
-                 store("horo-install-hint", "done");
-                 try { deferredInstall.prompt(); await deferredInstall.userChoice; } catch(err){}
-                 deferredInstall = null;
-               });
+    showInstallHint("<b>安裝</b>到主畫面後，就能在場館直接開啟。",
+                    "安裝",
+                    async ()=>{
+                      const promptEvent = deferredInstall;
+                      dismissInstallHint();
+                      deferredInstall = null;
+                      if (!promptEvent) return;
+                      try { promptEvent.prompt(); await promptEvent.userChoice; } catch(err){}
+                    });
   });
-  window.addEventListener("appinstalled", ()=>{ store("horo-install-hint", "done"); hideBanner(); });
+  window.addEventListener("appinstalled", dismissInstallHint);
 
   setTimeout(()=>{ updateOnlineState(); maybeShowInstallHint(); }, 1500);
 
