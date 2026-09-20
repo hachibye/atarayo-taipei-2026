@@ -2898,7 +2898,7 @@
         { time: 88.5, jp: "[clap]使った愛の手！ (ハイッ ハイッ)", ko: [{ text: "치츠캇타 아이노 테", tag: "clap"}, { text: " (하잇 하잇)", tag: "chant" }],               tr: "써 버렸지 사랑의 손길! (하잇 하잇)" },
         { time: 90, jp: "[clap]笑かしたbadなschemeを食ってしまう紳士",        ko: [{ text: "와라카시타 맛토나 스키-무오 쿳테 시마우 신시", tag: "clap" }],                                                     tr: "우스운 bad한 scheme까지 집어삼켜 버리는 신사" },
         { time: 92.5, jp: "[clap]フワァと立ちくらみ言葉を有し",        ko: [{ text: "후와-토 타치쿠라미 코토바오 유우시", tag: "clap" }],                                                     tr: "어질어질 휘청이며, 말을 지닌 채" },
-        { time: 94, jp: "[wave]CHAINSAW is 使える愛の手 (あ？なんだって？)", ko: [{ text: "체인소 이스 츠카에루 아이노 테", tag: "chant"}, { text: " (아 난닷테)"}],               tr: "써 버렸지 사랑의 손길! (하잇 하잇)" },
+        { time: 94, jp: "[wave]CHAINSAW is 使える愛の手 (あ？なんだって？)", ko: [{ text: "체인소 이스 츠카에루 아이노 테", tag: "chant"}, { text: " (아 난닷테)"}],               tr: "CHAINSAW is 쓸 수 있는 사랑의 손길 (어? 뭐라고?)" },
         { time: 97.5, jp: "[wave]見える雑踏は軽くcrackな始点",        ko: [{ text: "미에루 잣토-와 카루쿠 쿠락쿠나 시텐", tag: "chant" }],                                                     tr: "보이는 혼잡은 가볍게 crack한 시작점" },
         { time: 100.5, jp: "[wave]居ても泣いても立てぬflatな始点",        ko: [{ text: "이테모 나이테모 타테누 후렛토나 시텐", tag: "chant" }],                                                     tr: "있어도 울어도 서지 못한 flat한 시작점" },
         { time: 104, jp: "[wave]弾む鼓動は歪むclean toneで",        ko: [{ text: "하즈무 비-트와 히즈무 클린톤데", tag: "chant" }],                                                     tr: "튀는 고동은 일그러진 clean tone으로" },
@@ -4468,7 +4468,7 @@
   /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
      새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
      sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-  const BUILD = "v118";
+  const BUILD = "v120";
 
   /* 주소 뒤에 ?debug=1 을 붙이면 화면 위에 상태가 뜬다.
      "재생 중인 줄이 여러 개" 같은 문제가 폰에서만 날 때 원인을 보기 위한 것. */
@@ -6477,6 +6477,33 @@
       });
     }
 
+    /* 떼창만 듣기 중에는 가사를 옆으로 밀어 구간을 옮길 수 있다.
+       작은 ‹ › 단추를 정확히 누르지 않아도 되도록 — 화면을 덜 보고도 넘긴다.
+       · 세로로 넘기는 손짓과 헷갈리지 않게 가로로 충분히(70px), 그리고
+         세로 움직임보다 두 배 이상 많이 움직였을 때만 인정한다
+       · 왼쪽 가장자리에서 시작한 손짓은 브라우저 '뒤로 가기' 라 건드리지 않는다
+       · 떼창만 듣기가 꺼져 있을 때는 동작하지 않는다 (실수로 곡이 넘어가지 않도록) */
+    (function setupChantSwipe(){
+      const pane = songView.querySelector(".lyrics-pane");
+      if (!pane) return;
+      let x0 = 0, y0 = 0, on = false;
+      pane.addEventListener("touchstart", (e)=>{
+        if (!chantOnly || e.touches.length !== 1){ on = false; return; }
+        const t = e.touches[0];
+        if (t.clientX < 24 || t.clientX > window.innerWidth - 24){ on = false; return; }
+        x0 = t.clientX; y0 = t.clientY; on = true;
+      }, { passive:true });
+      pane.addEventListener("touchend", (e)=>{
+        if (!on) return;
+        on = false;
+        const t = e.changedTouches && e.changedTouches[0];
+        if (!t) return;
+        const dx = t.clientX - x0, dy = t.clientY - y0;
+        if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 2) return;
+        mediaSkip(dx < 0 ? 1 : -1);      // 왼쪽으로 밀면 다음, 오른쪽으로 밀면 이전
+      }, { passive:true });
+    })();
+
     // 가사 줄 탭 → 해당 위치로 이동 (목록이 바뀌어도 되도록 위임 방식)
     document.getElementById("lyrics-list").addEventListener("click", (e)=>{
       const btn = e.target.closest(".lyric-line");
@@ -6544,8 +6571,10 @@
       }
       const tag = (e.target && e.target.tagName || "").toLowerCase();
       if (tag === "input" || tag === "textarea") return;
-      if (e.key === "ArrowLeft")  document.getElementById("prev-song").click();
-      if (e.key === "ArrowRight") document.getElementById("next-song").click();
+      // 떼창만 듣기 중에는 구간 이동으로 (화면의 ‹ › 와 같은 동작).
+      // 방향키를 보내는 블루투스 리모컨·키보드에서도 그대로 쓸 수 있다.
+      if (e.key === "ArrowLeft"){  e.preventDefault(); chantOnly ? mediaSkip(-1) : document.getElementById("prev-song").click(); }
+      if (e.key === "ArrowRight"){ e.preventDefault(); chantOnly ? mediaSkip(1)  : document.getElementById("next-song").click(); }
     };
     document.addEventListener("keydown", songKeyHandler);
   }
@@ -6599,7 +6628,10 @@
       if (next)  next.disabled = true;
       return;
     }
-    if (msg) msg.textContent = chantDone ? "끝 — 재생을 누르면 처음부터" : "";
+    // 손가락으로 쓰는 기기에는 밀기 안내를, 키보드가 있는 기기에는 방향키 안내를
+    const touch = window.matchMedia && window.matchMedia("(hover: none)").matches;
+    if (msg) msg.textContent = chantDone ? "끝 — 재생을 누르면 처음부터"
+                             : (touch ? "옆으로 밀어 구간 이동" : "← → 로 구간 이동");
     if (count) count.textContent = Math.max(1, chantIdx + 1) + " / " + blocks.length;
     if (prev) prev.disabled = chantIdx <= 0;
     if (next) next.disabled = chantIdx >= blocks.length - 1;
@@ -6695,13 +6727,16 @@
               || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const SILENT_LOOP = "data:audio/wav;base64,UklGRsQPAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YaAPAACAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCBgIGAgYCB";
 
+  /* 아이폰에서는 기본적으로 시도하지 않지만, 주소 뒤에 ?mediakeys=1 을 붙이면
+     한 번 해 볼 수 있다. 부딪히면 2.5초 안에 스스로 물러나므로 시험해도 안전하다. */
+  const MEDIA_KEYS_FORCE = /[?&]mediakeys=1/.test(location.search);
   let mediaKeysOk   = true;    // 부딪힌 적이 있으면 false 로 내려간다
   let silentAudio   = null;
   let silentStarted = 0;       // 무음을 켠 시각 (부딪힘 판단용)
   let lastSelfPause = 0;       // 우리가 일부러 멈춘 시각
 
   function claimMediaKeys(){
-    if (IS_IOS || !mediaKeysOk) return;
+    if ((IS_IOS && !MEDIA_KEYS_FORCE) || !mediaKeysOk) return;
     try {
       if (!silentAudio){
         silentAudio = new Audio(SILENT_LOOP);
