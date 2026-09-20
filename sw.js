@@ -4,7 +4,7 @@
    ★ 가사나 화면을 고쳐서 다시 올릴 때는 아래 CACHE_VERSION 숫자를 꼭 올려 주세요.
      그래야 사람들 폰에 새 내용이 내려갑니다. (v1 → v2 → v3 …)
    ───────────────────────────────────────────────────────────── */
-const CACHE_VERSION = "v130";
+const CACHE_VERSION = "v131";
 const CACHE_NAME    = `horo-guide-${CACHE_VERSION}`;
 
 /* 처음 방문할 때 미리 받아 둘 파일들.
@@ -25,6 +25,7 @@ const PRECACHE = [
   "./images/poster-guide.jpg",
   "./images/poster-song.jpg",
   "./images/setlist-bg.jpg",
+  "./images/taipei-stage-map.webp",
 
   /* 공지 · 안내 이미지 (images/notice/) — 없는 파일은 그냥 건너뜁니다 */
   "./images/notice/01-venue-map.jpg",

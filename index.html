@@ -1783,9 +1783,8 @@
     border-radius:50%;font-size:14px;
   }
 
-  /* ── 좌석 배치도 ──────────────────────────────────────────────
-     그림 파일이 아니라 SVG 로 직접 그린다. 그래서 확대해도 깨지지 않고
-     인터넷이 없어도(공연장에서도) 그대로 열린다. */
+  /* ── 座位配置圖 ──────────────────────────────────────────────
+     台北場官方舞台／座位配置圖使用圖片顯示，點擊圖片可開啟原尺寸。 */
   .seat-wrap{
     margin:2px 0 0;
     border:1px solid var(--line);
@@ -1794,6 +1793,25 @@
     padding:12px 10px 10px;
   }
   .seat-map{ display:block;width:100%;height:auto; }
+  .seat-map-link{
+    display:block;
+    overflow:hidden;
+    border-radius:10px;
+    line-height:0;
+    background:#350000;
+  }
+  .seat-map-image{ display:block;width:100%;height:auto; }
+  .seat-map-link:focus-visible{
+    outline:2px solid var(--cream);
+    outline-offset:3px;
+  }
+  .seat-map-caption{
+    margin:8px 2px 0;
+    color:#a99579;
+    font-size:11.5px;
+    line-height:1.6;
+    text-align:center;
+  }
   .seat-map text{
     font-family:Pretendard,sans-serif;
     font-weight:700;
@@ -4438,7 +4456,7 @@
   /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
      새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
      sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-  const BUILD = "v130";
+  const BUILD = "v131";
 
   /* 주소 뒤에 ?debug=1 을 붙이면 화면 위에 상태가 뜬다.
      "재생 중인 줄이 여러 개" 같은 문제가 폰에서만 날 때 원인을 보기 위한 것. */
@@ -4537,9 +4555,9 @@
   }
 
   /* ---------------- HOME ---------------- */
-  /* ── 座位配置圖資料（目前不渲染，等待台北場官方座位圖） ──────────
-     台北場正式座位配置公布後，再以官方票區資料更新這組 SVG 座標。
-     在此之前不把其他場館的配置套用到台北小巨蛋。 */
+  /* ── 舊互動座位資料（目前不渲染） ──────────────────────────────
+     座位卡目前直接顯示台北場官方舞台／座位配置圖，避免把這組舊 SVG
+     區域資料誤當成最新官方配置。 */
   const SEAT_VIEW = { w: 630, h: 421, cx: 315, cy: 210 };
 
   /* 각 구역의 실제 도형.
@@ -5087,13 +5105,22 @@
             <div class="info-panel-inner">
               <div class="info-panel-title"><span class="bar">|</span> 台北小巨蛋 Taipei Arena <span class="bar">|</span></div>
 
-              <p class="way-note">台北場座位／站區配置請以 Ticket Plus 與主辦單位提供的<b>官方座位圖</b>為準。</p>
-              <p class="way-note">本站暫不顯示其他場次的座位示意圖，避免把不同場館的配置誤套到台北場。</p>
+              <p class="way-note">台北場最新官方舞台／座位配置圖：</p>
+              <div class="seat-wrap">
+                <a class="seat-map-link" href="./images/taipei-stage-map.webp" target="_blank" rel="noopener">
+                  <img class="seat-map-image" src="./images/taipei-stage-map.webp" alt="Vaundy ASIA ARENA TOUR 2026「HORO」台北場台北小巨蛋舞台與座位配置圖，含各區票價" loading="lazy" decoding="async">
+                </a>
+                <p class="seat-map-caption">點擊圖片可開啟原尺寸查看。</p>
+              </div>
+              <p class="way-note">圖中票價與票區依主辦單位公布的配置圖整理；實際座位、入場動線與現場安排仍以票券及演出當日公告為準。</p>
+              <a class="info-book-link" href="https://ticketplus.com.tw/activity/6c3d8c24e0f00c9c84777615c001bebe" target="_blank" rel="noopener">
+                ${EXT_LINK_SVG} 查看 Ticket Plus 售票頁面
+              </a>
               <a class="info-book-link" href="https://www.arena.taipei/" target="_blank" rel="noopener">
                 ${EXT_LINK_SVG} 前往台北小巨蛋官網
               </a>
 
-              <p class="info-footnote">※ 實際票區、座位與站區安排以票券及演出當日現場指示為準。</p>
+              <p class="info-footnote">※ 若主辦單位後續更新舞台、票區或票價，請以最新官方公告為準。</p>
             </div>
           </div>
         </div>
