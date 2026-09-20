@@ -1,8 +1,8 @@
 {
-  "name": "VAUNDY \"HORO\" SEOUL 응원가이드",
-  "short_name": "응원가이드",
-  "description": "VAUNDY ASIA ARENA TOUR 2026 \"HORO\" 서울 공연 응원 가이드 — 가사·떼창·박수·손 흔들기 포인트",
-  "lang": "ko",
+  "name": "VAUNDY \"HORO\" SEOUL 應援指南",
+  "short_name": "應援指南",
+  "description": "VAUNDY ASIA ARENA TOUR 2026 \"HORO\" 首爾演出應援指南 — 歌詞、大合唱、拍手與揮手重點",
+  "lang": "zh-Hant-TW",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

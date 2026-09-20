@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="zh-Hant-TW">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>VAUNDY ASIA ARENA TOUR 2026 "HORO" — SEOUL 응원가이드</title>
-<meta name="description" content="VAUNDY ASIA ARENA TOUR 2026 &quot;HORO&quot; 서울 공연 응원 가이드 — 곡별 가사와 떼창·박수·손 흔들기 포인트">
+<title>VAUNDY ASIA ARENA TOUR 2026 "HORO" — SEOUL 應援指南</title>
+<meta name="description" content="VAUNDY ASIA ARENA TOUR 2026 &quot;HORO&quot; 首爾演出應援指南 — 各曲歌詞與大合唱、拍手、揮手重點">
 <meta name="theme-color" content="#2a0a06">
 
 <!-- 홈 화면 설치(PWA) -->
@@ -14,12 +14,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="응원가이드">
+<meta name="apple-mobile-web-app-title" content="應援指南">
 
 <!-- 링크 공유용 -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="VAUNDY &quot;HORO&quot; SEOUL 응원가이드">
-<meta property="og:description" content="곡별 가사와 떼창·박수·손 흔들기 포인트를 영상에 맞춰 확인하세요">
+<meta property="og:title" content="VAUNDY &quot;HORO&quot; SEOUL 應援指南">
+<meta property="og:description" content="搭配影片確認各曲歌詞與大合唱、拍手、揮手重點">
 <meta property="og:image" content="./icon-512.png">
 <meta name="twitter:card" content="summary">
 <style>
@@ -705,7 +705,7 @@
     font-weight:700;
     color:#fff;
     white-space:normal;
-    word-break:keep-all;      /* 한글은 단어 단위로 줄바꿈 */
+    word-break:normal;
     line-height:1.4;
   }
   .info-table td.note{
@@ -713,7 +713,7 @@
     font-size:clamp(9px,2.5vw,11.5px);
     color:#b9a98a;
     white-space:normal;
-    word-break:keep-all;
+    word-break:normal;
     overflow-wrap:anywhere;
     line-height:1.45;
   }
@@ -1905,7 +1905,7 @@
     margin:0;
     color:var(--cream);opacity:.78;
     font-size:12.5px;line-height:1.66;
-    word-break:keep-all;
+    word-break:normal;
   }
   .home-note-body p.sub{
     margin-top:5px;
@@ -2627,26 +2627,26 @@
 
 <!-- 새 버전 안내 / 오프라인 안내 / 홈 화면 추가 안내가 여기에 뜹니다 -->
 <!-- 공지 이미지 크게 보기 -->
-<div class="notice-view" id="notice-view" role="dialog" aria-modal="true" aria-label="공지 이미지 크게 보기" aria-hidden="true" inert>
+<div class="notice-view" id="notice-view" role="dialog" aria-modal="true" aria-label="放大檢視公告圖片" aria-hidden="true" inert>
   <div class="nv-head">
     <span class="nv-title" id="nv-title"></span>
     <span class="nv-count" id="nv-count"></span>
-    <button class="nv-btn close" id="nv-close" aria-label="닫기">✕</button>
+    <button class="nv-btn close" id="nv-close" aria-label="關閉">✕</button>
   </div>
   <div class="nv-scroll" id="nv-scroll">
     <img id="nv-img" alt="" decoding="async">
   </div>
   <div class="nv-nav">
-    <button class="nv-btn" id="nv-prev">‹ 이전</button>
-    <button class="nv-btn" id="nv-zoom">확대</button>
-    <button class="nv-btn" id="nv-next">다음 ›</button>
+    <button class="nv-btn" id="nv-prev">‹ 上一張</button>
+    <button class="nv-btn" id="nv-zoom">放大</button>
+    <button class="nv-btn" id="nv-next">下一張 ›</button>
   </div>
 </div>
 
 <div class="app-banner" id="app-banner" role="status">
   <span class="msg" id="app-banner-msg"></span>
   <button type="button" id="app-banner-action"></button>
-  <button type="button" class="close" id="app-banner-close" aria-label="닫기">✕</button>
+  <button type="button" class="close" id="app-banner-close" aria-label="關閉">✕</button>
 </div>
 
 <script>
@@ -2654,22 +2654,22 @@
      (시각은 예매처 입장 안내 기준. 바꾸려면 이 표만 고치면 됩니다) */
   const SHOW_TIMELINE = {
     "2026-09-19": [
-      { t:"12:00", label:"티켓 · 스탠딩 · MD 부스 · 물품보관소 오픈" },
-      { t:"14:00", label:"아레나 로비 오픈 · 스탠딩 입장 대기" },
-      { t:"15:00", label:"공연장 입장 시작" },
-      { t:"16:30", label:"MD 부스 마감" },
-      { t:"17:00", label:"본 공연 시작" },
-      { t:"17:30", label:"티켓 부스 마감" },
-      { t:"20:00", label:"공연 종료 예정 · 물품보관소 마감" }
+      { t:"12:00", label:"票券・站席・MD 周邊攤位・行李寄放處開放" },
+      { t:"14:00", label:"Arena 大廳開放・等待站席入場" },
+      { t:"15:00", label:"開始進場" },
+      { t:"16:30", label:"MD 周邊攤位結束營業" },
+      { t:"17:00", label:"正式演出開始" },
+      { t:"17:30", label:"票券攤位結束營業" },
+      { t:"20:00", label:"預計演出結束・行李寄放處關閉" }
     ],
     "2026-09-20": [
-      { t:"11:00", label:"티켓 · 스탠딩 · MD 부스 · 물품보관소 오픈" },
-      { t:"13:00", label:"아레나 로비 오픈 · 스탠딩 입장 대기" },
-      { t:"14:00", label:"공연장 입장 시작" },
-      { t:"15:30", label:"MD 부스 마감" },
-      { t:"16:00", label:"본 공연 시작" },
-      { t:"16:30", label:"티켓 부스 마감" },
-      { t:"19:00", label:"공연 종료 예정 · 물품보관소 마감" }
+      { t:"11:00", label:"票券・站席・MD 周邊攤位・行李寄放處開放" },
+      { t:"13:00", label:"Arena 大廳開放・等待站席入場" },
+      { t:"14:00", label:"開始進場" },
+      { t:"15:30", label:"MD 周邊攤位結束營業" },
+      { t:"16:00", label:"正式演出開始" },
+      { t:"16:30", label:"票券攤位結束營業" },
+      { t:"19:00", label:"預計演出結束・行李寄放處關閉" }
     ]
   };
 
@@ -2738,36 +2738,36 @@
      · 새 공지가 나오면 한 줄만 더 적으면 됩니다.
      ───────────────────────────────────────────────────────────── */
   const NOTICES = [
-    { src: "./images/notice/01-venue-map.jpg",  title: "공연장 맵" },
-    { src: "./images/notice/02-id-check.jpg",   title: "본인확인" },
-    { src: "./images/notice/03-camera.jpg",     title: "카메라 반입 제한" },
-    { src: "./images/notice/04-md-sales.jpg",   title: "MD 현장판매" },
-    { src: "./images/notice/05-md-list.jpg",    title: "MD 목록" },
-    { src: "./images/notice/06-md-notice.jpg",  title: "현장 구매 유의사항" },
-    { src: "./images/notice/07-cd-sales.jpg",   title: "CD 현장판매" },
-    { src: "./images/notice/08-cd-bonus.jpg",   title: "CD 구매 특전" },
-    { src: "./images/notice/11-photo-booth.jpg", title: "포토 부스" },
+    { src: "./images/notice/01-venue-map.jpg",  title: "場館地圖" },
+    { src: "./images/notice/02-id-check.jpg",   title: "身分確認" },
+    { src: "./images/notice/03-camera.jpg",     title: "相機攜入限制" },
+    { src: "./images/notice/04-md-sales.jpg",   title: "MD 現場販售" },
+    { src: "./images/notice/05-md-list.jpg",    title: "MD 清單" },
+    { src: "./images/notice/06-md-notice.jpg",  title: "現場購買注意事項" },
+    { src: "./images/notice/07-cd-sales.jpg",   title: "CD 現場販售" },
+    { src: "./images/notice/08-cd-bonus.jpg",   title: "CD 購買特典" },
+    { src: "./images/notice/11-photo-booth.jpg", title: "拍照亭" },
     { src: "./images/notice/12-quick-bites.jpg", title: "F&B · VAUNDY CUP" },
-    { src: "./images/notice/13-sns-event.jpg",  title: "SNS 후기 이벤트" },
+    { src: "./images/notice/13-sns-event.jpg",  title: "SNS 感想活動" },
   ];
 
   /* VAWS 회원 티켓 카드 카드 안에서 보여 줄 사진 — 같은 images/notice/ 폴더를 씁니다 */
   const VAWS_PICS = [
-    { src: "./images/notice/10-vaws-card.jpg",  title: "VAWS 티켓 카드" },
-    { src: "./images/notice/09-vaws-booth.jpg", title: "VAWS 부스 위치" },
+    { src: "./images/notice/10-vaws-card.jpg",  title: "VAWS 票卡" },
+    { src: "./images/notice/09-vaws-booth.jpg", title: "VAWS 攤位位置" },
   ];
 
   const PICS = {
     /* 이름            파일 경로                              사진 아래 설명(없어도 됨) */
     "wave_jump":  { src: "./images/tips/wave_jump.gif",  caption: "jump" },
-    "wave_chain":  { src: "./images/tips/wave_chain.gif",  caption: "Hu Hu Hu Hu 에 맞춰" },
-    "wave_dada":  { src: "./images/tips/wave_dada.gif",  caption: "DA-DADADADA에 맞춰" },
-    "wave_turn":  { src: "./images/tips/wave_turn.gif",  caption: "손을 회전" },
-    "wave_rl":  { src: "./images/tips/wave_rl.gif",  caption: "좌우로 크게" },
-    "wave-basic":  { src: "./images/tips/wave-basic.gif",  caption: "양손 머리 위로 · 좌우로 크게" },
-    "wave-slow":   { src: "./images/tips/wave-slow.gif",   caption: "한 손으로 천천히" },
-    "clap-basic":  { src: "./images/tips/clap-basic.gif",  caption: "머리 위에서 박수" },
-    "jump":        { src: "./images/tips/jump.gif",        caption: "점프!" },
+    "wave_chain":  { src: "./images/tips/wave_chain.gif",  caption: "跟著 Hu Hu Hu Hu" },
+    "wave_dada":  { src: "./images/tips/wave_dada.gif",  caption: "跟著 DA-DADADADA" },
+    "wave_turn":  { src: "./images/tips/wave_turn.gif",  caption: "旋轉雙手" },
+    "wave_rl":  { src: "./images/tips/wave_rl.gif",  caption: "向左右大幅揮動" },
+    "wave-basic":  { src: "./images/tips/wave-basic.gif",  caption: "雙手舉過頭頂・向左右大幅揮動" },
+    "wave-slow":   { src: "./images/tips/wave-slow.gif",   caption: "單手慢慢揮動" },
+    "clap-basic":  { src: "./images/tips/clap-basic.gif",  caption: "在頭頂上方拍手" },
+    "jump":        { src: "./images/tips/jump.gif",        caption: "跳起來！" },
     /* ↓ 여기에 계속 추가하세요
     "이름":        { src: "./images/tips/파일이름.gif",     caption: "설명" },
     */
@@ -2776,7 +2776,7 @@
   const SONGS = [
     {
       id: "Tokimeki",
-      title: "두근거림 (Tokimeki)",
+      title: "心動 (Tokimeki)",
       youtubeId: "-_PKhPMXMDY", // ← 실제 유튜브 영상 ID로 교체
       lyrics: [
         { time: 0, jp: "[clap]目に映るのは 確かなときめきで光る魔法",        ko: [{ text: "메니 우츠루노와 타시카나 토키메키데 히카루\u00a0마호", tag: "clap" }],                                                     tr: "눈에 비치는 것은 확실한 두근거림으로 빛나는 마법" },
@@ -2817,7 +2817,7 @@
     },
     {
       id: "KaijuNoHanauta",
-      title: "괴수의 꽃노래 (怪獣の花唄)",
+      title: "怪獸之花歌 (怪獣の花唄)",
       youtubeId: "UM9XNpgrqVk",
       lyrics: [
        { time: 8, jp: "[clap]思い出すのは 君の歌",        ko: [{ text: "오모이다스노와 키미노 우타", tag: "clap" }],                                                     tr: "떠오르는 건 너의 노래" },
@@ -2929,7 +2929,7 @@
     },
     {
       id: "KoikazeniNosete",
-      title: "사랑 감기에 실려 (恋風邪にのせて)",
+      title: "乘著戀愛感冒 (恋風邪にのせて)",
       youtubeId: "1FIhcdocT-k",
       lyrics: [
         { time: 19,         ko: [{ text: "[clap]비트에 맞춰 박수", tag: "clap" }],                                                    },
@@ -2965,7 +2965,7 @@
     },
     {
       id: "Odoriko",
-      title: "무희 (踊り子)",
+      title: "舞者 (踊り子)",
       youtubeId: "7HgJIAUtICU",
       lyrics: [
         { time: 0,         ko: [{ text: "[clap]비트에 맞춰 박수", tag: "clap" }],                                                    },
@@ -3003,7 +3003,7 @@
     },
     {
       id: "HadakaNoYusha",
-      title: "벌거벗은 용사 (裸の勇者)",
+      title: "裸身勇者 (裸の勇者)",
       youtubeId: "FT0GKCuSaW0",
       lyrics: [
         { time: 0, jp: "[clap]誰かが変な涙を 飲み込んで 呑み込んでいる",        ko: [{ text: "다레카가 헨나 나미다오 노미콘데 노미콘데이루", tag: "clap" }],                                                     tr: "누군가가 이상한 눈물을 삼키고 삼키고 있어" },
@@ -3034,7 +3034,7 @@
     },
     {
       id: "Fukakouryoku",
-      title: "불가행력 (不可幸力)",
+      title: "不可幸力 (不可幸力)",
       youtubeId: "Gbz2C2gQREI",
       lyrics: [
         { time: 0,         ko: [{ text: "[clap]비트에 맞춰 박수", tag: "clap" }],                                                    },
@@ -3081,7 +3081,7 @@
     },
     {
       id: "Reunion",
-      title: "재회 (再会)",
+      title: "重逢 (再会)",
       youtubeId: "WcaSSvtHFeM",
       lyrics: [
         { time: 20.5,         ko: [{ text: "[clap]비트에 맞춰 박수", tag: "clap" }],                                                    },
@@ -3120,7 +3120,7 @@
     },
     {
       id: "hanaurana",
-      title: "꽃점 (花占い)",
+      title: "花占卜 (花占い)",
       youtubeId: "onhBN0qkUcE",
       lyrics: [
         { time: 1.5, jp: "[clap]街の夕焼けに溶けた僕たちはまだニ人だろうか",        ko: [{ text: "마치노 유-야케니 토케타 보쿠타치와 마다 후타리다로-카", tag: "clap"}],         tr: "거리의 노을에 녹아든 우리는 여전히 두 명이었을까" },
@@ -3163,7 +3163,7 @@
     },
     {
       id: "Yobigoe",
-      title: "부르는 소리 (呼び声)",
+      title: "呼喚聲 (呼び声)",
       youtubeId: "CI2x2aSi8aI",
       lyrics: [
         { time: 1, jp: "[clap]この惑星の真ん中で",        ko: [{ text: "코노 호시노 만나카데", tag: "clap"}],         tr: "이 별의 한가운데서" },
@@ -3214,7 +3214,7 @@
     },
     {
       id: "Tomoshibi",
-      title: "등불 (灯火)",
+      title: "燈火 (灯火)",
       youtubeId: "nrLZ-vTiQa4",
       lyrics: [
         { time: 10, jp: "[clap]単調な足音にメロディーを乗せたら",        ko: [{ text: "탄쵸-나 아시오토니 메로디-오 노세타라", tag: "clap"}],         tr: "단조로운 발소리에 멜로디를 실으면" },
@@ -3250,7 +3250,7 @@
     },
     {
       id: "HowdoIknow'",
-      title: "나는 어떻게 아는 걸까 (僕にはどうしてわかるんだろう)",
+      title: "我怎麼會知道呢 (僕にはどうしてわかるんだろう)",
       youtubeId: "x4aWXNWPrtY",
       lyrics: [
         { time: 28, jp: "今晩は降りる駅を変え僕の心に咲いていた",        ko: [{ text: "콘반와 오리루 에키오 카에 보쿠노 코코로니 사이테이타"}],         tr: "오늘밤은 내릴 역을 바꿔 내 마음에 피어있던" },
@@ -3292,7 +3292,7 @@
     },
     {
       id: "Shiwaawase'",
-      title: "주름맞추기 (しわあわせ)",
+      title: "皺褶相合 (しわあわせ)",
       youtubeId: "JwmGruvGt_I",
       lyrics: [
         { time: 35, jp: "僕の時価総額400円の心臓と",        ko: [{ text: "보쿠노 지카소가쿠 욘햐쿠엔노 신조토"}],         tr: "내 시가총액 400엔짜리 심장과" },
@@ -3332,7 +3332,7 @@
     },
     {
       id: "Homunculus",
-      title: "호문클루스 (ホムンクルス)",
+      title: "人造小人 (ホムンクルス)",
       youtubeId: "ZhUa0CumyxQ",
       lyrics: [
         { time: 8, ko: [{ text: "[wave]Oh-yeah, yeah-yeah-yeah x 3", tag: "chant"}]},
@@ -3410,7 +3410,7 @@
     },
     {
       id: "TokyoFlash",
-      title: "도쿄플래쉬 (東京フラッシュ)",
+      title: "東京 Flash (東京フラッシュ)",
       youtubeId: "SIuF37EWaLU",
       lyrics: [
         { time: 22.5, jp: "相槌がうまくなったんだできてるできてる",        ko: [{ text: "아이즈치가 우마쿠 낫탄다"}, { text: " 데키테루 데키테루", tag: "chant"}],         tr: "맞장구 치는 게 능숙해졌어 잘하고 있나 잘하고 있나" },
@@ -3452,7 +3452,7 @@
     },
     {
       id: "NakiJizo",
-      title: "우는 지장 (泣き地蔵)",
+      title: "哭泣地藏 (泣き地蔵)",
       youtubeId: "XQTM2M5iD_I",
       lyrics: [
         { time: 0,         ko: [{ text: "[clap]비트에 맞춰 박수", tag: "clap" }],                                                    },
@@ -3535,7 +3535,7 @@
     },
     {
       id: "Backlight",
-      title: "역광 (逆光)",
+      title: "逆光 (逆光)",
       youtubeId: "RhDxXvn6YaQ",
       lyrics: [
         { time: 27.5, jp: "[clap]散々な思い出は悲しみを穿つほど",        ko: [{ text: "산잔나 오모이데와 카나시미오 우가츠호도", tag: "clap" }],         tr: "지독한 추억은 슬픔을 꿰뚫을 만큼" },
@@ -3617,7 +3617,7 @@
     },
     {
       id: "ZuttoLoveSong",
-      title: "계속 러브송 (ずっとラブソング)",
+      title: "一直都是情歌 (ずっとラブソング)",
       youtubeId: "wriTi0J_-1A",
       lyrics: [
         { time: 14, jp: "いつかこの街ごと 消えてなくなること",        ko: [{ text: "이츠카 코노 마치고토 키에테 나쿠나루 코토"}],         tr: "언젠가 이 마을째로 사라져 없어질 거란걸" },
@@ -3662,7 +3662,7 @@
     },
     {
       id: "Iseijin'",
-      title: "위생인 (偉生人)",
+      title: "偉生人 (偉生人)",
       youtubeId: "aDaWuvpB_Kw",
       lyrics: [
         { time: 2, jp: "理想郷探した 誰より早く",        ko: [{ text: "리소오쿄오 사가시타 다레요리 하야쿠"}],         tr: "이상향을 찾아 헤맸어 누구보다 빨리" },
@@ -3758,7 +3758,7 @@
     },
     {
       id: "SonnaBitternaHanashi)",
-      title: "그런 bitter한 이야기 (そんなbitterな話)",
+      title: "那樣的 bitter 故事 (そんなbitterな話)",
       youtubeId: "V-gxqhWEbxI",
       lyrics: [
         { time: 19.5, jp: "思い出すようなmidnight",        ko: [{ text: "오모이 다스요오나 midnight"}],         tr: "생각이 날거같아 midnight" },
@@ -3807,7 +3807,7 @@
     },
     {
       id: "Fujin",
-      title: "풍신 (風神)",
+      title: "風神 (風神)",
       youtubeId: "yiU0I0tvt6s",
       lyrics: [
         { time: 13, jp: "[clap]よりも 「救いたい」 と悲劇を気取ってた",        ko: [{ text: "다레 요리모 스쿠이타이 토 히게키오 키돗테타", tag: "clap"}],         tr: "누구보다도 「구하고 싶다」 며 비극을 연기했어" },
@@ -3852,7 +3852,7 @@
     },
     {
       id: "Jonetsu",
-      title: "상열 (常熱)",
+      title: "常熱 (常熱)",
       youtubeId: "fxtQ4Dsmqo0",
       lyrics: [
         { time: 0,         ko: [{ text: "[clap]비트에 맞춰 박수", tag: "clap" }],                                                    },
@@ -3900,7 +3900,7 @@
     },
     {
       id: "Kagero",
-      title: "아지랑이 (かげろう)",
+      title: "陽炎 (かげろう)",
       youtubeId: "gY-7i-T76o0",
       lyrics: [
         { time: 10, jp: "焼かれて逃げ水追いかけては 追いつけない。",        ko: [{ text: "야카레테 니게미즈 오 오이카케테와 오이츠케나이"}],         tr: "타오르는 아지랑이를 쫓아가 봐도 끝내 닿을 수 없어" },
@@ -3943,7 +3943,7 @@
     },
     {
       id: "IdeagaAfureteNemurenai",
-      title: "이데아가 넘쳐서 잠들 수 없어 (イデアが溢れて眠れない)",
+      title: "理念滿溢而無法入睡 (イデアが溢れて眠れない)",
       youtubeId: "0u_zA8BJG6A",
       lyrics: [
         { time: 20.5, jp: "そこはかとなく 嫌いが勝つようになったね",        ko: [{ text: "소코와카토나쿠 키라이가 카츠요오니 낫타네"}],         tr: "왠지 모르게 싫은 감정이 앞서게 됐네" },
@@ -3995,7 +3995,7 @@
     },
     {
       id: "flyaway",
-      title: "날아오를 때 (飛ぶ時)",
+      title: "飛翔之時 (飛ぶ時)",
       youtubeId: "ARj1adoUoEU",
       lyrics: [
         { time: 0,         ko: [{ text: "[wave]비트에 맞춰 손흔들기"}],                                                    },
@@ -4048,7 +4048,7 @@
     },
     {
       id: "mabuta",
-      title: "눈꺼풀 (まぶた)",
+      title: "眼瞼 (まぶた)",
       youtubeId: "fjx_uy5eD8g",
       lyrics: [
         { time: 0,         ko: [{ text: "[clap]비트에 맞춰 박수", tag: "clap" }],                                                    },
@@ -4098,7 +4098,7 @@
     },
     {
       id: "Hitomibore",
-      title: "눈동자에 반함 (瞳惚れ)",
+      title: "為瞳孔著迷 (瞳惚れ)",
       youtubeId: "XEEXE8Ei5SA",
       lyrics: [
         { time: 0,         ko: [{ text: "[clap]비트에 맞춰 박수", tag: "clap" }],     },
@@ -4164,7 +4164,7 @@
     },
     {
       id: "SekainoHimitsu",
-      title: "세계의 비밀 (世界の秘密)",
+      title: "世界的秘密 (世界の秘密)",
       youtubeId: "xFoTFCHU70s",
       lyrics: [
         { time: 14,         ko: [{ text: "[clap]비트에 맞춰 박수", tag: "clap" }],     },
@@ -4218,7 +4218,7 @@
     },
     {
       id: "Wasuremono",
-      title: "잊어버린 것 (忘れ物)",
+      title: "遺忘之物 (忘れ物)",
       youtubeId: "tQq8C7irREk",
       lyrics: [
         { time: 15.5, jp: "僕らはきっと",        ko: [{ text: "보쿠라와 킷토"}],         tr: "우리들은 분명" },
@@ -4257,7 +4257,7 @@
     },
      {
       id: "Timeparadox",
-      title: "타임 패러독스 (タイムパラドックス)",
+      title: "時間悖論 (タイムパラドックス)",
       youtubeId: "ewhRE-BvJCg",
       lyrics: [
         { time: 11.5,         ko: [{ text: "[clap]비트에 맞춰 박수", tag: "clap" }],     },
@@ -4296,7 +4296,7 @@
     },
     {
       id: "TodomenoIchigeki",
-      title: "최후의 일격 (トドメの一撃)",
+      title: "最後一擊 (トドメの一撃)",
       youtubeId: "7xRWOylrLfI",
       lyrics: [
         { time: 7,         ko: [{ text: "[clap]비트에 맞춰 박수", tag: "clap" }],     },
@@ -4356,7 +4356,7 @@
     },
     {
       id: " Kimagure",
-      title: "변덕 (気まぐれ)",
+      title: "任性 (気まぐれ)",
       youtubeId: "uYyfD5A-w8Q",
       lyrics: [
         { time: 4.5, jp: "むせるほど、猛烈な",        ko: [{ text: "무세루 호도, 모-레츠나"}],         tr: "숨이 막힐 정도로, 맹렬한" },
@@ -4422,13 +4422,13 @@
      2026.09.05(토) · 09.06(일) 이틀 공연. songs 가 2개인 번호는 날짜별로
      곡이 달랐던 자리다. id 는 위 SONGS 의 id 와 같아야 곡 화면으로 넘어간다. */
   const SETLIST_TOKYO = {
-    label: "도쿄 공연",
-    dates: "2026.09.05 (토) · 09.06 (일)",
+    label: "東京演出",
+    dates: "2026.09.05（六）・09.06（日）",
     items: [
       { n:1,  songs:[{ id:"NakiJizo" }] },
       { n:2,  songs:[{ id:"Homunculus" }] },
       { n:3,  songs:[{ id:"HadakaNoYusha" }] },
-      { n:4,  songs:[{ id:"Reunion", day:"토" }, { id:"Backlight", day:"일" }] },
+      { n:4,  songs:[{ id:"Reunion", day:"六" }, { id:"Backlight", day:"日" }] },
       { n:5,  songs:[{ id:"Fukakouryoku" }] },
       { n:6,  songs:[{ id:"Fujin" }] },
       { n:7,  songs:[{ id:"SonnaBitternaHanashi)" }] },
@@ -4444,7 +4444,7 @@
       { n:17, songs:[{ id:"flyaway" }] },
       { n:18, songs:[{ id:"soramimi" }] },
       { n:19, songs:[{ id:"CHAINSAWBLOOD" }] },
-      { n:20, songs:[{ id:"Tokimeki", day:"토" }, { id:"hanaurana", day:"일" }] },
+      { n:20, songs:[{ id:"Tokimeki", day:"六" }, { id:"hanaurana", day:"日" }] },
       { n:21, songs:[{ id:"KaijuNoHanauta" }] },
       { n:22, songs:[{ id:"Odoriko" }] },
     ],
@@ -4468,7 +4468,7 @@
   /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
      새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
      sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-  const BUILD = "v121";
+  const BUILD = "v122";
 
   /* 주소 뒤에 ?debug=1 을 붙이면 화면 위에 상태가 뜬다.
      "재생 중인 줄이 여러 개" 같은 문제가 폰에서만 날 때 원인을 보기 위한 것. */
@@ -4517,9 +4517,9 @@
     document.querySelector('meta[name="theme-color"]').content = theme === "dark" ? "#151619" : "#f5f5f7";
     if (save) store("horo-theme", theme);
     document.querySelectorAll("[data-theme-toggle]").forEach(button => {
-      const label = theme === "dark" ? "라이트 모드" : "다크 모드";
+      const label = theme === "dark" ? "淺色模式" : "深色模式";
       button.textContent = label;
-      button.setAttribute("aria-label", `${label}로 전환`);
+      button.setAttribute("aria-label", `切換至${label}`);
     });
   }
   document.addEventListener("click", event => {
@@ -4636,19 +4636,19 @@
   ].map(a => ({ id: a[0], grade: a[1], x: a[2], y: a[3], pts: a[4] }));
 
   const SEAT_GRADE = {
-    floor: { label: "플로어 스탠딩",     cls: "floor" },
-    r:     { label: "R석 · 2층 지정석",  cls: "r" },
-    s:     { label: "S석 · 3층 지정석",  cls: "s" }
+    floor: { label: "Floor 站席",     cls: "floor" },
+    r:     { label: "R席・2樓指定席",  cls: "r" },
+    s:     { label: "S席・3樓指定席",  cls: "s" }
   };
 
-  const SEAT_HINT = "구역을 눌러 보세요. 어느 등급인지, 배치도에서 어디쯤인지 알려 드려요.";
+  const SEAT_HINT = "點選區域，查看座位等級與它在配置圖上的位置。";
 
   function seatBlockSvg(b){
     if (b.grade === "w")     return `<polygon class="seat-wheel" points="${b.pts}"></polygon>`;
     if (b.grade === "stage") return `<polygon class="seat-stage" points="${b.pts}"></polygon>`
                                   + `<text class="seat-stage-t" x="${b.x}" y="${b.y}">STAGE</text>`;
     const fs = b.grade === "floor" ? 30 : 16;
-    return `<g class="seat-blk ${b.grade}" data-id="${b.id}" role="button" tabindex="0" aria-label="${b.id}구역">`
+    return `<g class="seat-blk ${b.grade}" data-id="${b.id}" role="button" tabindex="0" aria-label="${b.id}區">`
          + `<polygon points="${b.pts}"></polygon>`
          + `<text x="${b.x}" y="${b.y}" font-size="${fs}">${b.id}</text>`
          + `</g>`;
@@ -4659,34 +4659,34 @@
     const order = (g) => g === "w" || g === "stage" ? 1 : 0;
     const list = SEAT_BLOCKS.slice().sort((a, b) => order(a.grade) - order(b.grade));
     return `<svg class="seat-map" viewBox="-5 -5 ${SEAT_VIEW.w + 10} ${SEAT_VIEW.h + 10}"`
-         + ` role="img" aria-label="인스파이어 아레나 좌석 배치도">`
+         + ` role="img" aria-label="Inspire Arena 座位配置圖">`
          + list.map(seatBlockSvg).join("")
          + `</svg>`;
   }
 
   /* 고른 구역이 배치도에서 어디쯤인지 말로 알려 준다 —
      무대가 한가운데라 '앞뒤'가 없으므로, 배치도 기준 여덟 방향으로 알려 준다. */
-  const SEAT_DIRS = ["위쪽","위쪽 오른편","오른편","아래쪽 오른편","아래쪽","아래쪽 왼편","왼편","위쪽 왼편"];
+  const SEAT_DIRS = ["上方","右上方","右側","右下方","下方","左下方","左側","左上方"];
   function seatWhere(b){
     const dx = b.x - SEAT_VIEW.cx, dy = b.y - SEAT_VIEW.cy;
     const deg = (Math.atan2(dy, dx) * 180 / Math.PI + 450) % 360;   // 0 = 위쪽, 시계 방향
-    return "배치도 " + SEAT_DIRS[Math.round(deg / 45) % 8];
+    return "配置圖的" + SEAT_DIRS[Math.round(deg / 45) % 8];
   }
 
   /* 플로어 구역별 스탠딩 대기장소 (공연장 맵 기준) */
-  const FLOOR_WAIT = { A:"서쪽", B:"서쪽", E:"서쪽", F:"서쪽",
-                       C:"북쪽", D:"북쪽", G:"북쪽", H:"북쪽" };
+  const FLOOR_WAIT = { A:"西側", B:"西側", E:"西側", F:"西側",
+                       C:"北側", D:"北側", G:"北側", H:"北側" };
 
   function seatReadoutHtml(b){
     const g = SEAT_GRADE[b.grade];
     const wait = FLOOR_WAIT[b.id];
     const tail = b.grade === "floor"
       ? (wait
-          ? `입장 전에는 <span class="hi">리조트 ${wait} 스탠딩 대기장소</span>로 가시면 돼요. 자세한 위치는 '공지 · 안내'의 공연장 맵을 봐 주세요.`
-          : "무대를 둘러싼 스탠딩 구역이에요. 입장 순서는 공연 당일 현장 안내를 따라 주세요.")
-      : `<span class="warn">A열 · B열은 안전 난간 때문에 시야가 조금 가릴 수 있어요.</span>`;
-    return `<span class="grade ${g.cls}">${g.label}</span><b>${escapeHtml(b.id)}구역</b> · ${seatWhere(b)}`
-         + `<br>${tail} <button type="button" class="seat-clear">선택 해제</button>`;
+          ? `入場前請前往 <span class="hi">渡假村${wait}側站席等候區</span>。詳細位置請查看「公告・指南」中的場館地圖。`
+          : "這是環繞舞台的站席區域。入場順序請依演出當天現場指示。")
+      : `<span class="warn">A 排・B 排可能因安全欄杆而有些許視線遮擋。</span>`;
+    return `<span class="grade ${g.cls}">${g.label}</span><b>${escapeHtml(b.id)}區</b>・${seatWhere(b)}`
+         + `<br>${tail} <button type="button" class="seat-clear">取消選取</button>`;
   }
 
   /* 카드 안 내용이 바뀌면 펼쳐진 높이를 다시 잡아 준다.
@@ -4822,7 +4822,7 @@
     if (prev) prev.disabled = viewIdx === 0;
     if (next) next.disabled = viewIdx === viewList.length - 1;
     if (view) view.classList.remove("zoom");
-    if (zoom) zoom.textContent = "확대";
+    if (zoom) zoom.textContent = "放大";
     if (scr){ scr.scrollTop = 0; scr.scrollLeft = 0; }
   }
 
@@ -4843,7 +4843,7 @@
 
     const toggleZoom = ()=>{
       const on = view.classList.toggle("zoom");
-      if (zoom) zoom.textContent = on ? "축소" : "확대";
+      if (zoom) zoom.textContent = on ? "縮小" : "放大";
       if (scr && on){
         // 확대하면 가운데가 보이도록
         scr.scrollLeft = (scr.scrollWidth - scr.clientWidth) / 2;
@@ -4954,11 +4954,11 @@
 
           <div class="show-meta">
             <div class="show-row">
-              <span class="show-day">09.19<span class="dow">SAT</span></span>
+              <span class="show-day">09.19<span class="dow">六</span></span>
               <span class="show-time">17:00</span>
             </div>
             <div class="show-row">
-              <span class="show-day">09.20<span class="dow">SUN</span></span>
+              <span class="show-day">09.20<span class="dow">日</span></span>
               <span class="show-time">16:00</span>
             </div>
             <div class="show-venue">INSPIRE ARENA, SEOUL</div>
@@ -4966,14 +4966,14 @@
 
           <!-- 공연 당일에만 나타나는 오늘의 일정 -->
           <div class="today-card" id="today-card" hidden>
-            <div class="today-head"><span class="dot"></span><span id="today-title">TODAY</span></div>
+            <div class="today-head"><span class="dot"></span><span id="today-title">今日</span></div>
             <div class="today-now" id="today-now"></div>
             <ul class="today-list" id="today-list"></ul>
           </div>
 
           <nav class="main-menu">
             <button class="menu-btn" id="guide-btn">
-              <span class="menu-btn-label">응원가이드</span>
+              <span class="menu-btn-label">應援指南</span>
             </button>
           </nav>
 
@@ -4982,64 +4982,64 @@
         <div class="info-card" id="info-card">
           <button class="menu-row info-toggle" id="info-toggle" aria-expanded="false" aria-controls="info-panel">
             <span class="info-toggle-icon">${INFO_SVG}</span>
-            <span class="info-toggle-label">공연 정보</span>
+            <span class="info-toggle-label">演出資訊</span>
             <span class="info-toggle-chevron">${CHEVRON_SVG}</span>
           </button>
           <div class="info-panel" id="info-panel" inert aria-hidden="true">
             <div class="info-panel-inner">
-              <div class="info-panel-title"><span class="bar">|</span> 공연 개요 <span class="bar">|</span></div>
+              <div class="info-panel-title"><span class="bar">|</span> 演出概要 <span class="bar">|</span></div>
               <dl class="info-facts">
-                <dt>공연명</dt>
+                <dt>演出名稱</dt>
                 <dd>Vaundy ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo; IN SEOUL</dd>
 
-                <dt>일시</dt>
+                <dt>日期／時間</dt>
                 <dd>
-                  <span class="em">2026.09.19(토) 17:00</span> / <span class="em">09.20(일) 16:00</span>
-                  <span class="sub">공연시간 약 120분</span>
+                  <span class="em">2026.09.19（六）17:00</span> ／ <span class="em">09.20（日）16:00</span>
+                  <span class="sub">演出時間約 120 分鐘</span>
                 </dd>
 
-                <dt>장소</dt>
+                <dt>地點</dt>
                 <dd>
-                  인스파이어 아레나
-                  <span class="sub">인천 중구 공항문화로 127</span>
+                  Inspire Arena
+                  <span class="sub">韓國仁川廣域市中區機場文化路 127 號</span>
                 </dd>
 
-                <dt>관람연령</dt>
+                <dt>觀賞年齡</dt>
                 <dd>
-                  만 7세 이상 (2019년생 이전)
-                  <span class="sub">만 13세 이하는 만 19세 이상 보호자 동반 입장</span>
+                  7 歲以上（2019 年以前出生）
+                  <span class="sub">13 歲以下須由 19 歲以上監護人陪同入場</span>
                 </dd>
 
-                <dt>티켓 가격</dt>
+                <dt>票價</dt>
                 <dd>
                   <p class="info-price">
-                    <span>스탠딩 165,000원</span>
-                    <span>R석 165,000원</span>
-                    <span>S석 154,000원</span>
+                    <span>站席 165,000 韓元</span>
+                    <span>R 席 165,000 韓元</span>
+                    <span>S 席 154,000 韓元</span>
                   </p>
-                  <span class="sub">예매 수수료 별도</span>
+                  <span class="sub">另收購票手續費</span>
                 </dd>
 
-                <dt>티켓 수령</dt>
+                <dt>取票方式</dt>
                 <dd>
-                  모바일 티켓만 제공
-                  <span class="sub">실물 티켓·배송·현장 수령 없음 / 선물하기 불가</span>
+                  僅提供電子票券
+                  <span class="sub">無實體票、配送或現場取票／不可贈送</span>
                 </dd>
 
-                <dt>예매</dt>
+                <dt>購票</dt>
                 <dd>
-                  NOL 티켓
-                  <span class="sub">본인인증 필요 · 예매자와 관람자 정보 일치 / 문의 1544-1555 (매일 09:00~18:00)</span>
+                  NOL Ticket
+                  <span class="sub">須完成身分認證・購票者與觀眾資料需一致／洽詢 1544-1555（每日 09:00～18:00）</span>
                 </dd>
               </dl>
 
               <a class="info-book-link" href="https://tickets.interpark.com/goods/26003199" target="_blank" rel="noopener">
-                ${EXT_LINK_SVG} NOL 예매 페이지에서 보기
+                ${EXT_LINK_SVG} 前往 NOL 購票頁面
               </a>
 
               <hr class="info-divider">
 
-              <div class="info-panel-title"><span class="bar">|</span> 관객 입장안내 <span class="bar">|</span></div>
+              <div class="info-panel-title"><span class="bar">|</span> 觀眾入場資訊 <span class="bar">|</span></div>
               <div class="info-table-wrap">
                 <table class="info-table">
                   <colgroup>
@@ -5050,59 +5050,59 @@
                   </colgroup>
                   <thead>
                     <tr>
-                      <th>일정</th>
-                      <th>9/19(토)</th>
-                      <th>9/20(일)</th>
-                      <th>비고</th>
+                      <th>項目</th>
+                      <th>9/19（六）</th>
+                      <th>9/20（日）</th>
+                      <th>備註</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td class="label" data-label="일정">티켓 부스, 스탠딩 부스</td>
-                      <td data-label="9/19(토)">12:00 ~ 17:30</td>
-                      <td data-label="9/20(일)">11:00 ~ 16:30</td>
-                      <td class="note" data-label="비고">공연시작 5시간 전 - 공연시작 후 30분까지</td>
+                      <td class="label" data-label="項目">票券攤位、站席攤位</td>
+                      <td data-label="9/19（六）">12:00 ～ 17:30</td>
+                      <td data-label="9/20（日）">11:00 ～ 16:30</td>
+                      <td class="note" data-label="備註">演出開始前 5 小時～演出開始後 30 分鐘</td>
                     </tr>
                     <tr>
-                      <td class="label" data-label="일정">MD 부스</td>
-                      <td data-label="9/19(토)">12:00 ~ 16:30</td>
-                      <td data-label="9/20(일)">11:00 ~ 15:30</td>
-                      <td class="note" data-label="비고">공연시작 5시간 전 - 공연시작 30분 전까지</td>
+                      <td class="label" data-label="項目">MD 周邊攤位</td>
+                      <td data-label="9/19（六）">12:00 ～ 16:30</td>
+                      <td data-label="9/20（日）">11:00 ～ 15:30</td>
+                      <td class="note" data-label="備註">演出開始前 5 小時～演出開始前 30 分鐘</td>
                     </tr>
                     <tr>
-                      <td class="label" data-label="일정">물품보관소</td>
-                      <td data-label="9/19(토)">12:00 ~ 20:00</td>
-                      <td data-label="9/20(일)">11:00 ~ 19:00</td>
-                      <td class="note" data-label="비고">공연시작 5시간 전 - 공연 종료 후까지</td>
+                      <td class="label" data-label="項目">行李寄放處</td>
+                      <td data-label="9/19（六）">12:00 ～ 20:00</td>
+                      <td data-label="9/20（日）">11:00 ～ 19:00</td>
+                      <td class="note" data-label="備註">演出開始前 5 小時～演出結束後</td>
                     </tr>
                     <tr>
-                      <td class="label" data-label="일정">아레나 로비 오픈</td>
-                      <td data-label="9/19(토)">14:00 ~</td>
-                      <td data-label="9/20(일)">13:00 ~</td>
-                      <td class="note" data-label="비고">공연시작 3시간 전</td>
+                      <td class="label" data-label="項目">Arena 大廳開放</td>
+                      <td data-label="9/19（六）">14:00 起</td>
+                      <td data-label="9/20（日）">13:00 起</td>
+                      <td class="note" data-label="備註">演出開始前 3 小時</td>
                     </tr>
                     <tr>
-                      <td class="label" data-label="일정">스탠딩석 입장 대기</td>
-                      <td data-label="9/19(토)">14:00 ~</td>
-                      <td data-label="9/20(일)">13:00 ~</td>
-                      <td class="note" data-label="비고">공연시작 3시간 전</td>
+                      <td class="label" data-label="項目">站席入場等候</td>
+                      <td data-label="9/19（六）">14:00 起</td>
+                      <td data-label="9/20（日）">13:00 起</td>
+                      <td class="note" data-label="備註">演出開始前 3 小時</td>
                     </tr>
                     <tr>
-                      <td class="label" data-label="일정">공연장 입장</td>
-                      <td data-label="9/19(토)">15:00 ~</td>
-                      <td data-label="9/20(일)">14:00 ~</td>
-                      <td class="note" data-label="비고">공연시작 2시간 전</td>
+                      <td class="label" data-label="項目">入場</td>
+                      <td data-label="9/19（六）">15:00 起</td>
+                      <td data-label="9/20（日）">14:00 起</td>
+                      <td class="note" data-label="備註">演出開始前 2 小時</td>
                     </tr>
                     <tr>
-                      <td class="label" data-label="일정">본 공연</td>
-                      <td data-label="9/19(토)">17:00 ~</td>
-                      <td data-label="9/20(일)">16:00 ~</td>
-                      <td class="note" data-label="비고">공연시간 120분</td>
+                      <td class="label" data-label="項目">正式演出</td>
+                      <td data-label="9/19（六）">17:00 起</td>
+                      <td data-label="9/20（日）">16:00 起</td>
+                      <td class="note" data-label="備註">演出時間 120 分鐘</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
-              <p class="info-footnote">※ 운영 시간은 당일 현장 상황에 따라 변동될 수 있습니다.<br>※ 공연 정보는 예매처(NOL 티켓) 기준이며, 최신 내용은 예매 페이지에서 확인해 주세요.</p>
+              <p class="info-footnote">※ 營運時間可能依演出當天現場狀況調整。<br>※ 演出資訊以購票平台（NOL Ticket）為準，最新內容請至購票頁面確認。</p>
 
 
 
@@ -5113,17 +5113,17 @@
         <div class="info-card" id="notice-card">
           <button class="menu-row info-toggle" aria-expanded="false">
             <span class="info-toggle-icon">${NOTICE_SVG}</span>
-            <span class="info-toggle-label">공지 · 안내</span>
+            <span class="info-toggle-label">公告・指南</span>
             <span class="info-toggle-chevron">${CHEVRON_SVG}</span>
           </button>
           <div class="info-panel" inert aria-hidden="true">
             <div class="info-panel-inner">
-              <p class="way-note">공연장 맵 · MD · 본인확인 등 <b>공식 공지</b>입니다. <b>탭하면 크게</b> 볼 수 있어요.</p>
+              <p class="way-note">這裡是場館地圖、MD、身分確認等<b>官方公告</b>。<b>點選即可放大</b>查看。</p>
               <div class="notice-grid" id="notice-grid"></div>
               <p class="notice-empty" id="notice-empty" hidden>
-                공지 이미지가 아직 없어요.<br><b>images/notice/</b> 폴더에 파일을 넣어 주세요.
+                目前還沒有公告圖片。<br>請將檔案放入 <b>images/notice/</b> 資料夾。
               </p>
-              <p class="info-footnote">※ 공식 공지 이미지 그대로입니다. 운영은 당일 현장 상황에 따라 달라질 수 있습니다.</p>
+              <p class="info-footnote">※ 圖片為官方公告原圖。實際安排可能依演出當天現場狀況調整。</p>
             </div>
           </div>
         </div>
@@ -5131,27 +5131,27 @@
         <div class="info-card" id="seat-card">
           <button class="menu-row info-toggle" aria-expanded="false">
             <span class="info-toggle-icon">${SEAT_SVG}</span>
-            <span class="info-toggle-label">좌석 배치도</span>
+            <span class="info-toggle-label">座位配置圖</span>
             <span class="info-toggle-chevron">${CHEVRON_SVG}</span>
           </button>
           <div class="info-panel" inert aria-hidden="true">
             <div class="info-panel-inner">
-              <div class="info-panel-title"><span class="bar">|</span> 인스파이어 아레나 <span class="bar">|</span></div>
+              <div class="info-panel-title"><span class="bar">|</span> Inspire Arena <span class="bar">|</span></div>
 
-              <p class="way-note">무대가 <b>한가운데</b> 있는 360도 배치입니다. 플로어 스탠딩 <b>A~H</b> 구역이 무대를 빙 둘러싸고, 그 바깥을 <b>2층 R석(201~220)</b> 과 <b>3층 S석(308~320)</b> 이 감쌉니다.</p>
+              <p class="way-note">舞台位於<b>正中央</b>，為 360 度配置。Floor 站席 <b>A～H</b> 區環繞舞台，外圍則是<b>二樓 R 席（201～220）</b>與<b>三樓 S 席（308～320）</b>。</p>
 
               <div class="seat-wrap">
                 ${seatMapSvg()}
                 <div class="seat-legend">
-                  <span><i style="background:#e2543a"></i>플로어 스탠딩</span>
-                  <span><i style="background:#e0b452"></i>R석 (2층)</span>
-                  <span><i style="background:#5ecdc4"></i>S석 (3층)</span>
-                  <span><i style="background:#9b7ad6"></i>휠체어석 (2층)</span>
+                  <span><i style="background:#e2543a"></i>Floor 站席</span>
+                  <span><i style="background:#e0b452"></i>R 席（二樓）</span>
+                  <span><i style="background:#5ecdc4"></i>S 席（三樓）</span>
+                  <span><i style="background:#9b7ad6"></i>輪椅席（二樓）</span>
                 </div>
                 <div class="seat-readout" id="seat-readout"></div>
               </div>
 
-              <p class="info-footnote">※ 예매처 좌석배치도의 구역 모양을 그대로 옮겨 사이트 색으로 다시 그린 그림입니다.<br>※ 무대 구성은 사전 공지 없이 변경될 수 있습니다. 정확한 내 좌석은 예매 내역에서 확인해 주세요.</p>
+              <p class="info-footnote">※ 本圖依購票平台座位配置圖的區域形狀重新繪製，並套用本網站配色。<br>※ 舞台配置可能未經事前公告而變更；確切座位請以購票紀錄為準。</p>
             </div>
           </div>
         </div>
@@ -5159,63 +5159,63 @@
         <div class="info-card" id="way-card">
           <button class="menu-row info-toggle" aria-expanded="false">
             <span class="info-toggle-icon">${MAP_SVG}</span>
-            <span class="info-toggle-label">가는 길</span>
+            <span class="info-toggle-label">交通方式</span>
             <span class="info-toggle-chevron">${CHEVRON_SVG}</span>
           </button>
           <div class="info-panel" inert aria-hidden="true">
             <div class="info-panel-inner">
               <div class="way-addr">
-                <b>인스파이어 아레나</b>
-                <span>인천 중구 공항문화로 127</span>
+                <b>Inspire Arena</b>
+                <span>韓國仁川廣域市中區機場文化路 127 號</span>
               </div>
               <div class="way-btns">
-                <a href="https://map.kakao.com/link/search/%EC%9D%B8%EC%8A%A4%ED%8C%8C%EC%9D%B4%EC%96%B4%20%EC%95%84%EB%A0%88%EB%82%98" target="_blank" rel="noopener">카카오맵</a>
-                <a href="https://map.naver.com/p/search/%EC%9D%B8%EC%8A%A4%ED%8C%8C%EC%9D%B4%EC%96%B4%20%EC%95%84%EB%A0%88%EB%82%98" target="_blank" rel="noopener">네이버지도</a>
-                <a href="https://www.google.com/maps/search/?api=1&query=Inspire+Arena+Incheon" target="_blank" rel="noopener">구글맵</a>
-                <button type="button" id="copy-addr">주소 복사</button>
+                <a href="https://map.kakao.com/link/search/%EC%9D%B8%EC%8A%A4%ED%8C%8C%EC%9D%B4%EC%96%B4%20%EC%95%84%EB%A0%88%EB%82%98" target="_blank" rel="noopener">Kakao 地圖</a>
+                <a href="https://map.naver.com/p/search/%EC%9D%B8%EC%8A%A4%ED%8C%8C%EC%9D%B4%EC%96%B4%20%EC%95%84%EB%A0%88%EB%82%98" target="_blank" rel="noopener">NAVER 地圖</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=Inspire+Arena+Incheon" target="_blank" rel="noopener">Google 地圖</a>
+                <button type="button" id="copy-addr">複製地址</button>
               </div>
 
-              <p class="way-note">공연 당일 공연장 주변 교통 혼잡이 예상되고 입장에도 시간이 걸립니다. <b>여유 있게 도착해 주세요.</b></p>
+              <p class="way-note">演出當天場館周邊預計交通壅塞，入場也需要時間。請<b>預留充裕時間抵達</b>。</p>
 
               <div class="way-sec">
-                <h4>무료 셔틀 <span>지하철 이용 시</span></h4>
+                <h4>免費接駁車 <span>搭乘地鐵時</span></h4>
 
                 <div class="way-block">
-                  <div class="way-block-t">① 올 때 — 공항철도 <b>화물청사역</b> → 아레나</div>
+                  <div class="way-block-t">① 前往場館 — 機場鐵路<b>貨物航廈站</b> → Arena</div>
                   <ul class="way-ul">
-                    <li>화물청사역 <b>2번 출구</b> 앞에서 아레나 전용 무료 순환 셔틀 탑승</li>
-                    <li>운영 <b>공연 시작 5시간 전 ~ 공연 시작</b>
-                      <span class="way-hint">9/19(토) 12:00~17:00 · 9/20(일) 11:00~16:00</span></li>
-                    <li>약 10~15분 소요 · <b>20분 간격</b> 배차 (현장 상황에 따라 탄력 운영)</li>
+                    <li>於貨物航廈站<b> 2 號出口</b>前搭乘 Arena 專用免費循環接駁車</li>
+                    <li>營運時間：<b>演出開始前 5 小時～演出開始</b>
+                      <span class="way-hint">9/19（六）12:00～17:00・9/20（日）11:00～16:00</span></li>
+                    <li>車程約 10～15 分鐘・<b>每 20 分鐘</b>一班（依現場狀況彈性調整）</li>
                   </ul>
                 </div>
 
                 <div class="way-block">
-                  <div class="way-block-t">② 갈 때 — 아레나 → 인천공항 <b>제2여객터미널</b></div>
+                  <div class="way-block-t">② 返回 — Arena → 仁川機場<b>第二航廈</b></div>
                   <ul class="way-ul">
-                    <li>아레나 외부 별도 장소에서 탑승 (안내문·직원 안내를 따라 주세요)</li>
-                    <li>운영 <b>공연 종료 ~ 종료 1시간 30분 후</b>까지</li>
-                    <li>귀가 시 탑승까지 <b>30분 이상</b> 대기가 생길 수 있습니다</li>
+                    <li>於 Arena 外部指定地點搭乘（請依公告與工作人員指示）</li>
+                    <li>營運至<b>演出結束～結束後 1 小時 30 分鐘</b></li>
+                    <li>返程時可能需要等候<b> 30 分鐘以上</b>才能上車</li>
                   </ul>
                 </div>
 
                 <ul class="way-ul warn">
-                  <li>주차장이 협소하고 주변 교통이 혼잡해 주차가 어려울 수 있으니 가급적 셔틀을 이용해 주세요.</li>
-                  <li>교통 상황·주차로 관람이 지연되어도 티켓 변경·환불은 불가합니다.</li>
-                  <li>도로 사정에 따라 운영이 지연될 수 있으니 시간 여유를 두고 이용해 주세요.</li>
+                  <li>停車場空間有限且周邊交通壅塞，可能難以停車，請盡量搭乘接駁車。</li>
+                  <li>即使因交通或停車導致觀賞延誤，也無法更改或退款。</li>
+                  <li>接駁車可能因道路狀況延誤，請預留充裕時間。</li>
                 </ul>
               </div>
 
               <div class="way-sec">
-                <h4>주차</h4>
+                <h4>停車</h4>
                 <ul class="way-ul">
-                  <li>인스파이어 엔터테인먼트 리조트 내 주차장</li>
-                  <li>공연 관람객 <b>1일 주차 무료</b> — 아레나 로비의 QR코드로 사전 등록 가능</li>
-                  <li>휠체어석 관객은 리조트 내 장애인 주차 공간을 이용해 주세요</li>
+                  <li>Inspire Entertainment Resort 內停車場</li>
+                  <li>演出觀眾<b>當日免費停車</b>・可用 Arena 大廳的 QR 碼事前登錄</li>
+                  <li>輪椅席觀眾請使用渡假村內的身心障礙停車位</li>
                 </ul>
               </div>
 
-              <p class="info-footnote">※ 지도 앱은 인터넷 연결이 필요합니다.<br>※ 셔틀·주차 안내는 예매처 공지 기준이며 현장 상황에 따라 달라질 수 있습니다.</p>
+              <p class="info-footnote">※ 地圖 App 需要網路連線。<br>※ 接駁車與停車資訊以購票平台公告為準，可能依現場狀況調整。</p>
             </div>
           </div>
         </div>
@@ -5223,52 +5223,52 @@
         <div class="info-card" id="manner-card">
           <button class="menu-row info-toggle" aria-expanded="false">
             <span class="info-toggle-icon">${MANNER_SVG}</span>
-            <span class="info-toggle-label">응원 매너 · 처음이라면</span>
+            <span class="info-toggle-label">應援禮儀・第一次參加</span>
             <span class="info-toggle-chevron">${CHEVRON_SVG}</span>
           </button>
           <div class="info-panel" inert aria-hidden="true">
             <div class="info-panel-inner">
 
-              <p class="way-note">콜을 몰라도 괜찮습니다. <b>응원은 의무가 아니에요.</b> 이 가이드는 &ldquo;알면 더 재미있는 것&rdquo;을 모아 둔 것이지, 외워 가야 하는 숙제가 아닙니다. 가만히 서서 들어도 훌륭한 관람이에요.</p>
+              <p class="way-note">不知道應援口號也沒關係。<b>應援不是義務。</b>這份指南整理的是「知道後會更有趣的事」，不是必須背熟的作業。安靜站著欣賞也很棒。</p>
 
               <div class="way-sec">
-                <h4>처음이라면 <span>이것만 알면 충분</span></h4>
+                <h4>第一次參加 <span>知道這些就足夠</span></h4>
                 <ul class="way-ul">
-                  <li><b>다 따라 하지 않아도 됩니다.</b> 아는 곡의 아는 부분만 함께해도 충분히 즐거워요</li>
-                  <li>일본어를 못해도 괜찮습니다 — 떼창은 대부분 <b>&ldquo;Hu Hu&rdquo;, &ldquo;DA-DA-DA&rdquo;</b> 같은 소리라 발음만 알면 됩니다</li>
-                  <li>이 가이드의 동작은 전부 <b>맨손</b>으로 하는 것들입니다. 따로 챙길 응원 도구는 없어요</li>
-                  <li>주변에서 하는 걸 한 박자 늦게 따라가도 전혀 이상하지 않습니다</li>
-                  <li>공연장은 데이터가 잘 안 터집니다. <b>집에서 이 페이지를 미리 한 번 열어 두세요</b> — 가사가 폰에 저장돼 인터넷 없이도 열립니다</li>
+                  <li><b>不用全部跟著做。</b>只要在熟悉的歌曲、熟悉的段落一起應援，就能玩得很開心</li>
+                  <li>不會日文也沒關係・大合唱多半是<b>「Hu Hu」、「DA-DA-DA」</b>這類聲音，記住發音就可以</li>
+                  <li>本指南的動作全部都是<b>徒手</b>完成，不需要另外準備應援物品</li>
+                  <li>晚一拍跟著周圍的人做也完全不奇怪</li>
+                  <li>場館內網路訊號可能不穩。請<b>在家先開啟一次這個頁面</b>・歌詞會儲存在手機裡，沒有網路也能查看</li>
                 </ul>
               </div>
 
               <div class="way-sec">
-                <h4>함께 지켜요 <span>모두의 관람을 위해</span></h4>
+                <h4>一起遵守 <span>為了大家的觀賞體驗</span></h4>
                 <ul class="way-ul warn">
-                  <li><b>촬영 · 녹음 · 녹화는 금지</b>입니다. 촬영 허용 구간이 있으면 현장에서 따로 안내됩니다</li>
-                  <li>공연 중 <b>휴대폰 화면 밝기를 낮춰</b> 주세요. 어두운 객석에서 밝은 화면은 뒷사람에게 매우 잘 보입니다</li>
-                  <li><b>폰 플래시(폰 반딧불)는 지양</b>해 주세요. 조명이 다 꺼진 순간까지 계산해서 만든 연출이라, 객석에서 켠 불빛 하나가 무대 조명과 어우러지지 못하고 그 장면을 흐트러뜨립니다
-                    <span class="way-hint">다 같이 불빛을 드는 순서가 있다면 공연 중에 따로 안내됩니다</span></li>
-                  <li>조용한 곡 · 어쿠스틱 구간에서는 <b>콜과 함성을 자제</b>해 주세요. 노래를 듣고 싶어 온 사람도 많습니다</li>
-                  <li>손을 머리 위로 크게 흔들 때는 <b>옆·뒷사람 시야</b>를 한 번 살펴 주세요</li>
-                  <li>공연 중 옆 사람과의 대화, 곡 해설은 끝나고 나눠 주세요</li>
-                  <li>높은 모자 · 부풀린 머리는 뒷사람 시야를 가립니다</li>
-                  <li>향이 강한 향수는 밀집된 공간에서 힘들어하는 사람이 있습니다</li>
+                  <li><b>禁止拍攝・錄音・錄影。</b>若有允許拍攝的段落，現場會另行通知</li>
+                  <li>演出中請<b>調低手機螢幕亮度</b>。昏暗觀眾席中的亮螢幕，後方觀眾會看得非常清楚</li>
+                  <li>請<b>避免使用手機閃光燈（手機螢火蟲）</b>。舞台演出連燈光完全熄滅的瞬間都經過設計，觀眾席的一道光可能破壞那個畫面
+                    <span class="way-hint">若有全場一起舉燈的安排，演出中會另行通知</span></li>
+                  <li>安靜歌曲・原聲樂段請<b>克制口號與歡呼</b>，很多人是來聽歌的</li>
+                  <li>把手大幅揮過頭頂時，請留意<b>左右與後方觀眾的視線</b></li>
+                  <li>演出中的交談與歌曲解說，請留到曲目結束後再分享</li>
+                  <li>高帽子・蓬鬆髮型可能遮擋後方觀眾視線</li>
+                  <li>在人潮密集的空間裡，氣味強烈的香水可能讓他人感到不適</li>
                 </ul>
               </div>
 
               <div class="way-sec">
-                <h4>스탠딩석이라면</h4>
+                <h4>如果是站席</h4>
                 <ul class="way-ul">
-                  <li><b>앞으로 밀지 않기.</b> 뒤에서 미는 힘은 앞줄에 그대로 쌓입니다</li>
-                  <li>큰 가방은 <b>물품보관소</b>에 — 발밑에 두면 넘어짐 사고로 이어집니다</li>
-                  <li>주변에서 누가 넘어지면 밀지 말고 <b>멈춰서 일으켜</b> 주세요</li>
-                  <li>입장 전에 물 한 번, 화장실 한 번. 2시간 동안 서 있습니다</li>
-                  <li>숨이 차거나 어지러우면 참지 말고 <b>가까운 스태프</b>에게 알려 주세요</li>
+                  <li><b>不要往前推。</b>後方推擠的力量會直接累積到前排</li>
+                  <li>大包包請放進<b>行李寄放處</b>・放在腳邊可能導致跌倒</li>
+                  <li>如果周圍有人跌倒，請不要推擠，<b>停下來扶起對方</b></li>
+                  <li>入場前先喝水、先上洗手間，因為要站立 2 小時</li>
+                  <li>若呼吸急促或頭暈，請不要勉強，告知<b>附近的工作人員</b></li>
                 </ul>
               </div>
 
-              <p class="info-footnote">※ 팬이 만든 안내입니다. 촬영·반입·재입장 등 공식 규정은 예매처(NOL 티켓) 공지와 <b>공연 당일 현장 안내</b>가 우선합니다.</p>
+              <p class="info-footnote">※ 本指南由粉絲製作。拍攝、攜入、再次入場等官方規定，以購票平台（NOL Ticket）公告與<b>演出當天現場指示</b>為準。</p>
             </div>
           </div>
         </div>
@@ -5276,37 +5276,37 @@
         <div class="info-card" id="vaws-card">
           <button class="menu-row info-toggle" aria-expanded="false">
             <span class="info-toggle-icon">${GIFT_SVG}</span>
-            <span class="info-toggle-label">VAWS 회원 티켓 카드</span>
+            <span class="info-toggle-label">VAWS 會員票卡</span>
             <span class="info-toggle-chevron">${CHEVRON_SVG}</span>
           </button>
           <div class="info-panel" inert aria-hidden="true">
             <div class="info-panel-inner">
-              <div class="info-panel-title"><span class="bar">|</span> 공연장 한정 특전 <span class="bar">|</span></div>
+              <div class="info-panel-title"><span class="bar">|</span> 場館限定特典 <span class="bar">|</span></div>
 
-              <p class="way-note">Vaundy 공식 팬클럽 <b>VAWS MEMBERS</b> 회원에게 <b>공연별 오리지널 티켓 카드</b>를 현장에서 무료로 나눠 줍니다. 공연일마다 디자인이 다른 공연장 한정 특전입니다.</p>
+              <p class="way-note">Vaundy 官方粉絲俱樂部 <b>VAWS MEMBERS</b> 會員可在現場免費領取<b>每場演出專屬原創票卡</b>。這是每個演出日設計不同的場館限定特典。</p>
 
               <dl class="info-facts">
-                <dt>특전</dt>
+                <dt>特典</dt>
                 <dd>
-                  공연별 오리지널 티켓 카드 1매
-                  <span class="sub">공연일마다 디자인 상이 · 공연장 한정</span>
+                  每場演出專屬原創票卡 1 張
+                  <span class="sub">每個演出日設計不同・場館限定</span>
                 </dd>
 
-                <dt>대상</dt>
+                <dt>對象</dt>
                 <dd>
-                  <span class="em">VAWS MEMBERS 회원</span>
-                  <span class="sub">공연 티켓이 없어도 받을 수 있음 / 당일 현장에서 새로 가입해도 대상</span>
+                  <span class="em">VAWS MEMBERS 會員</span>
+                  <span class="sub">沒有演出票券也可以領取／當天在現場新加入也符合資格</span>
                 </dd>
 
-                <dt>부스 위치</dt>
+                <dt>攤位位置</dt>
                 <dd>
-                  <span class="em">인스파이어 디스커버리파크 야외</span>
-                  <span class="sub">INSPIRE DISCOVERY PARK 야외 &#39;포토 부스&#39; 옆 — 서쪽 스탠딩 대기장소 쪽입니다</span>
+                  <span class="em">Inspire Discovery Park 戶外</span>
+                  <span class="sub">INSPIRE DISCOVERY PARK 戶外「拍照亭」旁・靠近西側站席等候區</span>
                 </dd>
 
               </dl>
 
-              <div class="info-panel-title"><span class="bar">|</span> 부스 운영 시간 <span class="bar">|</span></div>
+              <div class="info-panel-title"><span class="bar">|</span> 攤位營運時間 <span class="bar">|</span></div>
 
               <div class="info-table-wrap">
                 <table class="info-table">
@@ -5314,66 +5314,66 @@
                     <col class="info-col-label"><col class="info-col-day"><col class="info-col-day">
                   </colgroup>
                   <thead>
-                    <tr><th>구분</th><th>9/19(토)</th><th>9/20(일)</th></tr>
+                    <tr><th>項目</th><th>9/19（六）</th><th>9/20（日）</th></tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td class="label" data-label="구분">VAWS 부스</td>
-                      <td data-label="9/19(토)">12:00 ~ 20:00</td>
-                      <td data-label="9/20(일)">11:00 ~ 15:30</td>
+                      <td class="label" data-label="項目">VAWS 攤位</td>
+                      <td data-label="9/19（六）">12:00 ～ 20:00</td>
+                      <td data-label="9/20（日）">11:00 ～ 15:30</td>
                     </tr>
                     <tr>
-                      <td class="label" data-label="구분">공연 시작</td>
-                      <td data-label="9/19(토)">17:00</td>
-                      <td data-label="9/20(일)">16:00</td>
+                      <td class="label" data-label="項目">演出開始</td>
+                      <td data-label="9/19（六）">17:00</td>
+                      <td data-label="9/20（日）">16:00</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
-              <p class="way-note warn-note"><b>일요일(9/20)은 부스가 공연 시작 전에 닫습니다.</b> 15:30에 마감이라 <b>공연 시작(16:00) 전에</b> 미리 받아 두셔야 해요. 토요일은 공연이 끝난 뒤에도 20:00까지 열려 있습니다.</p>
+              <p class="way-note warn-note"><b>週日（9/20）攤位會在演出開始前關閉。</b>攤位 15:30 結束營業，請務必在<b>演出開始（16:00）前</b>領取。週六演出結束後仍開放至 20:00。</p>
 
               <div class="way-sec">
-                <h4>받는 방법 <span>공연 당일 현장에서만</span></h4>
+                <h4>領取方式 <span>僅限演出當天現場</span></h4>
                 <ul class="way-ul">
-                  <li>부스 근처에 붙어 있는 <b>교환용 QR코드</b>를 스마트폰으로 스캔</li>
-                  <li>화면에 뜬 <b>교환 화면을 웹브라우저에 띄운 채</b> VAWS MEMBERS 부스 방문
-                    <span class="way-hint">스크린샷 이미지는 인정되지 않습니다</span></li>
-                  <li>회원 확인 후 그 자리에서 티켓 카드 수령</li>
+                  <li>用手機掃描攤位附近張貼的<b>兌換用 QR 碼</b></li>
+                  <li>保持<b>兌換頁面在網頁瀏覽器中開啟</b>，前往 VAWS MEMBERS 攤位
+                    <span class="way-hint">不接受截圖</span></li>
+                  <li>確認會員資格後當場領取票卡</li>
                 </ul>
               </div>
 
               <ul class="way-ul warn">
-                <li>1인당 공연일별 1매 — 이틀 모두 참석하면 각각 1매씩 받을 수 있습니다.</li>
-                <li>준비된 수량이 소진되면 예정보다 일찍 종료될 수 있습니다.</li>
-                <li><b>개장 직전과 공연 시작 전후로는 많이 붐빕니다.</b> 시간 여유를 두고 가 주세요.</li>
-                <li>날씨나 현장 설치 상황에 따라 운영 시간·장소가 바뀔 수 있습니다.</li>
-                <li>불량품 교환은 해당 공연 당일 현장에서만 가능합니다.</li>
-                <li>재판매·양도 및 경매 사이트·중고거래 앱 출품은 금지되어 있습니다.</li>
+                <li>每人每個演出日限領 1 張・兩天都參加即可各領 1 張。</li>
+                <li>準備數量發完後，可能會比預定時間提早結束。</li>
+                <li><b>開場前與演出開始前後人潮較多。</b>請預留時間前往。</li>
+                <li>營運時間與地點可能依天氣或現場設置狀況變更。</li>
+                <li>瑕疵品僅能在該場演出當天現場更換。</li>
+                <li>禁止轉售、轉讓，以及刊登於拍賣網站或二手交易 App。</li>
               </ul>
 
-              <div class="info-panel-title"><span class="bar">|</span> 티켓 카드 · 부스 위치 <span class="bar">|</span></div>
-              <p class="way-note">공식 이미지입니다. <b>탭하면 크게</b> 볼 수 있어요.</p>
+              <div class="info-panel-title"><span class="bar">|</span> 票卡・攤位位置 <span class="bar">|</span></div>
+              <p class="way-note">這是官方圖片。<b>點選即可放大</b>查看。</p>
               <div class="notice-grid" id="vaws-grid"></div>
 
-              <a class="info-book-link" href="https://member.vaundy.jp/news/detail/11291?lang=ko" target="_blank" rel="noopener">
-                ${EXT_LINK_SVG} VAWS 공식 공지 원문 보기
+              <a class="info-book-link" href="https://member.vaundy.jp/news/detail/11291?lang=en" target="_blank" rel="noopener">
+                ${EXT_LINK_SVG} 查看 VAWS 官方公告原文
               </a>
 
-              <p class="info-footnote">※ 위 내용은 VAWS MEMBERS 공식 공지 기준입니다. 세부 운영은 당일 현장 상황에 따라 달라질 수 있습니다.</p>
+              <p class="info-footnote">※ 以上內容以 VAWS MEMBERS 官方公告為準，詳細安排可能依演出當天現場狀況調整。</p>
             </div>
           </div>
         </div>
 
         <div class="menu-links">
-          <a class="menu-chip" href="https://vaundy.jp/?lang=ko" target="_blank" rel="noopener">
+          <a class="menu-chip" href="https://vaundy.jp/?lang=en" target="_blank" rel="noopener">
             <span class="chip-ico">${EXT_LINK_SVG}</span>
-            <span class="chip-label">공식사이트</span>
+            <span class="chip-label">官方網站</span>
           </a>
           <button class="menu-chip spoiler" type="button" id="setlist-btn">
             <span class="chip-ico warn">${WARN_SVG}</span>
-            <span class="chip-label">도쿄 셋리스트</span>
-            <span class="chip-note">스포 포함</span>
+            <span class="chip-label">東京歌單</span>
+            <span class="chip-note">含劇透</span>
           </button>
         </div>
         </div>
@@ -5382,20 +5382,20 @@
         <aside class="home-note">
           <span class="home-note-ico">${FLASH_OFF_SVG}</span>
           <div class="home-note-body">
-            <b>폰 플래시(폰 반딧불)는 지양해 주세요</b>
-            <p>조명이 다 꺼지는 순간까지 계산해서 만든 무대입니다. 객석에서 켠 불빛 하나가 그 어둠을 깨고, 공들여 만든 장면을 흐트러뜨려요.</p>
-            <p class="sub">다 같이 불빛을 드는 순서가 있다면 공연 중에 따로 안내됩니다.</p>
+            <b>請避免使用手機閃光燈（手機螢火蟲）</b>
+            <p>舞台演出連燈光完全熄滅的瞬間都經過設計。觀眾席的一道光會打破黑暗，讓精心安排的畫面失去效果。</p>
+            <p class="sub">若有全場一起舉燈的安排，演出中會另行通知。</p>
           </div>
         </aside>
 
         <div class="home-foot">
-          <button class="share-btn" type="button" id="share-btn">${SHARE_SVG} 공유하기</button>
+          <button class="share-btn" type="button" id="share-btn">${SHARE_SVG} 分享</button>
         </div>
           </section>
         </div>
       </section>
 
-      <div class="credits">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo; · SEOUL FAN CHANT GUIDE (비공식 팬 제작) <span class="build">${BUILD}</span></div>
+      <div class="credits">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo;・SEOUL FAN CHANT GUIDE（非官方粉絲製作）<span class="build">${BUILD}</span></div>
     `;
 
     document.getElementById("guide-btn").addEventListener("click", ()=>{ location.hash = "#/guide"; });
@@ -5485,44 +5485,44 @@
     app.innerHTML = `
       <div class="guide-page">
         <div class="song-topbar">
-          <button class="back-btn" id="back-btn">← 홈으로</button>
+          <button class="back-btn" id="back-btn">← 返回首頁</button>
           ${themeToggleHtml()}
         </div>
 
         <section class="songs-section">
           <div class="songs-head">
-            <h1>응원가이드</h1>
-            <p>곡을 선택해 영상과 함께 가사 · 떼창 포인트를 보세요</p>
+            <h1>應援指南</h1>
+            <p>選擇歌曲，搭配影片查看歌詞與大合唱重點</p>
             <div class="song-legend">
-              <span class="legend-item"><span class="legend-icon chant">${INLINE_ICONS.mic}</span>떼창 <b class="legend-num">12</b>줄</span>
-              <span class="legend-item common"><span class="legend-icon clap">${INLINE_ICONS.clap}</span>박수</span>
-              <span class="legend-item common"><span class="legend-icon wave">${INLINE_ICONS.wave}</span>손 흔들기</span>
-              <span class="legend-item"><span class="legend-icon jump">${INLINE_ICONS.jump}</span>점프</span>
-              <span class="legend-item"><span class="legend-icon spin">${INLINE_ICONS.spin}</span>팔 돌리기</span>
+              <span class="legend-item"><span class="legend-icon chant">${INLINE_ICONS.mic}</span>大合唱 <b class="legend-num">12</b> 行</span>
+              <span class="legend-item common"><span class="legend-icon clap">${INLINE_ICONS.clap}</span>拍手</span>
+              <span class="legend-item common"><span class="legend-icon wave">${INLINE_ICONS.wave}</span>揮手</span>
+              <span class="legend-item"><span class="legend-icon jump">${INLINE_ICONS.jump}</span>跳躍</span>
+              <span class="legend-item"><span class="legend-icon spin">${INLINE_ICONS.spin}</span>轉臂</span>
             </div>
-            <p class="song-legend-note">숫자는 떼창 가사 줄 수입니다.<br>정렬한 순서대로 곡을 이동합니다.<br>박수·손 흔들기는 곡 화면에 있어요.</p>
+            <p class="song-legend-note">數字代表大合唱歌詞的行數。<br>切換歌曲時會依目前排序移動。<br>拍手・揮手提示會顯示在歌曲頁面。</p>
           </div>
           <div class="song-search-sentinel" id="song-search-sentinel"></div>
           <div class="song-search">
-            <label class="search-label" for="song-search-input">곡 검색</label>
+            <label class="search-label" for="song-search-input">搜尋歌曲</label>
             <div class="song-search-box">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
               <input id="song-search-input" type="search" inputmode="search" autocomplete="off"
-                     placeholder="곡 제목 · 번호 검색">
-              <button type="button" class="song-search-clear" id="song-search-clear" aria-label="지우기">✕</button>
+                     placeholder="搜尋歌曲名稱・編號">
+              <button type="button" class="song-search-clear" id="song-search-clear" aria-label="清除">✕</button>
             </div>
           </div>
-          <div class="song-sorts" role="group" aria-label="곡 목록 정렬">
-            <button class="song-sort" type="button" data-sort="default">기본</button>
-            <button class="song-sort" type="button" data-sort="title" id="sort-title">가나다</button>
-            <button class="song-sort" type="button" data-sort="chant" id="sort-chant">떼창</button>
+          <div class="song-sorts" role="group" aria-label="歌曲清單排序">
+            <button class="song-sort" type="button" data-sort="default">預設</button>
+            <button class="song-sort" type="button" data-sort="title" id="sort-title">名稱</button>
+            <button class="song-sort" type="button" data-sort="chant" id="sort-chant">大合唱</button>
           </div>
-          <div class="song-search-meta"><span id="song-count">전체 ${SONGS.length}곡</span></div>
-          <p class="song-empty" id="song-empty" hidden><b>찾는 곡이 없어요</b>제목 일부나 곡 번호를 입력해 보세요</p>
+          <div class="song-search-meta"><span id="song-count">共 ${SONGS.length} 首</span></div>
+          <p class="song-empty" id="song-empty" hidden><b>找不到歌曲</b>請輸入部分歌曲名稱或歌曲編號</p>
           <ul class="song-list" id="song-list"></ul>
         </section>
 
-        <div class="credits">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo; · SEOUL FAN CHANT GUIDE (비공식 팬 제작) <span class="build">${BUILD}</span></div>
+        <div class="credits">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo;・SEOUL FAN CHANT GUIDE（非官方粉絲製作）<span class="build">${BUILD}</span></div>
       </div>
     `;
 
@@ -5675,13 +5675,13 @@
         <div class="set-split">
           <div class="set-split-head">
             <span class="set-num">${pad(item.n)}</span>
-            <span class="set-split-note">날짜별로 다른 곡</span>
+            <span class="set-split-note">日期不同的歌曲</span>
           </div>
           ${item.songs.map(e=>{
             const exists = SONGS.some(s => s.id === e.id);
             return `
             <button class="set-row sub" data-id="${escapeHtml(e.id)}" ${exists ? "" : "disabled"}>
-              <span class="day-chip ${e.day === "일" ? "sun" : ""}">${e.day}</span>
+              <span class="day-chip ${e.day === "日" ? "sun" : ""}">${e.day}</span>
               <span class="set-title">${escapeHtml(setlistTitle(e))}</span>
               <span class="set-go">${exists ? "›" : ""}</span>
             </button>`;
@@ -5716,26 +5716,26 @@
 
     const countEl = document.getElementById("setlist-count");
     if (countEl) countEl.textContent = isOrder
-      ? `본편 ${SETLIST_TOKYO.items.length}곡 · 총 ${total}곡`
-      : `총 ${total}곡`;
+      ? `正式演出 ${SETLIST_TOKYO.items.length} 首・共 ${total} 首`
+      : `共 ${total} 首`;
 
     const metaEl = document.getElementById("setlist-mode-meta");
-    if (metaEl) metaEl.textContent = isOrder ? "SPOILER" : "RANDOM";
+    if (metaEl) metaEl.textContent = isOrder ? "劇透" : "隨機";
 
     const shufEl = document.getElementById("set-shuffle");
     if (shufEl) shufEl.hidden = isOrder;
 
     const desc = document.getElementById("setlist-desc");
     if (desc) desc.innerHTML = isOrder
-      ? `${escapeHtml(SETLIST_TOKYO.dates)}<br>곡을 누르면 응원가이드로 넘어가요`
-      : `${escapeHtml(SETLIST_TOKYO.dates)}<br><b>공연 순서는 감춘 채</b> 섞어서 보여 주고 있어요`;
+      ? `${escapeHtml(SETLIST_TOKYO.dates)}<br>點選歌曲即可前往應援指南`
+      : `${escapeHtml(SETLIST_TOKYO.dates)}<br>目前將歌曲<b>打亂顯示，不公開演出順序</b>`;
 
     const note = document.getElementById("setlist-note");
     if (note) note.innerHTML = isOrder
-      ? `※ 팬 기록을 정리한 비공식 셋리스트입니다. 서울 공연은 다를 수 있어요.<br>
-         ※ 날짜별로 다른 곡이 있었던 자리는 <b>토</b> · <b>일</b>로 나눠 두었습니다.`
-      : `※ 팬 기록을 정리한 비공식 셋리스트입니다. 서울 공연은 다를 수 있어요.<br>
-         ※ 순서도, 날짜별로 갈린 자리도 감춰 두었습니다. 전부 보려면 위에서 <b>공연 순서</b>를 눌러 주세요.`;
+      ? `※ 這是整理自粉絲紀錄的非官方歌單，首爾演出可能不同。<br>
+         ※ 日期不同而有變化的曲目，已分為<b>六</b>・<b>日</b>。`
+      : `※ 這是整理自粉絲紀錄的非官方歌單，首爾演出可能不同。<br>
+         ※ 演出順序與日期差異曲目皆已隱藏。想查看完整內容，請在上方點選<b>演出順序</b>。`;
 
     app.querySelectorAll(".set-mode").forEach(b=>{
       const on = b.dataset.mode === setlistMode;
@@ -5763,56 +5763,56 @@
     app.innerHTML = `
       <div class="setlist-page">
         <div class="song-topbar">
-          <button class="back-btn" id="setlist-back-btn">← 홈으로</button>
-          <h1>셋리스트</h1>
+          <button class="back-btn" id="setlist-back-btn">← 返回首頁</button>
+          <h1>歌單</h1>
           ${themeToggleHtml()}
         </div>
 
         <section class="spoiler-hero">
           <div class="spoiler-mark">${WARN_SVG}</div>
-          <h2 class="spoiler-title">스포주의</h2>
+          <h2 class="spoiler-title">劇透注意</h2>
           <p class="spoiler-desc">
-            이 화면에는 <b>${SETLIST_TOKYO.label}의 곡명과 순서</b>가 있어요.<br>
-            보기 방식을 고르기 전에는 내용이 표시되지 않습니다.
+            這個頁面包含<b>${SETLIST_TOKYO.label}的歌曲名稱與順序</b>。<br>
+            選擇查看方式前，不會顯示內容。
           </p>
-          <button class="spoiler-safe" type="button" id="spoiler-safe">스포 없이 홈으로</button>
+          <button class="spoiler-safe" type="button" id="spoiler-safe">不看劇透，返回首頁</button>
 
           <div class="spoiler-choice">
             <button class="spoiler-open soft" type="button" data-mode="random">
-              <b>곡명만 보기<span class="tag">곡명 스포</span></b>
-              <span>공연 순서는 섞어서 표시</span>
+              <b>只看歌曲名稱<span class="tag">歌曲劇透</span></b>
+              <span>打亂顯示演出順序</span>
             </button>
             <button class="spoiler-open" type="button" data-mode="order">
-              <b>공연 순서로 보기<span class="tag">전체 스포</span></b>
-              <span>곡명과 순서 모두 공개</span>
+              <b>依演出順序查看<span class="tag">完整劇透</span></b>
+              <span>公開歌曲名稱與完整順序</span>
             </button>
           </div>
         </section>
 
         <section class="setlist-body" id="setlist-body" hidden inert>
           <div class="setlist-head">
-            <h2>${escapeHtml(SETLIST_TOKYO.label)} 셋리스트</h2>
+            <h2>${escapeHtml(SETLIST_TOKYO.label)}歌單</h2>
             <p id="setlist-desc"></p>
           </div>
 
-          <div class="set-modes" role="group" aria-label="셋리스트 보기 방식">
-            <button class="set-mode" type="button" data-mode="order">공연 순서<span class="set-mode-badge">스포</span></button>
-            <button class="set-mode" type="button" data-mode="random">랜덤 순서</button>
+          <div class="set-modes" role="group" aria-label="歌單查看方式">
+            <button class="set-mode" type="button" data-mode="order">演出順序<span class="set-mode-badge">劇透</span></button>
+            <button class="set-mode" type="button" data-mode="random">隨機順序</button>
           </div>
-          <div class="set-order-confirm" id="set-order-confirm" role="group" aria-label="공연 순서 공개 확인" hidden>
-            <p>공연 순서가 그대로 공개됩니다.</p>
-            <button type="button" id="set-order-cancel">취소</button>
-            <button type="button" id="set-order-reveal">순서 공개</button>
+          <div class="set-order-confirm" id="set-order-confirm" role="group" aria-label="確認公開演出順序" hidden>
+            <p>演出順序將完整公開。</p>
+            <button type="button" id="set-order-cancel">取消</button>
+            <button type="button" id="set-order-reveal">公開順序</button>
           </div>
 
           <div class="set-shuffle" id="set-shuffle" hidden>
-            <span><b>순서를 섞어 두었어요.</b> 어떤 곡을 하는지만 보고, 순서는 공연 당일의 즐거움으로 남겨 두세요.</span>
-            <button type="button" id="set-reshuffle">다시 섞기</button>
+            <span><b>已將順序打亂。</b>先看看有哪些歌曲，把順序留到演出當天揭曉吧。</span>
+            <button type="button" id="set-reshuffle">重新打亂</button>
           </div>
 
           <div class="setlist-meta">
             <span id="setlist-count"></span>
-            <span id="setlist-mode-meta">SPOILER</span>
+            <span id="setlist-mode-meta">劇透</span>
           </div>
 
           <ul class="set-list" id="set-list"></ul>
@@ -5948,9 +5948,9 @@
     if (todayBuiltKey !== key){
       todayBuiltKey = key;
       const d = new Date(`${key}T12:00:00+09:00`);
-      const dow = ["일","월","화","수","목","금","토"][d.getDay()];
+      const dow = ["日","一","二","三","四","五","六"][d.getDay()];
       document.getElementById("today-title").textContent =
-        `오늘 공연 · ${Number(key.slice(5,7))}/${Number(key.slice(8,10))}(${dow})`;
+        `今日演出・${Number(key.slice(5,7))}/${Number(key.slice(8,10))}（${dow}）`;
     }
     document.getElementById("today-list").innerHTML = steps.map((v,i)=>{
       const cls = i < curIdx ? "past" : (i === curIdx ? "now" : "");
@@ -5959,14 +5959,14 @@
 
     const nowEl = document.getElementById("today-now");
     if (nextIdx === -1){
-      nowEl.innerHTML = `<b>공연이 모두 끝났습니다.</b> 오늘 고생 많으셨어요!`;
+      nowEl.innerHTML = `<b>今天的演出已全部結束。</b>辛苦了！`;
       return;
     }
     const diff = times[nextIdx] - now;
     const h = Math.floor(diff/3600000), m = Math.floor(diff%3600000/60000), sec = Math.floor(diff%60000/1000);
-    const left = h > 0 ? `${h}시간 ${pad(m)}분 ${pad(sec)}초` : `${m}분 ${pad(sec)}초`;
-    const cur  = curIdx >= 0 ? `<b>${escapeHtml(steps[curIdx].label)}</b> 진행 중<br>` : "";
-    nowEl.innerHTML = `${cur}${escapeHtml(steps[nextIdx].label)}까지 <span class="left">${left}</span>`;
+    const left = h > 0 ? `${h} 小時 ${pad(m)} 分 ${pad(sec)} 秒` : `${m} 分 ${pad(sec)} 秒`;
+    const cur  = curIdx >= 0 ? `<b>${escapeHtml(steps[curIdx].label)}</b>進行中<br>` : "";
+    nowEl.innerHTML = `${cur}距離${escapeHtml(steps[nextIdx].label)}還有 <span class="left">${left}</span>`;
   }
 
   /* ── 준비물 체크 · 주소 복사 · 공유 · 오프라인 상태 ───────────── */
@@ -5975,10 +5975,10 @@
     const copyBtn = document.getElementById("copy-addr");
     if (copyBtn){
       copyBtn.addEventListener("click", async ()=>{
-        const addr = "인천 중구 공항문화로 127 인스파이어 아레나";
-        try { await navigator.clipboard.writeText(addr); copyBtn.textContent = "복사됨 ✓"; }
+        const addr = "韓國仁川廣域市中區機場文化路 127 號 Inspire Arena";
+        try { await navigator.clipboard.writeText(addr); copyBtn.textContent = "已複製 ✓"; }
         catch(e){ copyBtn.textContent = addr; }
-        setTimeout(()=>{ copyBtn.textContent = "주소 복사"; }, 1600);
+        setTimeout(()=>{ copyBtn.textContent = "複製地址"; }, 1600);
       });
     }
 
@@ -5987,14 +5987,14 @@
     if (shareBtn){
       shareBtn.addEventListener("click", async ()=>{
         const data = {
-          title: "VAUNDY \"HORO\" SEOUL 응원가이드",
-          text: "곡별 가사와 떼창·박수·손 흔들기 포인트를 영상에 맞춰 볼 수 있어요",
+          title: "VAUNDY \"HORO\" SEOUL 應援指南",
+          text: "搭配影片查看各曲歌詞與大合唱、拍手、揮手重點",
           url: location.href.split("#")[0]
         };
         try {
           if (navigator.share){ await navigator.share(data); return; }
           await navigator.clipboard.writeText(data.url);
-          showBanner("링크를 <b>복사</b>했어요. 붙여넣기로 공유해 주세요.", "확인", hideBanner);
+          showBanner("已<b>複製</b>連結，請貼上分享。", "確定", hideBanner);
         } catch(e){ /* 사용자가 취소한 경우 등 — 아무것도 하지 않음 */ }
       });
     }
@@ -6047,17 +6047,17 @@
     });
     const chantBtn = document.getElementById("sort-chant");
     if (chantBtn){
-      const dir = songSort === "chant-asc" ? "적은 순" : "많은 순";
+      const dir = songSort === "chant-asc" ? "少→多" : "多→少";
       chantBtn.innerHTML = songSort.startsWith("chant")
-        ? `떼창 <span class="dir">${dir}</span>`
-        : "떼창";
+        ? `大合唱 <span class="dir">${dir}</span>`
+        : "大合唱";
     }
     const titleBtn = document.getElementById("sort-title");
     if (titleBtn){
-      const dir = songSort === "title-desc" ? "ㅎ→ㄱ" : "ㄱ→ㅎ";
+      const dir = songSort === "title-desc" ? "Z→A" : "A→Z";
       titleBtn.innerHTML = songSort.startsWith("title")
-        ? `가나다 <span class="dir">${dir}</span>`
-        : "가나다";
+        ? `名稱 <span class="dir">${dir}</span>`
+        : "名稱";
     }
 
     applyGuideFilter();
@@ -6087,7 +6087,7 @@
       if (ok) hit++;
     });
 
-    if (count) count.textContent = q ? `검색 결과 ${hit}곡` : `전체 ${items.length}곡`;
+    if (count) count.textContent = q ? `搜尋結果 ${hit} 首` : `共 ${items.length} 首`;
     if (empty) empty.hidden = hit !== 0;
     if (clear) clear.classList.toggle("show", !!input.value);
   }
@@ -6131,12 +6131,12 @@
       markShowRows(liveIdx, nextIdx);
 
       if (liveIdx !== -1){                 // 공연 진행 중 (토·일 모두)
-        setPill("NOW", "ON AIR", "live");
+        setPill("現在", "直播中", "live");
         return;
       }
       if (nextIdx === -1){                 // 남은 공연 없음
         if (now >= finalEnd){
-          setPill("END", "", "end");
+          setPill("結束", "", "end");
           stopCountdown();
         }
         return;
@@ -6171,11 +6171,11 @@
      이렇게 해야 DOM 이 가벼워진다. */
   const useSvg = (id) => `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#${id}"/></svg>`;
   const INLINE_ICONS = {
-    wave: `<span class="ico ico-wave" title="손 흔들기">${useSvg("i-wave")}</span>`,
-    clap: `<span class="ico ico-clap" title="박수"><span class="hand l">${useSvg("i-hand")}</span><span class="hand r">${useSvg("i-hand")}</span><span class="spark">${useSvg("i-spark")}</span></span>`,
-    mic:  `<span class="ico ico-mic" title="떼창">${useSvg("i-mic")}</span>`,
-    jump: `<span class="ico ico-jump" title="점프">${useSvg("i-jump")}<span class="ground"></span></span>`,
-    spin: `<span class="ico ico-spin" title="머리 위로 팔 돌리기">
+    wave: `<span class="ico ico-wave" title="揮手">${useSvg("i-wave")}</span>`,
+    clap: `<span class="ico ico-clap" title="拍手"><span class="hand l">${useSvg("i-hand")}</span><span class="hand r">${useSvg("i-hand")}</span><span class="spark">${useSvg("i-spark")}</span></span>`,
+    mic:  `<span class="ico ico-mic" title="大合唱">${useSvg("i-mic")}</span>`,
+    jump: `<span class="ico ico-jump" title="跳躍">${useSvg("i-jump")}<span class="ground"></span></span>`,
+    spin: `<span class="ico ico-spin" title="轉臂">
              <svg class="body" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-cheer"/></svg>
              <svg class="arm" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-cheer-arm"/></svg>
            </span>`
@@ -6213,7 +6213,7 @@
       if (ok) hit++;
     });
 
-    if (count) count.textContent = q ? `${hit}곡` : `${items.length}곡`;
+    if (count) count.textContent = q ? `${hit} 首` : `${items.length} 首`;
     if (empty) empty.hidden = hit !== 0;
     if (clear) clear.classList.toggle("show", !!input.value);
   }
@@ -6325,18 +6325,18 @@
     songView.innerHTML = `
       <div class="song-page" id="song-page">
         <div class="song-topbar">
-          <button class="back-btn" id="song-back-btn" aria-label="곡 목록으로" title="곡 목록으로">←</button>
+          <button class="back-btn" id="song-back-btn" aria-label="返回歌曲清單" title="返回歌曲清單">←</button>
           <h1 class="visually-hidden" id="song-page-heading"></h1>
-          <nav class="song-dock" aria-label="곡 이동">
+          <nav class="song-dock" aria-label="切換歌曲">
           <div class="song-nav">
-            <button class="song-nav-btn" id="prev-song" aria-label="이전 곡">${CHEV_LEFT_SVG}</button>
+            <button class="song-nav-btn" id="prev-song" aria-label="上一首">${CHEV_LEFT_SVG}</button>
             <div class="song-picker-h">
-              <button class="song-picker-btn" id="song-picker-btn" aria-expanded="false" aria-haspopup="dialog" title="곡 목록 열기">
+              <button class="song-picker-btn" id="song-picker-btn" aria-expanded="false" aria-haspopup="dialog" title="開啟歌曲清單">
                 <span class="song-picker-title" id="song-picker-title"></span>
                 <span class="song-picker-caret">${CHEVRON_SVG}</span>
               </button>
             </div>
-            <button class="song-nav-btn" id="next-song" aria-label="다음 곡">${CHEV_RIGHT_SVG}</button>
+            <button class="song-nav-btn" id="next-song" aria-label="下一首">${CHEV_RIGHT_SVG}</button>
           </div>
           </nav>
           ${themeToggleHtml()}
@@ -6347,17 +6347,17 @@
             <div class="video-wrap">
               <div class="video-frame">
                 <div id="yt-player"></div>
-                <div class="video-status" id="video-status" role="status">영상을 불러오는 중…</div>
+                <div class="video-status" id="video-status" role="status">正在載入影片…</div>
               </div>
-              <a class="watch-on-yt" id="watch-on-yt" href="#" target="_blank" rel="noopener">유튜브에서 보기 ↗</a>
+              <a class="watch-on-yt" id="watch-on-yt" href="#" target="_blank" rel="noopener">在 YouTube 觀看 ↗</a>
             </div>
 
-            <div class="lyrics-note"><span class="dot">●</span> 가사를 탭하면 해당 위치로 영상이 이동해요. 영상 재생 상태에 따라 가사 하이라이트가 동기화됩니다.</div>
+            <div class="lyrics-note"><span class="dot">●</span> 點選歌詞即可跳至影片對應位置。歌詞醒目顯示會依影片播放狀態同步。</div>
 
             <div class="lyrics-legend">
-              <span class="legend-item"><span class="legend-icon chant">${INLINE_ICONS.mic}</span>떼창</span>
-              <span class="legend-item"><span class="legend-icon clap">${INLINE_ICONS.clap}</span>박수</span>
-              <span class="legend-item"><span class="legend-icon wave">${INLINE_ICONS.wave}</span>손 흔들기</span>
+              <span class="legend-item"><span class="legend-icon chant">${INLINE_ICONS.mic}</span>大合唱</span>
+              <span class="legend-item"><span class="legend-icon clap">${INLINE_ICONS.clap}</span>拍手</span>
+              <span class="legend-item"><span class="legend-icon wave">${INLINE_ICONS.wave}</span>揮手</span>
             </div>
           </div>
 
@@ -6365,17 +6365,17 @@
             <!-- 떼창만 듣기 — 켜져 있을 때만 보이는 띠 -->
             <div class="chant-bar" id="chant-bar" hidden role="status">
               <span class="chant-ico">${STATIC_MIC_SVG}</span>
-              <span class="chant-bar-label">떼창만</span>
+              <span class="chant-bar-label">只聽大合唱</span>
               <span class="chant-bar-msg" id="chant-msg"></span>
               <span class="chant-bar-count" id="chant-count"></span>
-              <button class="chant-step" id="chant-prev" aria-label="이전 떼창 구간">${CHEV_LEFT_SVG}</button>
-              <button class="chant-step" id="chant-next" aria-label="다음 떼창 구간">${CHEV_RIGHT_SVG}</button>
-              <button class="chant-bar-off" id="chant-off" aria-label="떼창만 듣기 끄기">${CLOSE_SVG}</button>
+              <button class="chant-step" id="chant-prev" aria-label="上一段大合唱">${CHEV_LEFT_SVG}</button>
+              <button class="chant-step" id="chant-next" aria-label="下一段大合唱">${CHEV_RIGHT_SVG}</button>
+              <button class="chant-bar-off" id="chant-off" aria-label="關閉只聽大合唱">${CLOSE_SVG}</button>
             </div>
 
             <!-- 짤방(동작 사진) — 지정한 가사에서만 떴다가 사라집니다 -->
             <div class="tip-pic at-below-video" id="tip-pic" aria-live="polite">
-              <figure class="tip-pic-card" id="tip-pic-card" title="탭하면 크게 보여요">
+              <figure class="tip-pic-card" id="tip-pic-card" title="點選即可放大">
                 <img id="tip-pic-img" alt="" decoding="async">
                 <figcaption class="tip-pic-cap" id="tip-pic-cap"></figcaption>
               </figure>
@@ -6388,16 +6388,16 @@
         </div>
 
         <div class="player-controls">
-          <button class="play-toggle" id="play-toggle" aria-label="재생 / 일시정지">${PLAY_SVG}</button>
-          <button class="venue-toggle chant-toggle" id="chant-btn" aria-pressed="false" aria-label="떼창 부분만 듣기 켜기/끄기">
+          <button class="play-toggle" id="play-toggle" aria-label="播放／暫停">${PLAY_SVG}</button>
+          <button class="venue-toggle chant-toggle" id="chant-btn" aria-pressed="false" aria-label="開啟／關閉只聽大合唱">
             <span class="chant-ico">${STATIC_MIC_SVG}</span>
-            <span class="venue-label">떼창만</span>
+            <span class="venue-label">只聽大合唱</span>
           </button>
-          <button class="venue-toggle" id="venue-btn" aria-label="단축모드 켜기/끄기">
-            <span class="venue-label">단축모드</span>
+          <button class="venue-toggle" id="venue-btn" aria-label="開啟／關閉簡潔模式">
+            <span class="venue-label">簡潔模式</span>
             <span class="venue-switch"><span class="venue-knob"></span></span>
           </button>
-          <button class="autoscroll-toggle${autoScrollEnabled ? " active" : ""}" id="autoscroll-btn" aria-label="자동 스크롤 켜기/끄기">
+          <button class="autoscroll-toggle${autoScrollEnabled ? " active" : ""}" id="autoscroll-btn" aria-label="開啟／關閉自動捲動">
             <span class="autoscroll-label">AUTO SCROLL</span>
             <span class="autoscroll-switch"><span class="autoscroll-knob"></span></span>
           </button>
@@ -6405,23 +6405,23 @@
 
         <div class="song-sheet" id="song-sheet" aria-hidden="true" inert>
           <div class="song-sheet-backdrop" data-close-sheet></div>
-          <div class="song-sheet-panel" role="dialog" aria-modal="true" aria-label="곡 선택">
+          <div class="song-sheet-panel" role="dialog" aria-modal="true" aria-label="選擇歌曲">
             <span class="song-sheet-grip"></span>
             <div class="song-sheet-head">
-              <span class="song-sheet-title" id="song-sheet-title">곡 선택</span>
-              <span class="song-sheet-count">${SONGS.length}곡</span>
-              <button class="song-sheet-close" data-close-sheet aria-label="닫기">${CLOSE_SVG}</button>
+              <span class="song-sheet-title" id="song-sheet-title">選擇歌曲</span>
+              <span class="song-sheet-count">${SONGS.length} 首</span>
+              <button class="song-sheet-close" data-close-sheet aria-label="關閉">${CLOSE_SVG}</button>
             </div>
             <div class="sheet-search">
-              <label class="search-label" for="sheet-search-input">곡 검색</label>
+              <label class="search-label" for="sheet-search-input">搜尋歌曲</label>
               <div class="song-search-box">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
                 <input id="sheet-search-input" type="search" inputmode="search" autocomplete="off"
-                       placeholder="곡 제목 · 번호 검색">
-                <button type="button" class="song-search-clear" id="sheet-search-clear" aria-label="지우기">✕</button>
+                       placeholder="搜尋歌曲名稱・編號">
+                <button type="button" class="song-search-clear" id="sheet-search-clear" aria-label="清除">✕</button>
               </div>
             </div>
-            <p class="sheet-empty" id="sheet-empty" hidden>찾는 곡이 없어요</p>
+            <p class="sheet-empty" id="sheet-empty" hidden>找不到歌曲</p>
             <ul class="song-sheet-list" id="song-sheet-list"></ul>
           </div>
         </div>
@@ -6615,7 +6615,7 @@
     const next   = document.getElementById("chant-next");
 
     if (!blocks.length){
-      if (msg)   msg.textContent = "이 곡엔 떼창 구간이 없어요";
+      if (msg)   msg.textContent = "這首歌沒有大合唱段落";
       if (count) count.textContent = "";
       if (prev)  prev.disabled = true;
       if (next)  next.disabled = true;
@@ -6623,8 +6623,8 @@
     }
     // 손가락으로 쓰는 기기에는 밀기 안내를, 키보드가 있는 기기에는 방향키 안내를
     const touch = window.matchMedia && window.matchMedia("(hover: none)").matches;
-    if (msg) msg.textContent = chantDone ? "끝 — 재생을 누르면 처음부터"
-                             : (touch ? "옆으로 밀어 구간 이동" : "← → 로 구간 이동");
+    if (msg) msg.textContent = chantDone ? "結束・按播放即可從頭開始"
+                             : (touch ? "左右滑動切換段落" : "用 ← → 切換段落");
     if (count) count.textContent = Math.max(1, chantIdx + 1) + " / " + blocks.length;
     if (prev) prev.disabled = chantIdx <= 0;
     if (next) next.disabled = chantIdx >= blocks.length - 1;
@@ -6751,12 +6751,12 @@
     // 어디서 들어왔는지에 따라 '뒤로' 버튼의 안내 글을 바꾼다
     const backBtn = document.getElementById("song-back-btn");
     if (backBtn){
-      const label = songFrom === "setlist" ? "셋리스트로" : "곡 목록으로";
+      const label = songFrom === "setlist" ? "返回歌單" : "返回歌曲清單";
       backBtn.title = label;
       backBtn.setAttribute("aria-label", label);
     }
-    document.getElementById("prev-song").title = `이전 곡: ${prev.title}`;
-    document.getElementById("next-song").title = `다음 곡: ${next.title}`;
+    document.getElementById("prev-song").title = `上一首：${prev.title}`;
+    document.getElementById("next-song").title = `下一首：${next.title}`;
     document.getElementById("watch-on-yt").href =
       `https://www.youtube.com/watch?v=${encodeURIComponent(song.youtubeId)}`;
 
@@ -6778,13 +6778,13 @@
         <button class="song-sheet-item${s.id === song.id ? " current" : ""}" data-id="${s.id}" data-pos="${i}"${s.id === song.id ? ' aria-current="true"' : ""}>
           <span class="song-sheet-num">${pad(songNo(s))}</span>
           <span class="song-sheet-name">${escapeHtml(s.title)}</span>
-          ${s.id === song.id ? `<span class="song-sheet-now">현재 곡</span>` : ""}
+          ${s.id === song.id ? `<span class="song-sheet-now">目前播放</span>` : ""}
         </button>
       </li>`).join("");
 
     const sheetTitle = document.getElementById("song-sheet-title");
     if (sheetTitle) sheetTitle.textContent =
-      songFrom === "setlist" ? "셋리스트 곡" : "곡 선택";
+      songFrom === "setlist" ? "歌單歌曲" : "選擇歌曲";
 
     closeSongSheet();
     applySheetFilter();
@@ -6916,7 +6916,7 @@
       picBroken.add(img.getAttribute("src"));
       hideTipPic();
     };
-    img.alt = pic.caption || "응원 동작";
+    img.alt = pic.caption || "應援動作";
     if (img.getAttribute("src") !== pic.src) img.setAttribute("src", pic.src);
     if (cap) cap.textContent = pic.caption || "";
     box.classList.remove("big");
@@ -7027,7 +7027,7 @@
     let html = "";
     // 박수·손 흔들기는 가사 안에 넣는 [clap] / [wave] 아이콘으로만 표시하고
     // 왼쪽 종류 표시에는 떼창만 남긴다.
-    if (hasChant) html += `<span class="lyric-type-icon chant" title="떼창">${INLINE_ICONS.mic}</span>`;
+    if (hasChant) html += `<span class="lyric-type-icon chant" title="大合唱">${INLINE_ICONS.mic}</span>`;
     return html;
   }
 
@@ -7166,11 +7166,11 @@
   function songMarksHtml(song){
     const m = songMarks(song);
     let html = "";
-    if (m.chant) html += `<span class="song-mark chant" title="떼창 ${m.chant}줄" aria-label="떼창 ${m.chant}줄">${useSvg("i-mic")}<b>${m.chant}</b></span>`;
-    if (m.clap)  html += `<span class="song-mark dot clap common" title="박수" aria-label="박수">${useSvg("i-hand")}</span>`;
-    if (m.wave)  html += `<span class="song-mark dot wave common" title="손 흔들기" aria-label="손 흔들기">${useSvg("i-wave")}</span>`;
-    if (m.jump)  html += `<span class="song-mark dot jump" title="점프" aria-label="점프">${useSvg("i-jump")}</span>`;
-    if (m.spin)  html += `<span class="song-mark dot spin" title="머리 위로 팔 돌리기" aria-label="팔 돌리기">${useSvg("i-cheer")}</span>`;
+    if (m.chant) html += `<span class="song-mark chant" title="大合唱 ${m.chant} 行" aria-label="大合唱 ${m.chant} 行">${useSvg("i-mic")}<b>${m.chant}</b></span>`;
+    if (m.clap)  html += `<span class="song-mark dot clap common" title="拍手" aria-label="拍手">${useSvg("i-hand")}</span>`;
+    if (m.wave)  html += `<span class="song-mark dot wave common" title="揮手" aria-label="揮手">${useSvg("i-wave")}</span>`;
+    if (m.jump)  html += `<span class="song-mark dot jump" title="跳躍" aria-label="跳躍">${useSvg("i-jump")}</span>`;
+    if (m.spin)  html += `<span class="song-mark dot spin" title="轉臂" aria-label="轉臂">${useSvg("i-cheer")}</span>`;
     return html ? `<span class="song-marks">${html}</span>` : "";
   }
 
@@ -7213,9 +7213,9 @@
     clearTimeout(videoStatusTimer);
     status.hidden = playerReady;
     if (playerReady) return;
-    status.textContent = "영상을 불러오는 중…";
+    status.textContent = "正在載入影片…";
     videoStatusTimer = setTimeout(()=>{
-      if (!playerReady && status.isConnected) status.textContent = "영상 연결이 지연되고 있어요. 아래에서 유튜브로 열어 보세요.";
+      if (!playerReady && status.isConnected) status.textContent = "影片連線延遲，請在下方開啟 YouTube。";
     }, 8000);
   }
 
@@ -7259,7 +7259,7 @@
     const status = document.getElementById("video-status");
     if (!status) return;
     status.hidden = false;
-    status.textContent = "영상을 재생할 수 없어요. 아래에서 유튜브로 열어 보세요.";
+    status.textContent = "無法播放影片，請在下方開啟 YouTube。";
   }
 
   /* ── 볼륨 기억하기 ────────────────────────────────────────────
@@ -7318,7 +7318,7 @@
     const playing = (st === 1 || st === 3);   // PLAYING / BUFFERING
     btn.innerHTML = playing ? PAUSE_SVG : PLAY_SVG;
     btn.classList.toggle("playing", playing);
-    btn.setAttribute("aria-label", playing ? "일시정지" : "재생");
+    btn.setAttribute("aria-label", playing ? "暫停" : "播放");
   }
 
   function onPlayerStateChange(event) {
@@ -7557,8 +7557,8 @@
           sw.addEventListener("statechange", ()=>{
             // 이미 쓰고 있는 상태에서 새 버전이 준비된 경우에만 안내
             if (sw.state === "installed" && navigator.serviceWorker.controller){
-              showBanner("<b>새 버전</b>이 준비됐어요. 가사가 업데이트됐을 수 있어요.",
-                         "새로고침",
+              showBanner("<b>新版本</b>已準備完成，歌詞或介面可能已更新。",
+                         "重新整理",
                          ()=>{ sw.postMessage({ type:"SKIP_WAITING" }); });
             }
           });
@@ -7579,7 +7579,7 @@
   /* 2) 오프라인이 되면 알려 주기 — 가사는 되지만 영상은 안 된다는 안내 */
   function updateOnlineState(){
     if (!navigator.onLine){
-      showBanner("<b>오프라인</b> 상태예요. 가사와 응원 표시는 그대로 볼 수 있지만, 영상 재생은 안 됩니다.",
+      showBanner("目前處於<b>離線</b>狀態。仍可查看歌詞與應援提示，但無法播放影片。",
                  "", null, "offline");
     } else if (banner && banner.classList.contains("offline")){
       hideBanner();
@@ -7596,8 +7596,8 @@
     if (standalone) return;                             // 이미 홈 화면에서 실행 중
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
     if (!isIOS) return;
-    showBanner("공유 버튼 <b>⎋</b> → <b>홈 화면에 추가</b> 를 누르면 앱처럼 쓸 수 있어요.",
-               "알겠어요",
+    showBanner("點選分享按鈕 <b>⎋</b> → <b>加入主畫面</b>，即可像 App 一樣使用。",
+               "知道了",
                ()=>{ store("horo-install-hint", "done"); hideBanner(); });
   }
 
@@ -7607,8 +7607,8 @@
     e.preventDefault();
     deferredInstall = e;
     if (store("horo-install-hint") === "done") return;
-    showBanner("홈 화면에 <b>설치</b>하면 공연장에서 바로 열 수 있어요.",
-               "설치",
+    showBanner("<b>安裝</b>到主畫面後，就能在場館直接開啟。",
+               "安裝",
                async ()=>{
                  hideBanner();
                  store("horo-install-hint", "done");
