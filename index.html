@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>VAUNDY ASIA ARENA TOUR 2026 "HORO" — SEOUL 應援指南</title>
-<meta name="description" content="VAUNDY ASIA ARENA TOUR 2026 &quot;HORO&quot; 首爾演出應援指南 — 各曲歌詞與大合唱、拍手、揮手重點">
+<title>VAUNDY ASIA ARENA TOUR 2026 "HORO" — TAIPEI 應援指南</title>
+<meta name="description" content="VAUNDY ASIA ARENA TOUR 2026 &quot;HORO&quot; 台北演出應援指南 — 各曲歌詞與大合唱、拍手、揮手重點">
 <meta name="theme-color" content="#2a0a06">
 
 <!-- 홈 화면 설치(PWA) -->
@@ -18,7 +18,7 @@
 
 <!-- 링크 공유용 -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="VAUNDY &quot;HORO&quot; SEOUL 應援指南">
+<meta property="og:title" content="VAUNDY &quot;HORO&quot; TAIPEI 應援指南">
 <meta property="og:description" content="搭配影片確認各曲歌詞與大合唱、拍手、揮手重點">
 <meta property="og:image" content="./icon-512.png">
 <meta name="twitter:card" content="summary">
@@ -2113,7 +2113,7 @@
     .song-fixed-top .video-wrap{padding:0 36px;}
   }
 
-  /* ---------- 도쿄 셋리스트 (스포일러 페이지) ----------
+  /* ---------- 台北場參考歌單（劇透頁） ----------
      첫 화면에는 경고만 보이고, 스크롤을 내려야 곡 목록이 드러난다. */
   .menu-row.spoiler .info-toggle-icon{
     background:none;
@@ -2645,23 +2645,15 @@
   /* 공연 당일 타임라인 — 그날이 되면 홈 화면 위쪽에 자동으로 나타납니다.
      (시각은 예매처 입장 안내 기준. 바꾸려면 이 표만 고치면 됩니다) */
   const SHOW_TIMELINE = {
-    "2026-09-19": [
-      { t:"12:00", label:"票券・站席・MD 周邊攤位・行李寄放處開放" },
-      { t:"14:00", label:"Arena 大廳開放・等待站席入場" },
-      { t:"15:00", label:"開始進場" },
-      { t:"16:30", label:"MD 周邊攤位結束營業" },
-      { t:"17:00", label:"正式演出開始" },
-      { t:"17:30", label:"票券攤位結束營業" },
-      { t:"20:00", label:"預計演出結束・行李寄放處關閉" }
+    "2026-10-31": [
+      { t:"17:30", label:"開場・開始入場" },
+      { t:"19:00", label:"正式演出開始" },
+      { t:"21:00", label:"預計演出結束（以現場為準）" }
     ],
-    "2026-09-20": [
-      { t:"11:00", label:"票券・站席・MD 周邊攤位・行李寄放處開放" },
-      { t:"13:00", label:"Arena 大廳開放・等待站席入場" },
-      { t:"14:00", label:"開始進場" },
-      { t:"15:30", label:"MD 周邊攤位結束營業" },
-      { t:"16:00", label:"正式演出開始" },
-      { t:"16:30", label:"票券攤位結束營業" },
-      { t:"19:00", label:"預計演出結束・行李寄放處關閉" }
+    "2026-11-01": [
+      { t:"17:30", label:"開場・開始入場" },
+      { t:"19:00", label:"正式演出開始" },
+      { t:"21:00", label:"預計演出結束（以現場為準）" }
     ]
   };
 
@@ -2669,8 +2661,8 @@
      start ~ end 사이에는 "NOW / ON AIR", 그 사이 기간에는 다음 공연까지 카운트,
      마지막 end 가 지나면 "END" 로 바뀝니다. */
   const SHOW_SCHEDULE = [
-    { start:"2026-09-19T17:00:00+09:00", end:"2026-09-19T20:00:00+09:00" },  // 9/19(토)
-    { start:"2026-09-20T16:00:00+09:00", end:"2026-09-20T19:00:00+09:00" }   // 9/20(일)
+    { start:"2026-10-31T19:00:00+08:00", end:"2026-10-31T21:30:00+08:00" },  // 10/31（六）
+    { start:"2026-11-01T19:00:00+08:00", end:"2026-11-01T21:30:00+08:00" }   // 11/1（日）
   ];
 
   /* 가사 한 줄의 형식
@@ -2729,25 +2721,11 @@
      · 보여 줄 순서를 바꾸려면 아래 줄 순서를 바꾸면 됩니다.
      · 새 공지가 나오면 한 줄만 더 적으면 됩니다.
      ───────────────────────────────────────────────────────────── */
-  const NOTICES = [
-    { src: "./images/notice/01-venue-map.jpg",  title: "場館地圖" },
-    { src: "./images/notice/02-id-check.jpg",   title: "身分確認" },
-    { src: "./images/notice/03-camera.jpg",     title: "相機攜入限制" },
-    { src: "./images/notice/04-md-sales.jpg",   title: "MD 現場販售" },
-    { src: "./images/notice/05-md-list.jpg",    title: "MD 清單" },
-    { src: "./images/notice/06-md-notice.jpg",  title: "現場購買注意事項" },
-    { src: "./images/notice/07-cd-sales.jpg",   title: "CD 現場販售" },
-    { src: "./images/notice/08-cd-bonus.jpg",   title: "CD 購買特典" },
-    { src: "./images/notice/11-photo-booth.jpg", title: "拍照亭" },
-    { src: "./images/notice/12-quick-bites.jpg", title: "F&B · VAUNDY CUP" },
-    { src: "./images/notice/13-sns-event.jpg",  title: "SNS 感想活動" },
-  ];
+  // 台北場官方公告圖片公布後，再補進這個清單。
+  const NOTICES = [];
 
   /* VAWS 회원 티켓 카드 카드 안에서 보여 줄 사진 — 같은 images/notice/ 폴더를 씁니다 */
-  const VAWS_PICS = [
-    { src: "./images/notice/10-vaws-card.jpg",  title: "VAWS 票卡" },
-    { src: "./images/notice/09-vaws-booth.jpg", title: "VAWS 攤位位置" },
-  ];
+  const VAWS_PICS = [];
 
   const PICS = {
     /* 이름            파일 경로                              사진 아래 설명(없어도 됨) */
@@ -4410,12 +4388,12 @@
      (빛살 모양은 작게 줄이면 사선이 묻혀서 오히려 '불빛 켜기'처럼 보입니다) */
   const FLASH_OFF_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6.6" y="2.6" width="10.8" height="18.8" rx="2.4"/><line x1="10.4" y1="5.6" x2="13.6" y2="5.6"/><line x1="3.6" y1="20.8" x2="20.4" y2="3.2"/></svg>';
 
-  /* ── 도쿄(아시아 아레나 투어) 셋리스트 ──────────────────────────
-     2026.09.05(토) · 09.06(일) 이틀 공연. songs 가 2개인 번호는 날짜별로
-     곡이 달랐던 자리다. id 는 위 SONGS 의 id 와 같아야 곡 화면으로 넘어간다. */
-  const SETLIST_TOKYO = {
-    label: "東京演出",
-    dates: "2026.09.05（六）・09.06（日）",
+  /* ── 台北場參考歌單 ─────────────────────────────────────────────
+     台北場尚未演出，先以巡演既有歌單作為參考；實際順序以現場為準。
+     id 必須對應上方 SONGS，才能連到歌曲頁。 */
+  const SETLIST_TAIPEI = {
+    label: "台北場參考",
+    dates: "2026.10.31（六）・11.01（日）",
     items: [
       { n:1,  songs:[{ id:"NakiJizo" }] },
       { n:2,  songs:[{ id:"Homunculus" }] },
@@ -4460,7 +4438,7 @@
   /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
      새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
      sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-  const BUILD = "v128";
+  const BUILD = "v129";
 
   /* 주소 뒤에 ?debug=1 을 붙이면 화면 위에 상태가 뜬다.
      "재생 중인 줄이 여러 개" 같은 문제가 폰에서만 날 때 원인을 보기 위한 것. */
@@ -4559,14 +4537,9 @@
   }
 
   /* ---------------- HOME ---------------- */
-  /* ── 좌석 배치도 ─────────────────────────────────────────────
-     인스파이어 아레나 · HORO 서울 공연 배치 (예매처 좌석배치도 기준).
-       · 무대가 한가운데 있는 360도 배치
-       · 플로어 스탠딩 A~H 가 무대를 빙 둘러싼다
-       · 2층 R석  201~220  — 고리 모양으로 한 바퀴
-       · 3층 S석  308~320  — 바깥 고리. 왼쪽 아래에는 구역이 없다
-     그림 파일이 아니라 좌표로 그리므로, 배치가 바뀌면 아래 표만 고치면 된다.
-     좌표를 하나하나 적지 않도록 "가로줄 · 세로줄 · 모서리" 세 규칙으로 만든다. */
+  /* ── 座位配置圖資料（目前不渲染，等待台北場官方座位圖） ──────────
+     台北場正式座位配置公布後，再以官方票區資料更新這組 SVG 座標。
+     在此之前不把其他場館的配置套用到台北小巨蛋。 */
   const SEAT_VIEW = { w: 630, h: 421, cx: 315, cy: 210 };
 
   /* 각 구역의 실제 도형.
@@ -4651,7 +4624,7 @@
     const order = (g) => g === "w" || g === "stage" ? 1 : 0;
     const list = SEAT_BLOCKS.slice().sort((a, b) => order(a.grade) - order(b.grade));
     return `<svg class="seat-map" viewBox="-5 -5 ${SEAT_VIEW.w + 10} ${SEAT_VIEW.h + 10}"`
-         + ` role="img" aria-label="Inspire Arena 座位配置圖">`
+         + ` role="img" aria-label="台北小巨蛋座位配置圖">`
          + list.map(seatBlockSvg).join("")
          + `</svg>`;
   }
@@ -4674,7 +4647,7 @@
     const wait = FLOOR_WAIT[b.id];
     const tail = b.grade === "floor"
       ? (wait
-          ? `入場前請前往 <span class="hi">渡假村${wait}側站席等候區</span>。詳細位置請查看「公告・指南」中的場館地圖。`
+          ? `入場前請依現場公告前往 <span class="hi">${wait}側站席等候區</span>。詳細位置請查看「公告・指南」中的場館地圖。`
           : "這是環繞舞台的站席區域。入場順序請依演出當天現場指示。")
       : `<span class="warn">A 排・B 排可能因安全欄杆而有些許視線遮擋。</span>`;
     return `<span class="grade ${g.cls}">${g.label}</span><b>${escapeHtml(b.id)}區</b>・${seatWhere(b)}`
@@ -4946,14 +4919,14 @@
 
           <div class="show-meta">
             <div class="show-row">
-              <span class="show-day">09.19<span class="dow">六</span></span>
-              <span class="show-time">17:00</span>
+              <span class="show-day">10.31<span class="dow">六</span></span>
+              <span class="show-time">19:00</span>
             </div>
             <div class="show-row">
-              <span class="show-day">09.20<span class="dow">日</span></span>
-              <span class="show-time">16:00</span>
+              <span class="show-day">11.01<span class="dow">日</span></span>
+              <span class="show-time">19:00</span>
             </div>
-            <div class="show-venue">INSPIRE ARENA, SEOUL</div>
+            <div class="show-venue">TAIPEI ARENA, TAIPEI</div>
           </div>
 
           <!-- 공연 당일에만 나타나는 오늘의 일정 -->
@@ -4982,51 +4955,53 @@
               <div class="info-panel-title"><span class="bar">|</span> 演出概要 <span class="bar">|</span></div>
               <dl class="info-facts">
                 <dt>演出名稱</dt>
-                <dd>Vaundy ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo; IN SEOUL</dd>
+                <dd>Vaundy ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo; IN TAIPEI</dd>
 
                 <dt>日期／時間</dt>
                 <dd>
-                  <span class="em">2026.09.19（六）17:00</span> ／ <span class="em">09.20（日）16:00</span>
-                  <span class="sub">演出時間約 120 分鐘</span>
+                  <span class="em">2026.10.31（六）19:00</span> ／ <span class="em">11.01（日）19:00</span>
+                  <span class="sub">兩天皆 17:30 開場・時間以官方公告為準</span>
                 </dd>
 
                 <dt>地點</dt>
                 <dd>
-                  Inspire Arena
-                  <span class="sub">韓國仁川廣域市中區機場文化路 127 號</span>
+                  台北小巨蛋 Taipei Arena
+                  <span class="sub">105037 臺北市松山區南京東路4段2號</span>
                 </dd>
 
-                <dt>觀賞年齡</dt>
+                <dt>入場規則</dt>
                 <dd>
-                  7 歲以上（2019 年以前出生）
-                  <span class="sub">13 歲以下須由 19 歲以上監護人陪同入場</span>
+                  全場實名制
+                  <span class="sub">入場請攜帶票券及填寫的有效證件正本；外籍觀眾依售票平台規定攜帶護照正本</span>
                 </dd>
 
                 <dt>票價</dt>
                 <dd>
                   <p class="info-price">
-                    <span>站席 165,000 韓元</span>
-                    <span>R 席 165,000 韓元</span>
-                    <span>S 席 154,000 韓元</span>
+                    <span>NT$ 5,880</span>
+                    <span>NT$ 4,880</span>
+                    <span>NT$ 3,880</span>
+                    <span>NT$ 2,880</span>
+                    <span>NT$ 800</span>
                   </p>
                   <span class="sub">另收購票手續費</span>
                 </dd>
 
                 <dt>取票方式</dt>
                 <dd>
-                  僅提供電子票券
-                  <span class="sub">無實體票、配送或現場取票／不可贈送</span>
+                  依 Ticket Plus 遠大售票平台提供
+                  <span class="sub">實名制資料請務必填寫正確，入場規定以售票平台公告為準</span>
                 </dd>
 
                 <dt>購票</dt>
                 <dd>
-                  NOL Ticket
-                  <span class="sub">須完成身分認證・購票者與觀眾資料需一致／洽詢 1544-1555（每日 09:00～18:00）</span>
+                  Ticket Plus 遠大售票
+                  <span class="sub">票務、實名制與入場問題請依售票平台最新公告確認</span>
                 </dd>
               </dl>
 
-              <a class="info-book-link" href="https://tickets.interpark.com/goods/26003199" target="_blank" rel="noopener">
-                ${EXT_LINK_SVG} 前往 NOL 購票頁面
+              <a class="info-book-link" href="https://ticketplus.com.tw/activity/6c3d8c24e0f00c9c84777615c001bebe" target="_blank" rel="noopener">
+                ${EXT_LINK_SVG} 前往 Ticket Plus 售票頁面
               </a>
 
               <hr class="info-divider">
@@ -5043,58 +5018,40 @@
                   <thead>
                     <tr>
                       <th>項目</th>
-                      <th>9/19（六）</th>
-                      <th>9/20（日）</th>
+                      <th>10/31（六）</th>
+                      <th>11/1（日）</th>
                       <th>備註</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td class="label" data-label="項目">票券攤位、站席攤位</td>
-                      <td data-label="9/19（六）">12:00 ～ 17:30</td>
-                      <td data-label="9/20（日）">11:00 ～ 16:30</td>
-                      <td class="note" data-label="備註">演出開始前 5 小時～演出開始後 30 分鐘</td>
-                    </tr>
-                    <tr>
-                      <td class="label" data-label="項目">MD 周邊攤位</td>
-                      <td data-label="9/19（六）">12:00 ～ 16:30</td>
-                      <td data-label="9/20（日）">11:00 ～ 15:30</td>
-                      <td class="note" data-label="備註">演出開始前 5 小時～演出開始前 30 分鐘</td>
-                    </tr>
-                    <tr>
-                      <td class="label" data-label="項目">行李寄放處</td>
-                      <td data-label="9/19（六）">12:00 ～ 20:00</td>
-                      <td data-label="9/20（日）">11:00 ～ 19:00</td>
-                      <td class="note" data-label="備註">演出開始前 5 小時～演出結束後</td>
-                    </tr>
-                    <tr>
-                      <td class="label" data-label="項目">Arena 大廳開放</td>
-                      <td data-label="9/19（六）">14:00 起</td>
-                      <td data-label="9/20（日）">13:00 起</td>
-                      <td class="note" data-label="備註">演出開始前 3 小時</td>
-                    </tr>
-                    <tr>
-                      <td class="label" data-label="項目">站席入場等候</td>
-                      <td data-label="9/19（六）">14:00 起</td>
-                      <td data-label="9/20（日）">13:00 起</td>
-                      <td class="note" data-label="備註">演出開始前 3 小時</td>
-                    </tr>
-                    <tr>
-                      <td class="label" data-label="項目">入場</td>
-                      <td data-label="9/19（六）">15:00 起</td>
-                      <td data-label="9/20（日）">14:00 起</td>
-                      <td class="note" data-label="備註">演出開始前 2 小時</td>
+                      <td class="label" data-label="項目">開場／入場</td>
+                      <td data-label="10/31（六）">17:30</td>
+                      <td data-label="11/1（日）">17:30</td>
+                      <td class="note" data-label="備註">官方已公布</td>
                     </tr>
                     <tr>
                       <td class="label" data-label="項目">正式演出</td>
-                      <td data-label="9/19（六）">17:00 起</td>
-                      <td data-label="9/20（日）">16:00 起</td>
-                      <td class="note" data-label="備註">演出時間 120 分鐘</td>
+                      <td data-label="10/31（六）">19:00</td>
+                      <td data-label="11/1（日）">19:00</td>
+                      <td class="note" data-label="備註">官方已公布</td>
+                    </tr>
+                    <tr>
+                      <td class="label" data-label="項目">周邊／物品寄放</td>
+                      <td data-label="10/31（六）">待公告</td>
+                      <td data-label="11/1（日）">待公告</td>
+                      <td class="note" data-label="備註">請以主辦與場館公告為準</td>
+                    </tr>
+                    <tr>
+                      <td class="label" data-label="項目">演出結束</td>
+                      <td data-label="10/31（六）">預計 21:00 左右</td>
+                      <td data-label="11/1（日）">預計 21:00 左右</td>
+                      <td class="note" data-label="備註">實際時間以現場為準</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
-              <p class="info-footnote">※ 營運時間可能依演出當天現場狀況調整。<br>※ 演出資訊以購票平台（NOL Ticket）為準，最新內容請至購票頁面確認。</p>
+              <p class="info-footnote">※ 目前官方已確認開場與開演時間；周邊販售、物品寄放與入場動線公布後會再補上。<br>※ 最新資訊請以主辦單位、Ticket Plus 與台北小巨蛋公告為準。</p>
 
 
 
@@ -5110,12 +5067,12 @@
           </button>
           <div class="info-panel" inert aria-hidden="true">
             <div class="info-panel-inner">
-              <p class="way-note">這裡是場館地圖、MD、身分確認等<b>官方公告</b>。<b>點選即可放大</b>查看。</p>
+              <p class="way-note">台北場的場館地圖、MD、身分確認等<b>官方公告</b>會在公布後補上。</p>
               <div class="notice-grid" id="notice-grid"></div>
               <p class="notice-empty" id="notice-empty" hidden>
-                目前還沒有公告圖片。<br>請將檔案放入 <b>images/notice/</b> 資料夾。
+                台北場官方公告圖片尚未公布，請先以主辦與場館公告為準。
               </p>
-              <p class="info-footnote">※ 圖片為官方公告原圖。實際安排可能依演出當天現場狀況調整。</p>
+              <p class="info-footnote">※ 台北場官方公告圖片公布後再更新。</p>
             </div>
           </div>
         </div>
@@ -5128,22 +5085,15 @@
           </button>
           <div class="info-panel" inert aria-hidden="true">
             <div class="info-panel-inner">
-              <div class="info-panel-title"><span class="bar">|</span> Inspire Arena <span class="bar">|</span></div>
+              <div class="info-panel-title"><span class="bar">|</span> 台北小巨蛋 Taipei Arena <span class="bar">|</span></div>
 
-              <p class="way-note">舞台位於<b>正中央</b>，為 360 度配置。Floor 站席 <b>A～H</b> 區環繞舞台，外圍則是<b>二樓 R 席（201～220）</b>與<b>三樓 S 席（308～320）</b>。</p>
+              <p class="way-note">台北場座位／站區配置請以 Ticket Plus 與主辦單位提供的<b>官方座位圖</b>為準。</p>
+              <p class="way-note">本站暫不顯示其他場次的座位示意圖，避免把不同場館的配置誤套到台北場。</p>
+              <a class="info-book-link" href="https://www.arena.taipei/" target="_blank" rel="noopener">
+                ${EXT_LINK_SVG} 前往台北小巨蛋官網
+              </a>
 
-              <div class="seat-wrap">
-                ${seatMapSvg()}
-                <div class="seat-legend">
-                  <span><i style="background:#e2543a"></i>Floor 站席</span>
-                  <span><i style="background:#e0b452"></i>R 席（二樓）</span>
-                  <span><i style="background:#5ecdc4"></i>S 席（三樓）</span>
-                  <span><i style="background:#9b7ad6"></i>輪椅席（二樓）</span>
-                </div>
-                <div class="seat-readout" id="seat-readout"></div>
-              </div>
-
-              <p class="info-footnote">※ 本圖依購票平台座位配置圖的區域形狀重新繪製，並套用本網站配色。<br>※ 舞台配置可能未經事前公告而變更；確切座位請以購票紀錄為準。</p>
+              <p class="info-footnote">※ 實際票區、座位與站區安排以票券及演出當日現場指示為準。</p>
             </div>
           </div>
         </div>
@@ -5157,57 +5107,48 @@
           <div class="info-panel" inert aria-hidden="true">
             <div class="info-panel-inner">
               <div class="way-addr">
-                <b>Inspire Arena</b>
-                <span>韓國仁川廣域市中區機場文化路 127 號</span>
+                <b>台北小巨蛋 Taipei Arena</b>
+                <span>105037 臺北市松山區南京東路4段2號</span>
               </div>
               <div class="way-btns">
-                <a href="https://map.kakao.com/link/search/%EC%9D%B8%EC%8A%A4%ED%8C%8C%EC%9D%B4%EC%96%B4%20%EC%95%84%EB%A0%88%EB%82%98" target="_blank" rel="noopener">Kakao 地圖</a>
-                <a href="https://map.naver.com/p/search/%EC%9D%B8%EC%8A%A4%ED%8C%8C%EC%9D%B4%EC%96%B4%20%EC%95%84%EB%A0%88%EB%82%98" target="_blank" rel="noopener">NAVER 地圖</a>
-                <a href="https://www.google.com/maps/search/?api=1&query=Inspire+Arena+Incheon" target="_blank" rel="noopener">Google 地圖</a>
+                <a href="https://www.arena.taipei/cp.aspx?n=459956E830D4A8BB" target="_blank" rel="noopener">場館交通資訊</a>
+                <a href="https://web.metro.taipei/pages2026/WebStation/109" target="_blank" rel="noopener">台北捷運 G17</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=Taipei+Arena+Taipei" target="_blank" rel="noopener">Google 地圖</a>
                 <button type="button" id="copy-addr">複製地址</button>
               </div>
 
-              <p class="way-note">演出當天場館周邊預計交通壅塞，入場也需要時間。請<b>預留充裕時間抵達</b>。</p>
+              <p class="way-note">演出日場館周邊預計人潮與車流較多，請<b>優先搭乘大眾運輸並預留入場時間</b>。</p>
 
               <div class="way-sec">
-                <h4>免費接駁車 <span>搭乘地鐵時</span></h4>
+                <h4>捷運 <span>最推薦</span></h4>
 
                 <div class="way-block">
-                  <div class="way-block-t">① 前往場館 — 機場鐵路<b>貨物航廈站</b> → Arena</div>
+                  <div class="way-block-t">① 松山新店線（綠線） → <b>G17 台北小巨蛋站</b></div>
                   <ul class="way-ul">
-                    <li>於貨物航廈站<b> 2 號出口</b>前搭乘 Arena 專用免費循環接駁車</li>
-                    <li>營運時間：<b>演出開始前 5 小時～演出開始</b>
-                      <span class="way-hint">9/19（六）12:00～17:00・9/20（日）11:00～16:00</span></li>
-                    <li>車程約 10～15 分鐘・<b>每 20 分鐘</b>一班（依現場狀況彈性調整）</li>
+                    <li>搭乘台北捷運松山新店線至 G17 台北小巨蛋站，從<b> 2 號出口</b>出站即達。</li>
+                    <li>從其他捷運路線前往時，請先轉乘至松山新店線；出發前可用台北捷運官方網站確認路線與營運資訊。</li>
                   </ul>
                 </div>
-
-                <div class="way-block">
-                  <div class="way-block-t">② 返回 — Arena → 仁川機場<b>第二航廈</b></div>
-                  <ul class="way-ul">
-                    <li>於 Arena 外部指定地點搭乘（請依公告與工作人員指示）</li>
-                    <li>營運至<b>演出結束～結束後 1 小時 30 分鐘</b></li>
-                    <li>返程時可能需要等候<b> 30 分鐘以上</b>才能上車</li>
-                  </ul>
-                </div>
-
-                <ul class="way-ul warn">
-                  <li>停車場空間有限且周邊交通壅塞，可能難以停車，請盡量搭乘接駁車。</li>
-                  <li>即使因交通或停車導致觀賞延誤，也無法更改或退款。</li>
-                  <li>接駁車可能因道路狀況延誤，請預留充裕時間。</li>
-                </ul>
               </div>
 
               <div class="way-sec">
-                <h4>停車</h4>
+                <h4>公車</h4>
                 <ul class="way-ul">
-                  <li>Inspire Entertainment Resort 內停車場</li>
-                  <li>演出觀眾<b>當日免費停車</b>・可用 Arena 大廳的 QR 碼事前登錄</li>
-                  <li>輪椅席觀眾請使用渡假村內的身心障礙停車位</li>
+                  <li>可搜尋站名「臺北小巨蛋」或「捷運台北小巨蛋站」。</li>
+                  <li>公車路線、到站時間與演出日改道資訊，請以臺北市公車動態資訊及現場公告為準。</li>
                 </ul>
               </div>
 
-              <p class="info-footnote">※ 地圖 App 需要網路連線。<br>※ 接駁車與停車資訊以購票平台公告為準，可能依現場狀況調整。</p>
+              <div class="way-sec">
+                <h4>開車／停車</h4>
+                <ul class="way-ul warn">
+                  <li>活動日周邊車流與停車需求高，建議不要把開車作為首選。</li>
+                  <li>若需開車，請先查看台北小巨蛋官方停車與交通公告；場館車位有限，<b>停車不等於保證入場</b>。</li>
+                  <li>散場時請依工作人員與交通管制指示離場，避免在場館周邊久候。</li>
+                </ul>
+              </div>
+
+              <p class="info-footnote">※ 地圖 App 需要網路連線。<br>※ 出口、交通管制、停車與臨時接駁若有變更，均以台北小巨蛋、台北捷運及主辦官方公告為準。</p>
             </div>
           </div>
         </div>
@@ -5260,7 +5201,7 @@
                 </ul>
               </div>
 
-              <p class="info-footnote">※ 本指南由粉絲製作。拍攝、攜入、再次入場等官方規定，以購票平台（NOL Ticket）公告與<b>演出當天現場指示</b>為準。</p>
+              <p class="info-footnote">※ 本指南由粉絲製作。拍攝、攜入、再次入場等官方規定，以 Ticket Plus、台北小巨蛋公告與<b>演出當天現場指示</b>為準。</p>
             </div>
           </div>
         </div>
@@ -5275,81 +5216,36 @@
             <div class="info-panel-inner">
               <div class="info-panel-title"><span class="bar">|</span> 場館限定特典 <span class="bar">|</span></div>
 
-              <p class="way-note">Vaundy 官方粉絲俱樂部 <b>VAWS MEMBERS</b> 會員可在現場免費領取<b>每場演出專屬原創票卡</b>。這是每個演出日設計不同的場館限定特典。</p>
+              <p class="way-note">VAWS MEMBERS 的「公演別原創票卡」為巡演場館限定企劃；台北場攤位位置、開放時間與領取方式目前尚待官方公告。</p>
 
               <dl class="info-facts">
-                <dt>特典</dt>
+                <dt>台北場</dt>
                 <dd>
-                  每場演出專屬原創票卡 1 張
-                  <span class="sub">每個演出日設計不同・場館限定</span>
+                  <span class="em">台北小巨蛋 Taipei Arena</span>
+                  <span class="sub">2026.10.31（六）・11.01（日）</span>
                 </dd>
 
                 <dt>對象</dt>
                 <dd>
                   <span class="em">VAWS MEMBERS 會員</span>
-                  <span class="sub">沒有演出票券也可以領取／當天在現場新加入也符合資格</span>
+                  <span class="sub">是否可於演出當日新加入、兌換地點與流程，請等待官方公告</span>
                 </dd>
 
-                <dt>攤位位置</dt>
+                <dt>攤位資訊</dt>
                 <dd>
-                  <span class="em">Inspire Discovery Park 戶外</span>
-                  <span class="sub">INSPIRE DISCOVERY PARK 戶外「拍照亭」旁・靠近西側站席等候區</span>
+                  <span class="em">待官方公布</span>
+                  <span class="sub">其他場次的攤位位置與營運時間不適用於台北場</span>
                 </dd>
-
               </dl>
 
-              <div class="info-panel-title"><span class="bar">|</span> 攤位營運時間 <span class="bar">|</span></div>
-
-              <div class="info-table-wrap">
-                <table class="info-table">
-                  <colgroup>
-                    <col class="info-col-label"><col class="info-col-day"><col class="info-col-day">
-                  </colgroup>
-                  <thead>
-                    <tr><th>項目</th><th>9/19（六）</th><th>9/20（日）</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td class="label" data-label="項目">VAWS 攤位</td>
-                      <td data-label="9/19（六）">12:00 ～ 20:00</td>
-                      <td data-label="9/20（日）">11:00 ～ 15:30</td>
-                    </tr>
-                    <tr>
-                      <td class="label" data-label="項目">演出開始</td>
-                      <td data-label="9/19（六）">17:00</td>
-                      <td data-label="9/20（日）">16:00</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <p class="way-note warn-note"><b>週日（9/20）攤位會在演出開始前關閉。</b>攤位 15:30 結束營業，請務必在<b>演出開始（16:00）前</b>領取。週六演出結束後仍開放至 20:00。</p>
-
-              <div class="way-sec">
-                <h4>領取方式 <span>僅限演出當天現場</span></h4>
-                <ul class="way-ul">
-                  <li>用手機掃描攤位附近張貼的<b>兌換用 QR 碼</b></li>
-                  <li>保持<b>兌換頁面在網頁瀏覽器中開啟</b>，前往 VAWS MEMBERS 攤位
-                    <span class="way-hint">不接受截圖</span></li>
-                  <li>確認會員資格後當場領取票卡</li>
-                </ul>
-              </div>
-
               <ul class="way-ul warn">
-                <li>每人每個演出日限領 1 張・兩天都參加即可各領 1 張。</li>
-                <li>準備數量發完後，可能會比預定時間提早結束。</li>
-                <li><b>開場前與演出開始前後人潮較多。</b>請預留時間前往。</li>
-                <li>營運時間與地點可能依天氣或現場設置狀況變更。</li>
-                <li>瑕疵品僅能在該場演出當天現場更換。</li>
-                <li>禁止轉售、轉讓，以及刊登於拍賣網站或二手交易 App。</li>
+                <li>官方公布後，請依公告中的 QR 碼與兌換流程辦理。</li>
+                <li>攤位時間與數量可能依準備狀況、天氣及現場人流調整。</li>
+                <li>開場前後預計人潮較多，請預留時間。</li>
               </ul>
 
-              <div class="info-panel-title"><span class="bar">|</span> 票卡・攤位位置 <span class="bar">|</span></div>
-              <p class="way-note">這是官方圖片。<b>點選即可放大</b>查看。</p>
-              <div class="notice-grid" id="vaws-grid"></div>
-
-              <a class="info-book-link" href="https://member.vaundy.jp/news/detail/11291?lang=en" target="_blank" rel="noopener">
-                ${EXT_LINK_SVG} 查看 VAWS 官方公告原文
+              <a class="info-book-link" href="https://member.vaundy.jp/feature/ASIAARENATOUR_2026" target="_blank" rel="noopener">
+                ${EXT_LINK_SVG} 查看 VAWS 官方巡演頁面
               </a>
 
               <p class="info-footnote">※ 以上內容以 VAWS MEMBERS 官方公告為準，詳細安排可能依演出當天現場狀況調整。</p>
@@ -5364,7 +5260,7 @@
           </a>
           <button class="menu-chip spoiler" type="button" id="setlist-btn">
             <span class="chip-ico warn">${WARN_SVG}</span>
-            <span class="chip-label">東京歌單</span>
+            <span class="chip-label">台北場參考歌單</span>
             <span class="chip-note">含劇透</span>
           </button>
         </div>
@@ -5387,7 +5283,7 @@
         </div>
       </section>
 
-      <div class="credits">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo;・SEOUL FAN CHANT GUIDE（非官方粉絲製作）<span class="build">${BUILD}</span></div>
+      <div class="credits">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo;・TAIPEI FAN CHANT GUIDE（非官方粉絲製作）<span class="build">${BUILD}</span></div>
     `;
 
     document.getElementById("guide-btn").addEventListener("click", ()=>{ location.hash = "#/guide"; });
@@ -5514,7 +5410,7 @@
           <ul class="song-list" id="song-list"></ul>
         </section>
 
-        <div class="credits">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo;・SEOUL FAN CHANT GUIDE（非官方粉絲製作）<span class="build">${BUILD}</span></div>
+        <div class="credits">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo;・TAIPEI FAN CHANT GUIDE（非官方粉絲製作）<span class="build">${BUILD}</span></div>
       </div>
     `;
 
@@ -5601,7 +5497,7 @@
      드러나지 않는다. */
   function setlistFlat(){
     const out = [];
-    SETLIST_TOKYO.items.forEach(it =>
+    SETLIST_TAIPEI.items.forEach(it =>
       it.songs.forEach((e, i) => out.push({ key: it.n + ":" + i, id: e.id }))
     );
     return out;
@@ -5703,12 +5599,12 @@
     const total = setlistFlat().length;
 
     listEl.innerHTML = isOrder
-      ? SETLIST_TOKYO.items.map(setlistRowHtml).join("")
+      ? SETLIST_TAIPEI.items.map(setlistRowHtml).join("")
       : setlistRandomSongs().map(setlistRandomRowHtml).join("");
 
     const countEl = document.getElementById("setlist-count");
     if (countEl) countEl.textContent = isOrder
-      ? `正式演出 ${SETLIST_TOKYO.items.length} 首・共 ${total} 首`
+      ? `正式演出 ${SETLIST_TAIPEI.items.length} 首・共 ${total} 首`
       : `共 ${total} 首`;
 
     const metaEl = document.getElementById("setlist-mode-meta");
@@ -5719,14 +5615,14 @@
 
     const desc = document.getElementById("setlist-desc");
     if (desc) desc.innerHTML = isOrder
-      ? `${escapeHtml(SETLIST_TOKYO.dates)}<br>點選歌曲即可前往應援指南`
-      : `${escapeHtml(SETLIST_TOKYO.dates)}<br>目前將歌曲<b>打亂顯示，不公開演出順序</b>`;
+      ? `${escapeHtml(SETLIST_TAIPEI.dates)}<br>點選歌曲即可前往應援指南`
+      : `${escapeHtml(SETLIST_TAIPEI.dates)}<br>目前將歌曲<b>打亂顯示，不公開演出順序</b>`;
 
     const note = document.getElementById("setlist-note");
     if (note) note.innerHTML = isOrder
-      ? `※ 這是整理自粉絲紀錄的非官方歌單，首爾演出可能不同。<br>
+      ? `※ 台北場尚未演出，這是整理自其他場次的非官方參考歌單，實際順序可能不同。<br>
          ※ 日期不同而有變化的曲目，已分為<b>六</b>・<b>日</b>。`
-      : `※ 這是整理自粉絲紀錄的非官方歌單，首爾演出可能不同。<br>
+      : `※ 台北場尚未演出，這是整理自其他場次的非官方參考歌單，實際順序可能不同。<br>
          ※ 演出順序與日期差異曲目皆已隱藏。想查看完整內容，請在上方點選<b>演出順序</b>。`;
 
     app.querySelectorAll(".set-mode").forEach(b=>{
@@ -5764,7 +5660,7 @@
           <div class="spoiler-mark">${WARN_SVG}</div>
           <h2 class="spoiler-title">劇透注意</h2>
           <p class="spoiler-desc">
-            這個頁面包含<b>${SETLIST_TOKYO.label}的歌曲名稱與順序</b>。<br>
+            這個頁面包含<b>${SETLIST_TAIPEI.label}的歌曲名稱與順序</b>。<br>
             選擇查看方式前，不會顯示內容。
           </p>
           <button class="spoiler-safe" type="button" id="spoiler-safe">不看劇透，返回首頁</button>
@@ -5783,7 +5679,7 @@
 
         <section class="setlist-body" id="setlist-body" hidden inert>
           <div class="setlist-head">
-            <h2>${escapeHtml(SETLIST_TOKYO.label)}歌單</h2>
+            <h2>${escapeHtml(SETLIST_TAIPEI.label)}歌單</h2>
             <p id="setlist-desc"></p>
           </div>
 
@@ -5907,18 +5803,18 @@
   }
 
 
-  /* ── 오늘의 일정 ─────────────────────────────────────────────
-     한국 시간 기준으로 오늘이 공연날이면 카드가 나타나고,
+  /* ── 今日的行程 ─────────────────────────────────────────────
+     台北時間 기준으로 오늘이 공연날이면 카드가 나타나고,
      지금 어느 단계인지와 다음 단계까지 남은 시간을 1초마다 갱신한다. */
-  function kstDateKey(d){
+  function taipeiDateKey(d){
     return new Intl.DateTimeFormat("en-CA", {
-      timeZone:"Asia/Seoul", year:"numeric", month:"2-digit", day:"2-digit"
+      timeZone:"Asia/Taipei", year:"numeric", month:"2-digit", day:"2-digit"
     }).format(d);
   }
-  /* 한국 날짜 기준으로 두 시점이 며칠 차이인지 (오늘=0, 내일=1) */
-  function kstDayGap(from, to){
+  /* 台北日期 기준으로 두 시점이 며칠 차이인지 (오늘=0, 내일=1) */
+  function taipeiDayGap(from, to){
     const ymd = (t)=>{
-      const k = kstDateKey(new Date(t));
+      const k = taipeiDateKey(new Date(t));
       return Date.UTC(+k.slice(0,4), +k.slice(5,7) - 1, +k.slice(8,10));
     };
     return Math.max(0, Math.round((ymd(to) - ymd(from)) / 86400000));
@@ -5928,7 +5824,7 @@
   function updateTodayCard(now){
     const card = document.getElementById("today-card");
     if (!card) return;
-    const key   = kstDateKey(new Date(now));
+    const key   = taipeiDateKey(new Date(now));
     const steps = SHOW_TIMELINE[key];
     if (!steps){ card.hidden = true; todayBuiltKey = null; return; }
     card.hidden = false;
@@ -5967,7 +5863,7 @@
     const copyBtn = document.getElementById("copy-addr");
     if (copyBtn){
       copyBtn.addEventListener("click", async ()=>{
-        const addr = "韓國仁川廣域市中區機場文化路 127 號 Inspire Arena";
+        const addr = "105037 臺北市松山區南京東路4段2號 台北小巨蛋 Taipei Arena";
         try { await navigator.clipboard.writeText(addr); copyBtn.textContent = "已複製 ✓"; }
         catch(e){ copyBtn.textContent = addr; }
         setTimeout(()=>{ copyBtn.textContent = "複製地址"; }, 1600);
@@ -5979,7 +5875,7 @@
     if (shareBtn){
       shareBtn.addEventListener("click", async ()=>{
         const data = {
-          title: "VAUNDY \"HORO\" SEOUL 應援指南",
+          title: "VAUNDY \"HORO\" TAIPEI 應援指南",
           text: "搭配影片查看各曲歌詞與大合唱、拍手、揮手重點",
           url: location.href.split("#")[0]
         };
@@ -6135,10 +6031,10 @@
       }
 
       const diff = shows[nextIdx].start - now;
-      // D-day 는 "며칠 남았나"를 한국 날짜 기준으로 센다.
+      // D-day 以台北日期計算剩餘天數。
       // 남은 시간을 24로 나누면, 공연이 내일이어도 20시간 남았을 때 D-00 이 되어
       // '오늘이 공연날'로 잘못 읽힌다. 날짜끼리 빼야 내일은 D-01 이 된다.
-      const d = kstDayGap(now, shows[nextIdx].start);
+      const d = taipeiDayGap(now, shows[nextIdx].start);
       // 시:분:초는 시작까지 남은 전체 시간 (D-01 이면 24시간을 넘을 수 있다)
       const h = Math.floor(diff/3600000);
       const m = Math.floor(diff%3600000/60000);

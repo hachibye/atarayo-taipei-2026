@@ -1,4 +1,4 @@
-# HORO Seoul fan guide design
+# HORO Taipei fan guide design
 
 ## 1. Atmosphere & identity
 
@@ -10,7 +10,7 @@ The home hero keeps the existing deep wine background (`--bg-deep`), cream text 
 
 ## 3. Typography
 
-Pretendard Variable is the reading and control face, including Korean, Japanese fallback, and numeric data. Gmarket Sans Medium and Bold are for the tour title and page titles. Use a system monospace face for the large live countdown so every digit occupies the same width. Use tabular numerals for other times and song numbers. Body copy should keep Korean phrases together and should not use wide tracking or chromatic shadows.
+Pretendard Variable is the reading and control face, including Traditional Chinese, Japanese fallback, and numeric data. Gmarket Sans Medium and Bold are for the tour title and page titles. Use a system monospace face for the large live countdown so every digit occupies the same width. Use tabular numerals for other times and song numbers. Body copy should keep Traditional Chinese phrases together and should not use wide tracking or chromatic shadows.
 
 ## 4. Spacing & layout
 
@@ -42,6 +42,6 @@ Use tonal shifts and spacing for ordinary content. Reserve a hairline for neighb
 
 ## 8. Accessibility constraints & accepted debt
 
-Keep visible keyboard focus, readable contrast in the arena, meaningful icon labels, and phrase-preserving Korean wrapping. The existing large single-file page and its inline SVG illustration remain; restructuring them is outside this visual pass.
+Keep visible keyboard focus, readable contrast in the arena, meaningful icon labels, and phrase-preserving Traditional Chinese wrapping. The existing large single-file page and its inline SVG illustration remain; restructuring them is outside this visual pass.
 
 The guide and song picker show persistent search labels, with 16px search text on phones. Sort and view controls expose their pressed state as ordinary buttons. Collapsed information cards and inactive screens stay out of keyboard and screen-reader navigation. When a song picker or notice image opens, focus moves into it; closing returns focus to the trigger.
