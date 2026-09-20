@@ -4575,7 +4575,7 @@
   /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
      새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
      sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-  const BUILD = "v149";
+  const BUILD = "v151";
 
   /* 주소 뒤에 ?debug=1 을 붙이면 화면 위에 상태가 뜬다.
      "재생 중인 줄이 여러 개" 같은 문제가 폰에서만 날 때 원인을 보기 위한 것. */
@@ -7039,7 +7039,10 @@
       assignKaraokeLineTiming(line, karaokeLineTiming(currentSong, idx));
       syncIconAnimationPhase(line, now);
     });
-    updateKaraokeProgress(document.querySelector(".lyric-line.active"), getPlayerTime());
+    /* The reading toggle replaces the lyric DOM. Re-run the normal sync path
+       so the active line and the newly allocated romaji timings are painted
+       against the current video position immediately. */
+    updateLyricsSync(true);
   }
   window.addEventListener("online",  ()=>{ if (songShellBuilt) applyVenueMode(); });
   window.addEventListener("offline", ()=>{ if (songShellBuilt) applyVenueMode(); });
@@ -7420,7 +7423,12 @@
     if (!line) return;
     const target = line.querySelector(".lyric-jp");
     const units = target && target._karaokeUnits || [];
-    units.forEach(unit => { unit.start = null; unit.end = null; });
+    units.forEach(unit => {
+      unit.start = null;
+      unit.end = null;
+      delete unit.el.dataset.karaokeStart;
+      delete unit.el.dataset.karaokeEnd;
+    });
     if (!timedLine || !Array.isArray(timedLine.words) || !timedLine.words.length){
       return;
     }
@@ -7441,6 +7449,11 @@
       if (!timing) return;
       unit.start = Number(timing.start);
       unit.end = Math.max(unit.start + 0.02, Number(timing.end));
+      /* Keep the timing on the element too.  Reading-mode changes replace
+         the inner HTML, and a DOM-backed value makes the romaji fallback
+         survive browser rendering/isolation differences just like kana. */
+      unit.el.dataset.karaokeStart = String(unit.start);
+      unit.el.dataset.karaokeEnd = String(unit.end);
     });
     line.dataset.karaokeSource = enoughTextMatches ? "word" : "line-proportional";
   }
@@ -7486,11 +7499,17 @@
     const end = Number(line.dataset.karaokeEnd);
     if (!units.length || !Number.isFinite(start) || !Number.isFinite(end)) return;
 
-    const hasRealWordTiming = units.some(unit => Number.isFinite(unit.start) && Number.isFinite(unit.end));
+    const hasRealWordTiming = units.some(unit =>
+      (Number.isFinite(unit.start) && Number.isFinite(unit.end))
+      || (Number.isFinite(Number(unit.el.dataset.karaokeStart))
+        && Number.isFinite(Number(unit.el.dataset.karaokeEnd)))
+    );
     if (hasRealWordTiming){
       units.forEach(unit => {
-        const unitStart = Number(unit.start);
-        const unitEnd = Number(unit.end);
+        const unitStart = Number.isFinite(unit.start)
+          ? Number(unit.start) : Number(unit.el.dataset.karaokeStart);
+        const unitEnd = Number.isFinite(unit.end)
+          ? Number(unit.end) : Number(unit.el.dataset.karaokeEnd);
         if (!Number.isFinite(unitStart) || !Number.isFinite(unitEnd)){
           unit.el.classList.remove("karaoke-lit", "karaoke-current");
           unit.el.style.removeProperty("--karaoke-word-progress");
