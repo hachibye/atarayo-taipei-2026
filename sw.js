@@ -4,7 +4,7 @@
    ★ 가사나 화면을 고쳐서 다시 올릴 때는 아래 CACHE_VERSION 숫자를 꼭 올려 주세요.
      그래야 사람들 폰에 새 내용이 내려갑니다. (v1 → v2 → v3 …)
    ───────────────────────────────────────────────────────────── */
-const CACHE_VERSION = "v146";
+const CACHE_VERSION = "v149";
 const CACHE_NAME    = `horo-guide-${CACHE_VERSION}`;
 
 /* 처음 방문할 때 미리 받아 둘 파일들.
@@ -13,6 +13,7 @@ const PRECACHE = [
   "./",
   "./index.html",
   "./furigana.js",
+  "./karaoke-sources.js",
   "./design.css",
   "./fonts/PretendardVariable.woff2",
   "./fonts/GmarketSansMedium.woff",
