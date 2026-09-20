@@ -816,8 +816,7 @@
     flex-direction:column;
     overflow:hidden;
     background:var(--bg-deep);
-    --icon-wave-duration:1.1s;
-    --icon-clap-duration:.62s;
+    --icon-beat-duration:.62s;
   }
   .song-body{
     flex:1;
@@ -1166,7 +1165,7 @@
   .ico-wave svg{
     width:100%;height:100%;
     transform-origin:60% 85%;
-    animation:handWave var(--icon-wave-duration, 1.1s) ease-in-out infinite;
+    animation:handWave var(--icon-beat-duration, 1.1s) ease-in-out infinite;
   }
   @keyframes handWave{
     0%,100%{ transform:rotate(-16deg); }
@@ -1185,8 +1184,8 @@
     display:block;
   }
   .ico-clap .hand svg{width:100%;height:100%;}
-  .ico-clap .hand.l{ left:0;  animation:clapL var(--icon-clap-duration, .62s) ease-in-out infinite; }
-  .ico-clap .hand.r{ right:0; animation:clapR var(--icon-clap-duration, .62s) ease-in-out infinite; }
+  .ico-clap .hand.l{ left:0;  animation:clapL var(--icon-beat-duration, .62s) ease-in-out infinite; }
+  .ico-clap .hand.r{ right:0; animation:clapR var(--icon-beat-duration, .62s) ease-in-out infinite; }
   .ico-clap .spark{
     position:absolute;
     left:50%;top:-0.12em;
@@ -1194,7 +1193,7 @@
     margin-left:-0.45em;
     color:var(--gold);
     opacity:0;
-    animation:clapSpark var(--icon-clap-duration, .62s) ease-out infinite;
+    animation:clapSpark var(--icon-beat-duration, .62s) ease-out infinite;
     pointer-events:none;
   }
   .ico-clap .spark svg{width:100%;height:100%;}
@@ -1223,7 +1222,7 @@
     position:absolute;left:0;top:0;
     width:100%;height:84%;
     transform-origin:50% 100%;
-    animation:iconJump .72s cubic-bezier(.3,.7,.4,1) infinite;
+    animation:iconJump var(--icon-beat-duration, .72s) cubic-bezier(.3,.7,.4,1) infinite;
   }
   .ico-jump .ground{
     position:absolute;
@@ -1253,7 +1252,7 @@
   }
   .ico-spin .arm{
     transform-origin:47.5% 67.1%;     /* 어깨 위치 (11.4, 16.1) */
-    animation:iconArmCircle 1.15s linear infinite;
+    animation:iconArmCircle var(--icon-beat-duration, 1.15s) linear infinite;
   }
   /* 든 손이 머리 옆에서 작은 원을 그리도록 —
      좌우로 기울이기(rotate) + 팔 길이 원근감(scale) 을 90° 어긋나게 겹친다 */
@@ -1272,7 +1271,7 @@
     91.667%{ transform:rotate(9.53deg) scale(0.930); }
     100%   { transform:rotate(11.00deg) scale(1.000); }
   }
-  .lyric-line.active .ico-spin .arm{ animation-duration:.8s; }
+  .lyric-line.active .ico-spin .arm{ animation-duration:var(--icon-beat-duration); }
   .lyric-line.active .ico-spin{ filter:drop-shadow(0 0 6px rgba(255,134,200,0.5)); }
 
   /* 떼창(마이크) — 살짝 커졌다 작아지는 맥박 */
@@ -1282,7 +1281,7 @@
   }
   .ico-mic svg{
     width:100%;height:100%;
-    animation:micPulse 1.2s ease-in-out infinite;
+    animation:micPulse var(--icon-beat-duration, 1.2s) ease-in-out infinite;
   }
   @keyframes micPulse{
     0%,100%{ transform:scale(1); }
@@ -1290,14 +1289,14 @@
   }
 
   /* 目前播放中的歌詞列沿用歌曲 BPM，只增加陰影讓焦點更清楚 */
-  .lyric-line.active .ico-wave svg{ animation-duration:var(--icon-wave-duration); }
-  .lyric-line.active .ico-clap .hand{ animation-duration:var(--icon-clap-duration); }
-  .lyric-line.active .ico-clap .spark{ animation-duration:var(--icon-clap-duration); }
+  .lyric-line.active .ico-wave svg{ animation-duration:var(--icon-beat-duration); }
+  .lyric-line.active .ico-clap .hand{ animation-duration:var(--icon-beat-duration); }
+  .lyric-line.active .ico-clap .spark{ animation-duration:var(--icon-beat-duration); }
   .lyric-line.active .ico-wave{ filter:drop-shadow(0 0 6px rgba(141,224,95,0.5)); }
   .lyric-line.active .ico-clap{ filter:drop-shadow(0 0 6px rgba(79,168,224,0.45)); }
 
-  .lyric-line.active .ico-mic svg{ animation-duration:.8s; }
-  .lyric-line.active .ico-jump svg{ animation-duration:.5s; }
+  .lyric-line.active .ico-mic svg{ animation-duration:var(--icon-beat-duration); }
+  .lyric-line.active .ico-jump svg{ animation-duration:var(--icon-beat-duration); }
   .lyric-line.active .ico-jump{ filter:drop-shadow(0 0 6px rgba(185,140,255,0.5)); }
 
   /* 화면에 보이는 가사 줄의 아이콘만 실제로 움직인다.
@@ -4490,6 +4489,7 @@
   let lastActiveIdx = -1;
   let syncTicks = 0;      // 동기화가 몇 번 돌았는지 (진단용)
   let syncErr   = "";     // 재생 위치 읽기 실패 메시지 (진단용)
+  let iconClockStartedAt = performance.now();
 
   /* ── 가사 넘어가는 속도 조절값 (이 세 값만 바꾸면 됨) ──────────────
      SYNC_INTERVAL_MS : 재생 위치를 확인하는 주기(ms). 작을수록 빨리 반응.
@@ -4501,7 +4501,7 @@
   /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
      새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
      sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-  const BUILD = "v132";
+  const BUILD = "v133";
 
   /* 주소 뒤에 ?debug=1 을 붙이면 화면 위에 상태가 뜬다.
      "재생 중인 줄이 여러 개" 같은 문제가 폰에서만 날 때 원인을 보기 위한 것. */
@@ -6698,9 +6698,9 @@
 
     const beatSeconds = 60 / bpm;
     page.style.setProperty("--song-bpm", String(bpm));
-    page.style.setProperty("--icon-clap-duration", `${beatSeconds.toFixed(3)}s`);
-    page.style.setProperty("--icon-wave-duration", `${(beatSeconds * 2).toFixed(3)}s`);
+    page.style.setProperty("--icon-beat-duration", `${beatSeconds.toFixed(3)}s`);
     page.dataset.bpm = String(bpm);
+    iconClockStartedAt = performance.now();
   }
 
   function renderSong(song){
@@ -6789,13 +6789,42 @@
     const lines = songView.querySelectorAll(".lyric-line");
     if (!container || !lines.length) return;
     if (!("IntersectionObserver" in window)){
-      lines.forEach(el => el.classList.add("in-view"));
+      const now = performance.now();
+      lines.forEach(el => {
+        el.classList.add("in-view");
+        syncIconAnimationPhase(el, now);
+      });
       return;
     }
     lyricObserver = new IntersectionObserver((entries)=>{
-      entries.forEach(e => e.target.classList.toggle("in-view", e.isIntersecting));
+      const now = performance.now();
+      entries.forEach(e => {
+        e.target.classList.toggle("in-view", e.isIntersecting);
+        if (e.isIntersecting) syncIconAnimationPhase(e.target, now);
+      });
     }, { root: container, rootMargin: "120px 0px" });
     lines.forEach(el => lyricObserver.observe(el));
+  }
+
+  /*
+   * 可視區外的圖示仍會暫停以節省電量，但重新進入畫面時要接回同一個全域拍點。
+   * 否則每一列會從自己的第 0 拍開始，看起來就像同一種符號各自不同步。
+   */
+  function syncIconAnimationPhase(line, now){
+    const page = document.getElementById("song-page");
+    const bpm = Number(page && page.dataset.bpm);
+    if (!line || !page || !Number.isFinite(bpm) || bpm <= 0) return;
+
+    const periodMs = 60000 / bpm;
+    const elapsedMs = Math.max(0, (now || performance.now()) - iconClockStartedAt);
+    const delay = -((elapsedMs % periodMs) / 1000);
+    const icons = line.querySelectorAll(
+      ".ico-wave svg, .ico-mic svg, .ico-jump svg, "
+      + ".ico-spin .arm, .ico-clap .hand, .ico-clap .spark"
+    );
+    icons.forEach(icon => {
+      icon.style.animationDelay = `${delay.toFixed(3)}s`;
+    });
   }
 
   /* 단축모드 화면 적용 — 곡을 바꿔도 유지된다 */
