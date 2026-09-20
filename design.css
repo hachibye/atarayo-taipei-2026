@@ -758,9 +758,7 @@ button{touch-action:manipulation;}
 .song-page .chant-toggle.active .chant-ico{ opacity:1; }
 
 
-/* 단축모드에서는 재생 버튼까지 더해져 버튼이 넷이 된다.
-   그 상태로는 한 줄에 다 들어가지 않아 가사가 가려지므로,
-   단축모드에서만 '떼창만' 을 마이크 아이콘 하나로 줄인다.
-   (무엇인지 익히는 일반 화면에서는 글자를 그대로 둔다) */
-.song-page.venue .chant-toggle .venue-label{ display:none; }
-.song-page.venue .chant-toggle{ padding-left:9px;padding-right:9px; }
+/* 일반·簡潔模式都將「只聽大合唱」縮成麥克風圖示，
+   讓新增的歌詞切換按鈕加入後，兩種模式的控制列高度一致。 */
+.song-page .chant-toggle .venue-label{ display:none; }
+.song-page .chant-toggle{ padding-left:9px;padding-right:9px; }
