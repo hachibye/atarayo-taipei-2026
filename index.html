@@ -2021,6 +2021,17 @@
   .venue-toggle.active .venue-switch{ background:#51432d; }
   .venue-toggle.active .venue-knob{ transform:translateX(11px); background:var(--gold); }
 
+  /* 日文讀音切換 — 假名適合熟悉日文的使用者，Romaji 會把整行日文都轉換 */
+  .reading-toggle{ min-width:92px; }
+  .reading-value{
+    font-family:'Gmarket Sans',sans-serif;
+    font-size:11px;
+    letter-spacing:.02em;
+    color:var(--gold-soft);
+    white-space:nowrap;
+  }
+  .reading-toggle.active .reading-value{ color:var(--gold); }
+
   /* 켜진 상태 — 영상 영역은 화면에서 사라지고 가사만 남는다 */
   .song-page.venue .song-body{ flex-direction:column; }
   .song-page.venue .song-fixed-top{
@@ -4499,6 +4510,7 @@
   let syncTimer = null;
   let autoScrollEnabled = true;
   let venueMode = false;          // 단축모드 (첫 실행 때 저장값을 읽어 옴)
+  let readingMode = store("horo-reading") === "romaji" ? "romaji" : "kana";
   let lastActiveIdx = -1;
   let syncTicks = 0;      // 동기화가 몇 번 돌았는지 (진단용)
   let syncErr   = "";     // 재생 위치 읽기 실패 메시지 (진단용)
@@ -4514,7 +4526,7 @@
   /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
      새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
      sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-  const BUILD = "v134";
+  const BUILD = "v135";
 
   /* 주소 뒤에 ?debug=1 을 붙이면 화면 위에 상태가 뜬다.
      "재생 중인 줄이 여러 개" 같은 문제가 폰에서만 날 때 원인을 보기 위한 것. */
@@ -6370,6 +6382,10 @@
             <span class="venue-label">簡潔模式</span>
             <span class="venue-switch"><span class="venue-knob"></span></span>
           </button>
+          <button class="venue-toggle reading-toggle" id="reading-btn" aria-pressed="${readingMode === "romaji" ? "true" : "false"}" aria-label="切換日文讀音：目前顯示${readingMode === "romaji" ? "羅馬拼音" : "假名"}">
+            <span class="venue-label">讀音</span>
+            <span class="reading-value" id="reading-value">${readingMode === "romaji" ? "Romaji" : "假名"}</span>
+          </button>
           <button class="autoscroll-toggle${autoScrollEnabled ? " active" : ""}" id="autoscroll-btn" aria-label="開啟／關閉自動捲動">
             <span class="autoscroll-label">AUTO SCROLL</span>
             <span class="autoscroll-switch"><span class="autoscroll-knob"></span></span>
@@ -6512,6 +6528,13 @@
       venueMode = !venueMode;
       store("horo-venue", venueMode ? "1" : "");
       applyVenueMode();
+    });
+
+    document.getElementById("reading-btn").addEventListener("click", ()=>{
+      readingMode = readingMode === "romaji" ? "kana" : "romaji";
+      store("horo-reading", readingMode);
+      updateReadingUi();
+      repaintJapaneseReadings();
     });
 
     document.getElementById("autoscroll-btn").addEventListener("click", (e)=>{
@@ -6783,6 +6806,7 @@
     syncChantUi();                         // 떼창만 듣기 상태 반영
     paintChantBar();
     applyVenueMode();                      // 단축모드 상태 반영 (글자 크기 등)
+    updateReadingUi();                      // 假名／羅馬拼音顯示狀態
     updateLyricsPadding();                 // 첫 소절도 가운데 오도록 여백 계산
     observeLyricLines();                   // 보이는 줄의 아이콘만 움직이게
     requestWakeLock();                     // 가사 보는 동안 화면이 꺼지지 않게
@@ -6853,6 +6877,34 @@
     // 글자 크기가 달라지므로 가운데 기준을 다시 잡고 현재 소절로 맞춘다
     updateLyricsPadding();
     updateLyricsSync(true);
+  }
+
+  function updateReadingUi(){
+    const btn = document.getElementById("reading-btn");
+    const value = document.getElementById("reading-value");
+    const romaji = readingMode === "romaji";
+    if (value) value.textContent = romaji ? "Romaji" : "假名";
+    if (btn){
+      btn.classList.toggle("active", romaji);
+      btn.setAttribute("aria-pressed", romaji ? "true" : "false");
+      btn.setAttribute("aria-label", `切換日文讀音：目前顯示${romaji ? "羅馬拼音" : "假名"}`);
+    }
+  }
+
+  /* 切換讀音時只重畫日文列，保留目前歌曲、播放進度與繁中字幕。 */
+  function repaintJapaneseReadings(){
+    if (!currentSong) return;
+    const list = document.getElementById("lyrics-list");
+    if (!list) return;
+    const now = performance.now();
+    list.querySelectorAll(".lyric-line").forEach(line => {
+      const idx = Number(line.dataset.idx);
+      const lyric = currentSong.lyrics && currentSong.lyrics[idx];
+      const target = line.querySelector(".lyric-jp");
+      if (!lyric || !target) return;
+      target.innerHTML = renderJapaneseLine(lyric.jp || "");
+      syncIconAnimationPhase(line, now);
+    });
   }
   window.addEventListener("online",  ()=>{ if (songShellBuilt) applyVenueMode(); });
   window.addEventListener("offline", ()=>{ if (songShellBuilt) applyVenueMode(); });
@@ -6995,6 +7047,10 @@
   }
   function renderJapaneseLine(str){
     const source = String(str ?? "");
+    if (readingMode === "romaji"){
+      const romaji = window.JP_ROMAJI && window.JP_ROMAJI[source];
+      return withIcons(typeof romaji === "string" ? romaji : source);
+    }
     const ruby = window.JP_FURIGANA && window.JP_FURIGANA[source];
     if (!ruby) return withIcons(source);
     return ruby.replace(ICON_TOKEN_RE, (m, key)=> INLINE_ICONS[key.toLowerCase()] || m);
