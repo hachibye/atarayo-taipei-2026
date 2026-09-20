@@ -4543,7 +4543,8 @@
   let readingMode = store("horo-reading") === "romaji" ? "romaji" : "kana";
   let showJapanese = store("horo-show-japanese") !== "0";
   let showChinese = store("horo-show-chinese") !== "0";
-  let karaokeEnabled = store("horo-karaoke") !== "0";
+  // 卡拉OK 預設關閉；若使用者曾手動選擇，則沿用保存的設定。
+  let karaokeEnabled = store("horo-karaoke") === "1";
   let lastActiveIdx = -1;
   let karaokeActiveLine = null;
   let syncTicks = 0;      // 동기화가 몇 번 돌았는지 (진단용)
@@ -4560,7 +4561,7 @@
   /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
      새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
      sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-  const BUILD = "v144";
+  const BUILD = "v145";
 
   /* 주소 뒤에 ?debug=1 을 붙이면 화면 위에 상태가 뜬다.
      "재생 중인 줄이 여러 개" 같은 문제가 폰에서만 날 때 원인을 보기 위한 것. */
