@@ -1,5 +1,6 @@
 import {
   INFO_SVG,
+  GITHUB_SVG,
   EXT_LINK_SVG,
   MAP_SVG,
   PLAY_SVG,
@@ -79,6 +80,25 @@ const SYNC_INTERVAL_MS   = 100;
    새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
    sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
 const BUILD = "v1.6.4";
+
+const REPO_URL = "https://github.com/watain666/Vaundy-Taiwan-2026";
+const FEEDBACK_URL = `${REPO_URL}/issues/new`;
+
+function siteFooterHtml(){
+  return `
+    <footer class="credits">
+      <p class="credits-copy">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo;・TAIPEI FAN CHANT GUIDE（非官方粉絲製作）<span class="build">${BUILD}</span></p>
+      <nav class="credits-links" aria-label="專案連結">
+        <a class="credits-link" href="${REPO_URL}" target="_blank" rel="noopener" aria-label="GitHub Repo">
+          ${GITHUB_SVG}<span>GitHub Repo</span>
+        </a>
+        <a class="credits-link" href="${FEEDBACK_URL}" target="_blank" rel="noopener" aria-label="意見回饋">
+          ${EXT_LINK_SVG}<span>意見回饋</span>
+        </a>
+      </nav>
+    </footer>
+  `;
+}
 
 /* 주소 뒤에 ?debug=1 을 붙이면 화면 위에 상태가 뜬다.
    "재생 중인 줄이 여러 개" 같은 문제가 폰에서만 날 때 원인을 보기 위한 것. */
@@ -860,7 +880,7 @@ function renderHome(){
       </div>
     </section>
 
-    <div class="credits">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo;・TAIPEI FAN CHANT GUIDE（非官方粉絲製作）<span class="build">${BUILD}</span></div>
+    ${siteFooterHtml()}
   `;
 
   document.getElementById("guide-btn").addEventListener("click", ()=>{ location.hash = "#/guide"; });
@@ -987,7 +1007,7 @@ function renderGuide(){
         <ul class="song-list" id="song-list"></ul>
       </section>
 
-      <div class="credits">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo;・TAIPEI FAN CHANT GUIDE（非官方粉絲製作）<span class="build">${BUILD}</span></div>
+      ${siteFooterHtml()}
     </div>
   `;
 
