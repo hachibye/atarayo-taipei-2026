@@ -42,6 +42,8 @@ npm run preview
 
 Gmarket Sans 字體的重新發布條件記載於 `fonts/OFL-GmarketSans.txt`；介面中文使用台灣常見的裝置內建字體（PingFang TC、Microsoft JhengHei、Noto Sans CJK TC）。
 
+應援動作動畫使用 WebM 優先、動畫 WebP 次之、GIF 最後回退；圖片只會在目前歌詞需要時載入。公告與 VAWS 圖片則在展開對應卡片後才建立，並使用瀏覽器的 lazy loading，避免首頁第一次開啟就下載大型資源。
+
 ## 2. 開啟 GitHub Pages
 
 1. 將儲存庫的 **Settings** → **Pages** → **Build and deployment / Source** 設為 **GitHub Actions**。
@@ -78,7 +80,7 @@ GitHub Pages 使用 HTTPS 提供網站，因此離線快取功能可以直接運
 修改歌詞或畫面並重新上傳時，請務必增加 **`sw.js` 頂端的 `CACHE_VERSION` 數字**，並讓 `src/main.js` 的 `BUILD` 同步更新。
 
 ```js
-const CACHE_VERSION = "v1.6.20";   // → 改成下一個版本號
+const CACHE_VERSION = "v1.7.1";   // → 改成下一個版本號
 ```
 
 如果數字沒有變更，曾經造訪過網站的使用者仍可能看到舊內容。提高版本號後，下一次連線時會下載新檔案，畫面下方也會出現「新版本已準備好・重新整理」的提示，方便立即更新。

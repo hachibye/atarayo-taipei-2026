@@ -2651,10 +2651,12 @@
     border-radius:14px;
     gap:4px;
   }
-  .tip-pic.at-below-video .tip-pic-card img{ max-height:min(15svh, 128px); border-radius:10px; }
+  .tip-pic.at-below-video .tip-pic-card img,
+  .tip-pic.at-below-video .tip-pic-card video{ max-height:min(15svh, 128px); border-radius:10px; }
   .tip-pic.at-below-video .tip-pic-cap{ font-size:11px; padding:0 3px 1px; }
   .tip-pic.at-below-video.big .tip-pic-card{ max-width:min(84vw, 360px); }
-  .tip-pic.at-below-video.big .tip-pic-card img{ max-height:min(34svh, 280px); }
+  .tip-pic.at-below-video.big .tip-pic-card img,
+  .tip-pic.at-below-video.big .tip-pic-card video{ max-height:min(34svh, 280px); }
 
   /* ② PC 2단 — 가사 칸 오른쪽 위 모서리. 작게 두어 가사를 최소한만 덮는다 */
   .tip-pic.at-lyrics-right{
@@ -2664,10 +2666,12 @@
     transform:translateY(-10px) scale(0.97);
   }
   .tip-pic.at-lyrics-right .tip-pic-card{ max-width:min(78%, 320px); padding:8px 8px 6px; }
-  .tip-pic.at-lyrics-right .tip-pic-card img{ max-height:clamp(120px, 26svh, 228px); }
+  .tip-pic.at-lyrics-right .tip-pic-card img,
+  .tip-pic.at-lyrics-right .tip-pic-card video{ max-height:clamp(120px, 26svh, 228px); }
   .tip-pic.at-lyrics-right .tip-pic-cap{ font-size:12px; }
   .tip-pic.at-lyrics-right.big .tip-pic-card{ max-width:min(100%, 460px); }
-  .tip-pic.at-lyrics-right.big .tip-pic-card img{ max-height:min(52svh, 400px); }
+  .tip-pic.at-lyrics-right.big .tip-pic-card img,
+  .tip-pic.at-lyrics-right.big .tip-pic-card video{ max-height:min(52svh, 400px); }
 
   /* ③ 단축모드 — 가사 위 가운데 (영상이 없는 화면이라 제일 크게) */
   .tip-pic.at-lyrics{
@@ -2697,7 +2701,7 @@
     gap:6px;
     cursor:zoom-in;
   }
-  .tip-pic-card img{
+  .tip-pic-card img, .tip-pic-card video{
     display:block;
     max-width:100%;
     max-height:var(--tip-pic-h, clamp(96px, 22svh, 190px));
@@ -2722,7 +2726,7 @@
     cursor:zoom-out;
     max-width:min(100%, 560px);
   }
-  .tip-pic.big .tip-pic-card img{
+  .tip-pic.big .tip-pic-card img, .tip-pic.big .tip-pic-card video{
     max-height:min(52svh, 420px);
   }
 

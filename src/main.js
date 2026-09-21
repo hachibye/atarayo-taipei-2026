@@ -83,11 +83,12 @@ const SYNC_INTERVAL_MS   = 100;
 /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
    새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
    sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-const BUILD = "v1.6.20";
+const BUILD = "v1.7.1";
 
 const REPO_URL = "https://github.com/watain666/Vaundy-Taiwan-2026";
 const FEEDBACK_URL = "https://www.threads.com/@brainginger/post/DdiLWztgen9";
 const ORIGINAL_SITE_URL = "https://vaundy-seoul-2026.pages.dev/";
+const KOREAN_AUTHOR_URL = "https://gall.dcinside.com/mgallery/board/view/?id=vaundy0606&no=35550";
 const TRANSLATION_CREDIT_URL = "https://home.gamer.com.tw/profile/index.php?owner=tsukilsao319";
 const CC_BY_NC_SA_URL = "https://creativecommons.org/licenses/by-nc-sa/4.0/";
 
@@ -99,8 +100,11 @@ function siteFooterHtml(){
         <a class="credits-link" href="${REPO_URL}" target="_blank" rel="noopener" aria-label="GitHub Repo" title="GitHub Repo">
           ${GITHUB_SVG}
         </a>
-        <a class="credits-fork" href="${ORIGINAL_SITE_URL}" target="_blank" rel="noopener" aria-label="Fork from limskyy123456-sudo/Vaundy-Seoul-2026">
-          Fork from limskyy123456-sudo/Vaundy-Seoul-2026
+        <a class="credits-fork" href="${ORIGINAL_SITE_URL}" target="_blank" rel="noopener" aria-label="Fork from SEOUL 응원가이드">
+          Fork from SEOUL 응원가이드
+        </a>
+        <a class="credits-fork" href="${KOREAN_AUTHOR_URL}" target="_blank" rel="noopener" aria-label="感謝韓國原作者 카쿠메">
+          感謝韓國原作者 카쿠메
         </a>
         <a class="credits-link" href="${FEEDBACK_URL}" target="_blank" rel="noopener" aria-label="意見回饋" title="意見回饋">
           <span>意見回饋</span>
@@ -279,7 +283,8 @@ let noticeTrigger = null;
    · 다 불러오면 카드 높이를 다시 재고, 오프라인용으로도 저장해 둔다
    같은 코드를 '공지 · 안내' 와 'VAWS 회원 티켓 카드' 두 곳에서 같이 쓴다. */
 function buildPicGrid(grid, list, ready, emptyEl){
-  if (!grid) return;
+  if (!grid || grid.dataset.loaded === "1") return;
+  grid.dataset.loaded = "1";
   grid.innerHTML = "";
   ready.length = 0;
 
@@ -297,11 +302,10 @@ function buildPicGrid(grid, list, ready, emptyEl){
     btn.type = "button";
     btn.className = "notice-item";
     btn.hidden = true;
-    // loading="lazy" 를 쓰면 접혀 있는 동안 아래쪽 사진이 안 불러와져서
-    // 목록에도 안 잡히고 오프라인 저장에서도 빠진다. 그래서 전부 바로 불러온다.
     btn.innerHTML = `<img alt="${escapeHtml(n.title)}" decoding="async">`
                   + `<span class="cap">${escapeHtml(n.title)}</span>`;
     const img = btn.querySelector("img");
+    img.loading = "lazy";
 
     img.addEventListener("load", ()=>{
       btn.hidden = false;
@@ -322,12 +326,16 @@ function buildPicGrid(grid, list, ready, emptyEl){
 }
 
 function setupNotices(){
-  buildPicGrid(document.getElementById("notice-grid"), NOTICES, noticeReady,
+  const grid = document.getElementById("notice-grid");
+  if (!grid || grid.dataset.loaded === "1") return;
+  buildPicGrid(grid, NOTICES, noticeReady,
                document.getElementById("notice-empty"));
 }
 
 function setupVawsPics(){
-  buildPicGrid(document.getElementById("vaws-grid"), VAWS_PICS, vawsReady, null);
+  const grid = document.getElementById("vaws-grid");
+  if (!grid || grid.dataset.loaded === "1") return;
+  buildPicGrid(grid, VAWS_PICS, vawsReady, null);
 }
 
 /* 공지 이미지도 오프라인용으로 저장해 둔다 (공연장에서 데이터가 안 터져도 보이도록) */
@@ -902,8 +910,6 @@ function renderHome(){
   document.getElementById("guide-btn").addEventListener("click", ()=>{ location.hash = "#/guide"; });
   document.getElementById("setlist-btn").addEventListener("click", ()=>{ location.hash = "#/setlist"; });
   setupAccordions();
-  setupNotices();
-  setupVawsPics();
   setupNoticeViewer();
   setupSeatMap();
   setupHomeExtras();
@@ -970,6 +976,8 @@ function setupOneAccordion(card){
       panel.setAttribute("aria-hidden", "false");
       card.classList.add("open");
       btn.setAttribute("aria-expanded", "true");
+      if (card.id === "notice-card") setupNotices();
+      if (card.id === "vaws-card") setupVawsPics();
       panel.style.maxHeight = panel.scrollHeight + "px";
       // 이후 내부 콘텐츠 크기 변화(폰트 로딩 등)에도 대응해 살짝 여유를 둠
       // (스크롤은 건드리지 않음 — 화면은 사용자가 직접 내리도록 둠)
@@ -1868,7 +1876,8 @@ function buildSongShell(){
           <!-- 짤방(동작 사진) — 지정한 가사에서만 떴다가 사라집니다 -->
           <div class="tip-pic at-below-video" id="tip-pic" aria-live="polite">
             <figure class="tip-pic-card" id="tip-pic-card" title="點選即可放大">
-              <img id="tip-pic-img" alt="" decoding="async">
+              <video id="tip-pic-video" muted loop playsinline preload="none" aria-hidden="true" hidden></video>
+              <img id="tip-pic-img" alt="" decoding="async" hidden>
               <figcaption class="tip-pic-cap" id="tip-pic-cap"></figcaption>
             </figure>
           </div>
@@ -2305,7 +2314,6 @@ function renderSong(song){
   chantIdx = -1; chantDone = false; chantWantSec = null; chantWaitUntil = 0;
   startActiveGuard();          // 여러 줄이 켜지는 일이 없도록 지켜본다
   hideTipPic();                 // 곡을 바꾸면 짤방도 초기화
-  preloadSongPics(song);        // 이 곡에서 쓰는 짤방 미리 받아 두기
   if (scrollRafId !== null) { cancelAnimationFrame(scrollRafId); scrollRafId = null; }
 
   const { prev, next } = songNeighbors(song);
@@ -2577,12 +2585,22 @@ function resolvePic(id){
   // 등록표에 없으면 경로를 직접 적은 것으로 본다 ("./images/tips/a.gif")
   const src = entry ? entry.src : (/[\/.]/.test(id) ? id : null);
   if (!src || picBroken.has(src)) return null;
-  return { key: id, src, caption: (entry && entry.caption) || "" };
+  const video = entry?.video || (/\.gif$/i.test(src) ? src.replace(/\.gif$/i, ".webm") : "");
+  const fallback = entry?.fallback || (/\.webp$/i.test(src) ? src.replace(/\.webp$/i, ".gif") : "");
+  return { key: id, src, video, fallback, caption: (entry && entry.caption) || "" };
 }
 
 function hideTipPic(){
   const box = document.getElementById("tip-pic");
   if (!box) return;
+  const video = document.getElementById("tip-pic-video");
+  const img = document.getElementById("tip-pic-img");
+  if (video){
+    video.pause();
+    video.hidden = true;
+    video.setAttribute("aria-hidden", "true");
+  }
+  if (img) img.hidden = true;
   box.classList.remove("show", "big");
   currentPicKey = null;
 }
@@ -2613,16 +2631,50 @@ function placeTipPic(){
 
 function showTipPic(pic){
   const box = document.getElementById("tip-pic");
+  const video = document.getElementById("tip-pic-video");
   const img = document.getElementById("tip-pic-img");
   const cap = document.getElementById("tip-pic-cap");
   if (!box || !img) return;
 
-  img.onerror = ()=>{                     // 파일이 아직 없을 때
-    picBroken.add(img.getAttribute("src"));
-    hideTipPic();
+  const showImageFallback = ()=>{
+    if (video){
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+      video.hidden = true;
+      video.setAttribute("aria-hidden", "true");
+    }
+    img.hidden = false;
+    img.alt = pic.caption || "應援動作";
+    img.dataset.fallbackTried = "0";
+    img.onerror = ()=>{
+      if (img.dataset.fallbackTried !== "1" && pic.fallback && pic.fallback !== pic.src){
+        img.dataset.fallbackTried = "1";
+        img.src = pic.fallback;
+        return;
+      }
+      picBroken.add(pic.src);
+      hideTipPic();
+    };
+    img.src = pic.src;
   };
-  img.alt = pic.caption || "應援動作";
-  if (img.getAttribute("src") !== pic.src) img.setAttribute("src", pic.src);
+
+  if (video && pic.video && video.canPlayType("video/webm")){
+    video.onerror = showImageFallback;
+    video.onloadeddata = ()=>{
+      video.hidden = false;
+      video.setAttribute("aria-hidden", "false");
+      img.hidden = true;
+      video.play().catch(()=>{});
+    };
+    video.muted = true;
+    video.hidden = true;
+    video.setAttribute("aria-hidden", "true");
+    video.src = pic.video;
+    video.load();
+  } else {
+    showImageFallback();
+  }
   if (cap) cap.textContent = pic.caption || "";
   box.classList.remove("big");
   box.classList.add("show");
@@ -2638,37 +2690,6 @@ function updateTipPic(activeIdx){
   if (!pic) return hideTipPic();
   if (pic.key === currentPicKey) return;   // 같은 사진이 이어지는 줄 — 그대로 둔다
   showTipPic(pic);
-}
-
-/* 곡에 들어갈 때 그 곡에서 쓰는 사진들을 미리 받아 둔다 (뜰 때 바로 보이도록) */
-function preloadSongPics(song){
-  if (!song || !Array.isArray(song.lyrics)) return;
-  const seen = new Set();
-  song.lyrics.forEach(l => {
-    const pic = resolvePic(l && l.pic);
-    if (!pic || seen.has(pic.src)) return;
-    seen.add(pic.src);
-    const im = new Image();
-    im.onerror = ()=> picBroken.add(pic.src);
-    im.src = pic.src;
-  });
-}
-
-/* 서비스워커에게 "이 사진들도 오프라인용으로 저장해 둬" 라고 알려 준다 */
-function cachePicsOffline(){
-  if (!("serviceWorker" in navigator)) return;
-  // '데이터 절약' 을 켜 두었거나 느린 연결이면 큰 GIF 를 몰래 받지 않는다
-  const net = navigator.connection;
-  if (net && (net.saveData || /(^|-)2g$/.test(net.effectiveType || ""))) return;
-  const urls = [];
-  SONGS.forEach(s => (s.lyrics || []).forEach(l => {
-    const pic = resolvePic(l && l.pic);
-    if (pic && !urls.includes(pic.src)) urls.push(pic.src);
-  }));
-  if (!urls.length) return;
-  navigator.serviceWorker.ready
-    .then(reg => reg.active && reg.active.postMessage({ type:"CACHE_URLS", urls }))
-    .catch(()=>{});
 }
 
 function escapeHtml(str){
@@ -2834,6 +2855,33 @@ function applyKaraokeTimingToDom(song){
   paintChantBar();
 }
 
+/* 有些歌曲會在兩句歌詞中間放一筆只有拍手／揮手提示的資料。
+   這些資料沒有實際會顯示的日文、翻譯或背景合唱文字，不能把前一句
+   的 Karaoke 時間窗截短，也不能搶走目前正在演唱的那一行。 */
+function lyricPartText(value){
+  if (typeof value === "string") return value;
+  if (!Array.isArray(value)) return "";
+  return value.map(part => typeof part === "string" ? part : (part && part.text) || "").join("");
+}
+
+function hasDisplayedLyricText(line){
+  if (!line) return false;
+  return [line.jp, line.tr, line.bg].some(value =>
+    lyricPartText(value).replace(ICON_TOKEN_RE, "").replace(/\s/gu, "").length > 0
+  );
+}
+
+function nextDisplayedLyricTime(song, index){
+  const lines = song && Array.isArray(song.lyrics) ? song.lyrics : [];
+  const current = Number(lines[index] && lines[index].time);
+  for (let i = index + 1; i < lines.length; i++){
+    if (!hasDisplayedLyricText(lines[i])) continue;
+    const time = Number(lines[i] && lines[i].time);
+    if (Number.isFinite(time) && (!Number.isFinite(current) || time > current)) return time;
+  }
+  return null;
+}
+
 async function loadKaraokeTiming(song){
   const seq = ++karaokeLoadSeq;
   karaokeTiming = null;
@@ -2901,11 +2949,7 @@ function karaokeRange(song, index){
   const bpm = Number(SONG_BPM[song.id]) || 120;
   const estimatedDuration = Math.max(0.8, Math.min(12, weight * (60 / bpm) * KARAOKE_UNIT_BEATS));
 
-  let next = null;
-  for (let i = index + 1; i < lines.length; i++){
-    const t = Number(lines[i] && lines[i].time);
-    if (Number.isFinite(t) && t > start){ next = t; break; }
-  }
+  const next = nextDisplayedLyricTime(song, index);
   // 最後一句沒有下一個錨點，留一個依句長估出的收尾時間。
   const end = next === null
     ? start + estimatedDuration
@@ -3560,7 +3604,14 @@ function updateLyricsSync(force) {
   if (cur !== null && isFinite(cur)){
     activeIdx = -1;
     for (let i = 0; i < lines.length; i++) {
-      if (cur >= Number(lines[i].dataset.time)) activeIdx = i;
+      if (cur >= Number(lines[i].dataset.time)) {
+        /* Cue-only rows (for example "拍手") are intentionally kept in the
+           list for their metadata, but they must not replace a lyric line
+           while the singer is still finishing that line. */
+        if (hasDisplayedLyricText(currentSong && currentSong.lyrics && currentSong.lyrics[i])) {
+          activeIdx = i;
+        }
+      }
       else break;                     // time 순서대로이므로 더 볼 필요 없음
     }
   }
@@ -3737,8 +3788,6 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
         });
       });
     }).catch(()=>{});
-
-    cachePicsOffline();      // 짤방 사진도 오프라인용으로 저장해 둔다
 
     let reloading = false;
     navigator.serviceWorker.addEventListener("controllerchange", ()=>{

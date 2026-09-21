@@ -4,27 +4,18 @@
    ★ 가사나 화면을 고쳐서 다시 올릴 때는 아래 CACHE_VERSION 숫자를 꼭 올려 주세요.
      그래야 사람들 폰에 새 내용이 내려갑니다. (v1 → v2 → v3 …)
    ───────────────────────────────────────────────────────────── */
-const CACHE_VERSION = "v1.6.20";
+const CACHE_VERSION = "v1.7.1";
 const CACHE_NAME    = `horo-guide-${CACHE_VERSION}`;
 
 /* Vite production builds replace this with the hashed files in dist/assets.
    The source version stays empty because it precaches the root files below. */
 const VITE_BUILD_ASSETS = [];
 
-/* 처음 방문할 때 미리 받아 둘 파일들.
-   없는 파일이 있어도 설치가 실패하지 않도록 하나씩 따로 담습니다. */
+/* 처음 방문할 때 미리 받아 둘 핵심 파일들.
+   큰 사진과 응원 GIF/WebM은 실제로 사용될 때만 받아 둡니다. */
 const PRECACHE = [
   "./",
   "./index.html",
-  "./src/main.js",
-  "./src/data.js",
-  "./src/app.css",
-  "./src/base.css",
-  "./src/theme.css",
-  "./furigana.js",
-  "./karaoke-sources.js",
-  "./fonts/GmarketSansMedium.woff",
-  "./fonts/GmarketSansBold.woff",
   "https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap",
   "./manifest.json",
   "./icon-192.png",
@@ -32,25 +23,7 @@ const PRECACHE = [
   "./icon-maskable-512.png",
   "./apple-touch-icon.png",
   "./images/poster.jpg",
-  "./images/poster-guide.jpg",
-  "./images/poster-song.jpg",
   "./images/setlist-bg.jpg",
-  "./images/taipei-stage-map.webp",
-
-  /* 공지 · 안내 이미지 (images/notice/) — 없는 파일은 그냥 건너뜁니다 */
-  "./images/notice/01-venue-map.jpg",
-  "./images/notice/02-id-check.jpg",
-  "./images/notice/03-camera.jpg",
-  "./images/notice/04-md-sales.jpg",
-  "./images/notice/05-md-list.jpg",
-  "./images/notice/06-md-notice.jpg",
-  "./images/notice/07-cd-sales.jpg",
-  "./images/notice/08-cd-bonus.jpg",
-  "./images/notice/09-vaws-booth.jpg",
-  "./images/notice/10-vaws-card.jpg",
-  "./images/notice/11-photo-booth.jpg",
-  "./images/notice/12-quick-bites.jpg",
-  "./images/notice/13-sns-event.jpg",
   ...VITE_BUILD_ASSETS
 ];
 
