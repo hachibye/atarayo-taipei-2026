@@ -1070,6 +1070,7 @@
   .karaoke-source-popover{
     position:absolute;
     top:8px;right:8px;
+    width:min(280px,calc(100vw - 48px));
     z-index:4;
   }
   .karaoke-source-popover summary{
@@ -1077,6 +1078,7 @@
     place-items:center;
     width:28px;height:28px;
     padding:0;
+    margin-left:auto;
     border:1px solid var(--stage-line);
     border-radius:999px;
     background:var(--stage-raised);

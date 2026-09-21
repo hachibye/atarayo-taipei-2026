@@ -2277,7 +2277,7 @@ function renderSong(song){
       </button>
     </li>`).join("");
   decorateKaraokeLines(song);
-  setKaraokeSourceStatus("loading", "逐字時間：正在尋找開源時間碼…");
+  setKaraokeSourceStatus("loading", "歌詞逐字時間：正在尋找開源時間碼…");
 
   document.getElementById("song-sheet-list").innerHTML = sheetSongs().map((s, i)=>`
     <li data-no="${songNo(s)}">
@@ -2672,11 +2672,11 @@ function applyKaraokeTimingToDom(song){
 async function loadKaraokeTiming(song){
   const seq = ++karaokeLoadSeq;
   karaokeTiming = null;
-  setKaraokeSourceStatus("loading", "逐字時間：正在尋找開源時間碼…");
+  setKaraokeSourceStatus("loading", "歌詞逐字時間：正在尋找開源時間碼…");
 
   const api = await loadKaraokeSources();
   if (!api || typeof api.load !== "function" || typeof api.alignToLocalLyrics !== "function"){
-    setKaraokeSourceStatus("miss", "逐字時間：目前使用本地估算同步");
+    setKaraokeSourceStatus("miss", "歌詞逐字時間：目前使用本地估算同步");
     return;
   }
 
@@ -2687,9 +2687,9 @@ async function loadKaraokeTiming(song){
       duration,
       onStatus: event => {
         if (seq !== karaokeLoadSeq || !event) return;
-        if (event.state === "cache") setKaraokeSourceStatus("loading", "逐字時間：已讀取本機快取，正在校正影片偏移…");
-        else if (event.state === "fallback") setKaraokeSourceStatus("fallback", "逐字時間：前順位來源沒有結果，改查 AMLL TTML DB…");
-        else if (event.state === "offline") setKaraokeSourceStatus("miss", "逐字時間：離線且沒有快取，使用本地估算同步");
+        if (event.state === "cache") setKaraokeSourceStatus("loading", "歌詞逐字時間：已讀取本機快取，正在校正影片偏移…");
+        else if (event.state === "fallback") setKaraokeSourceStatus("fallback", "歌詞逐字時間：前順位來源沒有結果，改查 AMLL TTML DB…");
+        else if (event.state === "offline") setKaraokeSourceStatus("miss", "歌詞逐字時間：離線且沒有快取，使用本地估算同步");
       }
     });
   } catch (error) {
@@ -2698,19 +2698,19 @@ async function loadKaraokeTiming(song){
   if (seq !== karaokeLoadSeq || !song || currentSong !== song) return;
 
   if (!timed){
-    setKaraokeSourceStatus("miss", "逐字時間：找不到可用來源，使用本地估算同步");
+    setKaraokeSourceStatus("miss", "歌詞逐字時間：找不到可用來源，使用本地估算同步");
     return;
   }
   const aligned = api.alignToLocalLyrics(timed, song.lyrics);
   if (!aligned){
-    setKaraokeSourceStatus("miss", "逐字時間：來源歌詞與本頁不相符，使用本地估算同步");
+    setKaraokeSourceStatus("miss", "歌詞逐字時間：來源歌詞與本頁不相符，使用本地估算同步");
     return;
   }
   aligned.songId = song.id;
   karaokeTiming = aligned;
   applyKaraokeTimingToDom(song);
   const cachedHint = timed.source && timed.source.indexOf("開源多來源") >= 0 ? "開源多來源" : (timed.source || "開源來源");
-  setKaraokeSourceStatus("ready", `逐字時間：${cachedHint}（已對齊 ${aligned.matchedLines}/${aligned.totalLines} 行，偏移 ${aligned.offset.toFixed(2)} 秒）`);
+  setKaraokeSourceStatus("ready", `歌詞逐字時間：${cachedHint}（已對齊 ${aligned.matchedLines}/${aligned.totalLines}行，偏移${aligned.offset.toFixed(2)}秒）`);
   updateLyricsSync(true);
 }
 
