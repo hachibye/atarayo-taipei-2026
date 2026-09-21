@@ -86,6 +86,12 @@
     margin-bottom:8px;
     text-shadow:none;
   }
+  @media (max-width:520px){
+    .tour-title{
+      font-size:min(37px,8.55vw);
+      white-space:nowrap;
+    }
+  }
 
   /* ── 카운트다운 (D-DAY 알약 + 공연 일정 목록) ───────────────── */
   .countdown{
