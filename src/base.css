@@ -797,10 +797,21 @@
   .info-book-link:hover{ border-color:var(--teal); color:var(--teal); }
   .info-book-link svg{ width:14px;height:14px; }
   .info-book-links{
-    display:flex;flex-wrap:wrap;gap:8px;
+    display:flex;flex-wrap:nowrap;gap:6px;
     margin-top:16px;
+    overflow-x:auto;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
   }
-  .info-book-links .info-book-link{ margin:0; }
+  .info-book-links::-webkit-scrollbar{ display:none; }
+  .info-book-links .info-book-link{
+    flex:0 0 auto;
+    margin:0;
+    padding:8px 10px;
+    gap:5px;
+    font-size:11.5px;
+    white-space:nowrap;
+  }
   .info-divider{
     margin:22px 0 0;
     border:0;
