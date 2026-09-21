@@ -2313,6 +2313,7 @@ function renderSong(song){
   if (scroller) scroller.scrollTop = 0;
 
   showVideoStatus();
+  ensurePlayer();
   ensurePlaying(song.youtubeId);
   loadKaraokeTiming(song);
 }
