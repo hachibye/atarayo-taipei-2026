@@ -13,7 +13,6 @@ const PRECACHE = [
   "./",
   "./index.html",
   "./design.css",
-  "./fonts/PretendardVariable.woff2",
   "./fonts/GmarketSansMedium.woff",
   "./fonts/GmarketSansBold.woff",
   "./manifest.json",

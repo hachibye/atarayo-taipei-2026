@@ -39,13 +39,14 @@
     --wave:#8de05f;
     --jump:#b98cff;
     --spin:#ff86c8;
+    --font-tw-sans:"PingFang TC","Microsoft JhengHei","Noto Sans CJK TC",sans-serif;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
     background:var(--bg-deep);
     color:var(--cream);
-    font-family:Pretendard,sans-serif;
+    font-family:var(--font-tw-sans);
     -webkit-font-smoothing:antialiased;
     overflow-x:hidden;
   }
@@ -397,7 +398,7 @@
   }
   .song-title{
     flex:1;
-    font-family:Pretendard,sans-serif;
+    font-family:var(--font-tw-sans);
     font-weight:500;
     font-size:clamp(16px,4.4vw,18px);
     letter-spacing:0;
@@ -1545,7 +1546,7 @@
     color:var(--gold);
   }
   .way-sec h4 span{
-    font-family:Pretendard,sans-serif;
+    font-family:var(--font-tw-sans);
     font-size:11.5px;font-weight:400;
     color:#8d7d62;
   }
@@ -1737,7 +1738,7 @@
   }
   .seat-map{ display:block;width:100%;height:auto; }
   .seat-map text{
-    font-family:Pretendard,sans-serif;
+    font-family:var(--font-tw-sans);
     font-weight:700;
     fill:#20100a;
     text-anchor:middle;
@@ -2163,12 +2164,12 @@
     flex:none;
     margin-left:5px;
     color:#d9705a;
-    font-family:Pretendard,sans-serif;
+    font-family:var(--font-tw-sans);
     font-weight:700;
     font-size:10px;letter-spacing:.02em;
   }
   .spoiler-choice .spoiler-open span{
-    font-family:Pretendard,sans-serif;
+    font-family:var(--font-tw-sans);
     font-weight:500;
     font-size:11.5px;letter-spacing:0;
     color:#b9a98a;
@@ -2292,7 +2293,7 @@
   }
   .set-title{
     flex:1;min-width:0;
-    font-family:Pretendard,sans-serif;
+    font-family:var(--font-tw-sans);
     font-weight:500;
     font-size:clamp(15px,4.2vw,17px);
     line-height:1.45;

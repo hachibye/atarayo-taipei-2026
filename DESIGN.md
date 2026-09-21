@@ -10,7 +10,7 @@ The home hero keeps the existing deep wine background (`--bg-deep`), cream text 
 
 ## 3. Typography
 
-Pretendard Variable is the reading and control face, including Traditional Chinese, Japanese fallback, and numeric data. Gmarket Sans Medium and Bold are for the tour title and page titles. Use a system monospace face for the large live countdown so every digit occupies the same width. Use tabular numerals for other times and song numbers. Body copy should keep Traditional Chinese phrases together and should not use wide tracking or chromatic shadows.
+The reading and control face uses the Taiwan-common system stack PingFang TC, Microsoft JhengHei, and Noto Sans CJK TC. Gmarket Sans Medium and Bold are for the tour title and page titles. Japanese lyric text uses Noto Sans JP first, then the Taiwan system stack. In Chinese and Japanese lyrics, keep one half-width space between CJK characters and adjacent half-width Latin letters or digits; treat this as a project-wide lyric formatting rule following [盤古之白](https://www.jkg.tw/p3601/). Use a system monospace face for the large live countdown so every digit occupies the same width. Use tabular numerals for other times and song numbers. Body copy should keep Traditional Chinese phrases together and should not use wide tracking or chromatic shadows.
 
 ## 4. Spacing & layout
 

@@ -20,7 +20,7 @@ package.json                ← Vite 指令與相依套件
 package-lock.json           ← 鎖定建置版本
 vite.config.js              ← 相對路徑、靜態資產與 Service Worker 建置設定
 .github/workflows/pages.yml  ← GitHub Pages production 部署
-fonts/                      ← 離線使用的 Pretendard、Gmarket Sans 字體
+fonts/                      ← 離線使用的 Gmarket Sans 字體；介面中文使用裝置內建字體
 DESIGN.md                   ← 畫面設計原則
 sw.js                       ← 管理離線快取
 manifest.json               ← App 名稱、圖示與色彩
@@ -40,7 +40,7 @@ npm run build
 npm run preview
 ```
 
-字體重新發布條件記載於 `fonts/OFL-Pretendard.txt` 與 `fonts/OFL-GmarketSans.txt`。
+Gmarket Sans 字體的重新發布條件記載於 `fonts/OFL-GmarketSans.txt`；介面中文使用台灣常見的裝置內建字體（PingFang TC、Microsoft JhengHei、Noto Sans CJK TC）。
 
 ## 2. 開啟 GitHub Pages
 
@@ -78,7 +78,7 @@ GitHub Pages 使用 HTTPS 提供網站，因此離線快取功能可以直接運
 修改歌詞或畫面並重新上傳時，請務必增加 **`sw.js` 頂端的 `CACHE_VERSION` 數字**，並讓 `src/main.js` 的 `BUILD` 同步更新。
 
 ```js
-const CACHE_VERSION = "v1.6.10";   // → 改成下一個版本號
+const CACHE_VERSION = "v1.6.19";   // → 改成下一個版本號
 ```
 
 如果數字沒有變更，曾經造訪過網站的使用者仍可能看到舊內容。提高版本號後，下一次連線時會下載新檔案，畫面下方也會出現「新版本已準備好・重新整理」的提示，方便立即更新。

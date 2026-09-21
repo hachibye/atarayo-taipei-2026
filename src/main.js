@@ -83,7 +83,7 @@ const SYNC_INTERVAL_MS   = 100;
 /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
    새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
    sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-const BUILD = "v1.6.18";
+const BUILD = "v1.6.19";
 
 const REPO_URL = "https://github.com/watain666/Vaundy-Taiwan-2026";
 const FEEDBACK_URL = "https://www.threads.com/@brainginger/post/DdiLWztgen9";
@@ -2675,26 +2675,85 @@ function escapeHtml(str){
   return String(str).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 
+/*
+ * 歌詞排版原則：中文／日文與相鄰的半形英數字之間保留一個半形空白。
+ * 這是顯示層的處理，原始歌詞仍維持不變，避免影響假名索引與卡拉 OK 對齊。
+ */
+const CJK_CHAR_RE = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u;
+const LATIN_OR_DIGIT_CHAR_RE = /[A-Za-z0-9]/;
+const CJK_TO_LATIN_RE = /([\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}])(?=[A-Za-z0-9])/gu;
+const LATIN_TO_CJK_RE = /([A-Za-z0-9])(?=[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}])/gu;
+
+function spaceCjkLatinText(value){
+  return String(value ?? "")
+    .replace(CJK_TO_LATIN_RE, "$1 ")
+    .replace(LATIN_TO_CJK_RE, "$1 ");
+}
+
+function edgeNonSpaceChar(value, fromEnd){
+  const chars = Array.from(String(value || ""));
+  while (chars.length && /\s/u.test(fromEnd ? chars.at(-1) : chars[0])){
+    if (fromEnd) chars.pop();
+    else chars.shift();
+  }
+  return fromEnd ? chars.at(-1) || "" : chars[0] || "";
+}
+
+/* furigana 會產生帶有 <ruby>/<rt> 的 HTML；只處理文字片段，保留標記本身。 */
+function spaceCjkLatinMarkup(markup){
+  const parts = String(markup || "").split(/(<[^>]*>)/g);
+  const textIndexes = [];
+
+  parts.forEach((part, index) => {
+    if (/^<[^>]*>$/.test(part)) return;
+    parts[index] = spaceCjkLatinText(part);
+    textIndexes.push(index);
+  });
+
+  for (let i = 1; i < textIndexes.length; i++){
+    const previousIndex = textIndexes[i - 1];
+    const currentIndex = textIndexes[i];
+    const previous = parts[previousIndex];
+    const current = parts[currentIndex];
+    const previousChar = edgeNonSpaceChar(previous, true);
+    const currentChar = edgeNonSpaceChar(current, false);
+    const hasTrailingSpace = /\s$/u.test(previous);
+    const hasLeadingSpace = /^\s/u.test(current);
+
+    if (!hasTrailingSpace && !hasLeadingSpace
+      && CJK_CHAR_RE.test(previousChar) && LATIN_OR_DIGIT_CHAR_RE.test(currentChar)){
+      parts[currentIndex] = " " + current;
+    } else if (!hasTrailingSpace && !hasLeadingSpace
+      && LATIN_OR_DIGIT_CHAR_RE.test(previousChar) && CJK_CHAR_RE.test(currentChar)){
+      parts[previousIndex] = previous + " ";
+    }
+  }
+
+  return parts.join("");
+}
+
 /* 가사 글자를 안전하게 처리하면서, [wave] [clap] [mic] 같은 표시를
    그 자리에서 움직이는 아이콘으로 바꿔 준다. 가사 어느 위치에나 넣을 수 있다. */
 /* [wave] 처럼 대괄호로도, (wave) 처럼 소괄호로도 쓸 수 있게 둘 다 인식 */
 const ICON_TOKEN_RE = /[\[(](wave|clap|mic|chant|jump|spin|turn)[\])]/gi;
 function withIcons(str){
   if (str === undefined || str === null) return "";
-  return escapeHtml(String(str)).replace(ICON_TOKEN_RE, (m, key)=> INLINE_ICONS[key.toLowerCase()] || m);
+  return escapeHtml(spaceCjkLatinText(str)).replace(ICON_TOKEN_RE, (m, key)=> INLINE_ICONS[key.toLowerCase()] || m);
 }
 function renderKanaLine(str){
   const source = String(str ?? "");
   const ruby = window.JP_FURIGANA && window.JP_FURIGANA[source];
   if (!ruby) return withIcons(source);
-  return ruby.replace(ICON_TOKEN_RE, (m, key)=> INLINE_ICONS[key.toLowerCase()] || m);
+  return spaceCjkLatinMarkup(ruby).replace(ICON_TOKEN_RE, (m, key)=> INLINE_ICONS[key.toLowerCase()] || m);
 }
 
 function renderRomajiLine(str, includeIcons = true){
   const source = String(str ?? "");
   const romaji = window.JP_ROMAJI && window.JP_ROMAJI[source];
   const value = typeof romaji === "string" ? romaji : source;
-  return includeIcons ? withIcons(value) : escapeHtml(value).replace(ICON_TOKEN_RE, "");
+  return includeIcons
+    ? withIcons(value)
+    : escapeHtml(spaceCjkLatinText(value)).replace(ICON_TOKEN_RE, "");
 }
 
 function readingModeLabel(mode = readingMode){

@@ -1,11 +1,4 @@
 @font-face{
-  font-family:Pretendard;
-  src:url('./fonts/PretendardVariable.woff2') format('woff2');
-  font-style:normal;
-  font-weight:100 900;
-  font-display:swap;
-}
-@font-face{
   font-family:'Gmarket Sans';
   src:url('./fonts/GmarketSansMedium.woff') format('woff');
   font-style:normal;
@@ -36,9 +29,10 @@
   --stage-raised:#2b2c30;
   --stage-muted:#a9a9af;
   --stage-line:rgba(255,255,255,.1);
+  --font-tw-sans:"PingFang TC","Microsoft JhengHei","Noto Sans CJK TC",sans-serif;
 }
 body,button,input,select,textarea{
-  font-family:Pretendard,system-ui,sans-serif;
+  font-family:var(--font-tw-sans);
   word-break:keep-all;
   overflow-wrap:break-word;
 }
@@ -60,7 +54,7 @@ button{touch-action:manipulation;}
 .songs-head h1,.song-topbar h1,.song-picker-title,
 .spoiler-title,.setlist-head h2,.set-title,
 .info-panel-title,.song-title,.today-head,.today-now .left{
-  font-family:'Gmarket Sans',Pretendard,sans-serif;
+  font-family:'Gmarket Sans',var(--font-tw-sans);
   text-shadow:none;
 }
 .tour-title{font-weight:700;letter-spacing:-.045em;line-height:1.08;}
@@ -79,7 +73,7 @@ button{touch-action:manipulation;}
 .show-venue{letter-spacing:.08em;text-shadow:none;color:var(--gold-soft);}
 .info-toggle-label,.menu-btn-label,.spoiler-open,.set-num,
 .song-mark,.song-sheet-num,.song-sheet-name,.song-sheet-count{
-  font-family:Pretendard,system-ui,sans-serif;
+  font-family:var(--font-tw-sans);
   text-shadow:none;
 }
 .info-toggle-label{font-size:15px;font-weight:600;letter-spacing:0;}
@@ -142,7 +136,7 @@ button{touch-action:manipulation;}
   border-radius:8px;
   background:var(--action);
   color:var(--ink);
-  font:700 15px Pretendard,system-ui,sans-serif;
+  font:700 15px var(--font-tw-sans);
   cursor:pointer;
 }
 .spoiler-safe:hover{background:var(--cream);}
@@ -178,7 +172,7 @@ button{touch-action:manipulation;}
 .song-nav-btn,.song-sheet-close{min-width:40px;}
 .song-search-clear.show{min-width:32px;min-height:32px;}
 .song-sheet-title{letter-spacing:0;}
-.song-sheet-now{font-family:Pretendard,system-ui,sans-serif;font-size:11px;letter-spacing:0;}
+.song-sheet-now{font-family:var(--font-tw-sans);font-size:11px;letter-spacing:0;}
 
 .guide-page{
   --focus:var(--page-ink);
@@ -195,7 +189,7 @@ button{touch-action:manipulation;}
 .guide-page .songs-section{padding-top:44px;}
 .guide-page .songs-head h1{
   margin:0 0 8px;
-  font:700 clamp(24px,6vw,30px)/1.25 'Gmarket Sans',Pretendard,sans-serif;
+  font:700 clamp(24px,6vw,30px)/1.25 'Gmarket Sans',var(--font-tw-sans);
   letter-spacing:-.025em;
 }
 .guide-page .songs-head p,
@@ -382,7 +376,7 @@ button{touch-action:manipulation;}
   border-radius:6px;
   background:none;
   color:var(--gold-soft);
-  font:600 13px Pretendard,system-ui,sans-serif;
+  font:600 13px var(--font-tw-sans);
   cursor:pointer;
 }
 .set-order-confirm #set-order-cancel{background:var(--action);border-color:var(--action);color:var(--ink);}
@@ -434,7 +428,7 @@ button{touch-action:manipulation;}
   --dock-padding:6px;
   --radius-pill:999px;
   --radius-notice:20px;
-  --type-control:600 12px/1.2 Pretendard,system-ui,sans-serif;
+  --type-control:600 12px/1.2 var(--font-tw-sans);
   --type-dock-size:clamp(14px,4vw,17px);
   --elevation-float:0 8px 24px rgba(0,0,0,.15);
   --home-control-bg:rgba(255,255,255,.14);

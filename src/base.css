@@ -14,13 +14,14 @@
     --wave:#8de05f;
     --jump:#b98cff;
     --spin:#ff86c8;
+    --font-tw-sans:"PingFang TC","Microsoft JhengHei","Noto Sans CJK TC",sans-serif;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
     background:var(--bg-deep);
     color:var(--cream);
-    font-family:Pretendard,sans-serif;
+    font-family:var(--font-tw-sans);
     -webkit-font-smoothing:antialiased;
     overflow-x:hidden;
   }
@@ -29,7 +30,7 @@
   button{font-family:inherit;}
 
   /* 歌名中的日文原題使用日文字型；中文譯名仍沿用介面字體。 */
-  [lang="ja"]{ font-family:'Noto Sans JP',Pretendard,system-ui,sans-serif; }
+  [lang="ja"]{ font-family:'Noto Sans JP',var(--font-tw-sans); }
 
   /* ---------- utility ---------- */
   .eyebrow{
@@ -375,7 +376,7 @@
   }
   .song-title{
     flex:1;
-    font-family:Pretendard,sans-serif;
+    font-family:var(--font-tw-sans);
     font-weight:500;
     font-size:clamp(16px,4.4vw,18px);
     letter-spacing:0;
@@ -512,7 +513,7 @@
       font-size:10px;
     }
     .credits-links{
-      justify-content:flex-start;
+      justify-content:center;
       gap:6px;
     }
     .credits-link svg{ width:14px;height:14px; }
@@ -1433,7 +1434,7 @@
   .lyric-body{min-width:0;display:block;flex:1;}
   .lyric-jp{
     display:block;
-    font-family:'Noto Sans JP',Pretendard,system-ui,sans-serif;
+    font-family:'Noto Sans JP',var(--font-tw-sans);
     font-size:clamp(13px,3.6vw,14px);
     color:#a99a80;
     line-height:1.5;
@@ -1749,7 +1750,7 @@
     color:var(--gold);
   }
   .way-sec h4 span{
-    font-family:Pretendard,sans-serif;
+    font-family:var(--font-tw-sans);
     font-size:11.5px;font-weight:400;
     color:#8d7d62;
   }
@@ -1959,7 +1960,7 @@
     text-align:center;
   }
   .seat-map text{
-    font-family:Pretendard,sans-serif;
+    font-family:var(--font-tw-sans);
     font-weight:700;
     fill:#20100a;
     text-anchor:middle;
@@ -2442,12 +2443,12 @@
     flex:none;
     margin-left:5px;
     color:#d9705a;
-    font-family:Pretendard,sans-serif;
+    font-family:var(--font-tw-sans);
     font-weight:700;
     font-size:10px;letter-spacing:.02em;
   }
   .spoiler-choice .spoiler-open span{
-    font-family:Pretendard,sans-serif;
+    font-family:var(--font-tw-sans);
     font-weight:500;
     font-size:11.5px;letter-spacing:0;
     color:#b9a98a;
@@ -2571,7 +2572,7 @@
   }
   .set-title{
     flex:1;min-width:0;
-    font-family:Pretendard,sans-serif;
+    font-family:var(--font-tw-sans);
     font-weight:500;
     font-size:clamp(15px,4.2vw,17px);
     line-height:1.45;
