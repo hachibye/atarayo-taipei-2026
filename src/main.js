@@ -86,7 +86,7 @@ const SYNC_INTERVAL_MS   = 100;
 const BUILD = "v1.6.14";
 
 const REPO_URL = "https://github.com/watain666/Vaundy-Taiwan-2026";
-const FEEDBACK_URL = `${REPO_URL}/issues`;
+const FEEDBACK_URL = "https://www.threads.com/@brainginger/post/DdiLWztgen9";
 const ORIGINAL_SITE_URL = "https://vaundy-seoul-2026.pages.dev/";
 const TRANSLATION_CREDIT_URL = "https://home.gamer.com.tw/profile/index.php?owner=tsukilsao319";
 const CC_BY_NC_SA_URL = "https://creativecommons.org/licenses/by-nc-sa/4.0/";
