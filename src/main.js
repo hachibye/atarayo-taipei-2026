@@ -18,6 +18,8 @@ import {
   STATIC_MIC_SVG,
   CHEV_LEFT_SVG,
   CHEV_RIGHT_SVG,
+  TRACK_PREV_SVG,
+  TRACK_NEXT_SVG,
   CLOSE_SVG
 } from "./ui/icons.js";
 
@@ -76,7 +78,7 @@ const SYNC_INTERVAL_MS   = 100;
 /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
    새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
    sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-const BUILD = "v1.6.3";
+const BUILD = "v1.6.4";
 
 /* 주소 뒤에 ?debug=1 을 붙이면 화면 위에 상태가 뜬다.
    "재생 중인 줄이 여러 개" 같은 문제가 폰에서만 날 때 원인을 보기 위한 것. */
@@ -1766,14 +1768,14 @@ function buildSongShell(){
         <h1 class="visually-hidden" id="song-page-heading"></h1>
         <nav class="song-dock" aria-label="切換歌曲">
         <div class="song-nav">
-          <button class="song-nav-btn" id="prev-song" aria-label="上一首">${CHEV_LEFT_SVG}</button>
+          <button class="song-nav-btn" id="prev-song" aria-label="上一首">${TRACK_PREV_SVG}</button>
           <div class="song-picker-h">
             <button class="song-picker-btn" id="song-picker-btn" aria-expanded="false" aria-haspopup="dialog" title="開啟歌曲清單">
               <span class="song-picker-title" id="song-picker-title"></span>
               <span class="song-picker-caret">${CHEVRON_SVG}</span>
             </button>
           </div>
-          <button class="song-nav-btn" id="next-song" aria-label="下一首">${CHEV_RIGHT_SVG}</button>
+          <button class="song-nav-btn" id="next-song" aria-label="下一首">${TRACK_NEXT_SVG}</button>
         </div>
         </nav>
         ${themeToggleHtml()}
