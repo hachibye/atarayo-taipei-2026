@@ -108,6 +108,42 @@ export const SONGS = [
 ];
 
 /*
+ * Direct track identifiers verified against Spotify Web API and Apple's
+ * official iTunes Search API on 2026-09-21. Keeping identifiers instead of
+ * search URLs prevents mobile apps from opening an empty search screen.
+ */
+export const STREAMING_IDS = Object.freeze({
+  Suzukaze: ["1dHoORp875dv0CJrqZ4kVF", "6793854736"],
+  Sakana: ["3c98GZdP2qgTOr4zxLLbZL", "6784079017"],
+  HaruTonari: ["6UFYmzhfHBkQXYAPo1cx35", "1868571279"],
+  Haku: ["6rcu3zzJEHEZaiCnGHI1pR", "1861463479"],
+  YozoraWoMushibande: ["3aWz8DKkDInc9AQDP1es3T", "1838386839"],
+  Bouai: ["4JjMVB8xrHPO3PuFBor8tr", "1804255675"],
+  TsukiNoFune: ["67G4XvHmTW7JKg6YKzPZV2", "1801497806"],
+  Shizuku: ["4ABfKq8N5qMsLXOdXTBkjn", "1769019030"],
+  AkegataNoNatsu: ["6caaFgoMDcQWyXbwCZ31AV", "1764228952"],
+  BokuWa: ["5uJOkhUYFa6kkDrlEmZk3D", "1720898327"],
+  ShounenKazeKaoru: ["5Gpkdf4zVQkzuLgRvo1EVD", "1748519663"],
+  KoisuruMonoNoAware: ["3rWcWii8DDL4hO68IEFThP", "1727258917"],
+  JugatsuMukuchi: ["2YQ8TlTmNheRI3VafoDpod", "1558400919"],
+  Natsugasumi: ["34jv2mOVzPjncrBncjYl6F", "1578238903"],
+  MataNatsuWoOu: ["53mioS2nnOFyknS2qGPig8", "1637768598"],
+  Usotsuki: ["74ndzfvtog0KrABo5cwpmW", "1586096310"],
+  BokuraWaSoreWoAiToYonda: ["79ooqFAy9eNPlcC3f4xyIh", "1687919176"],
+  NatsuGaKuruTabi: ["55ItTj78No5IMK6yR9grGj", "1698938111"],
+  EightEight: ["0vnQh69kXw7PqpyWsOgFMz", "1569265026"],
+  Ureizakura: ["4P4Ocx5koM1TT8RHQ0Ssgv", "1671745398"],
+  Outcry: ["2lQoiI7k4xuDWmla4GhEdo", "1613670052"],
+  Harururu: ["2W1NCler1KTYtQneW1Wtyz", "1562938620"],
+  AkaneChiru: ["0pZIXyZeLrFoA4Lt6BgJtM", "1649885699"],
+  Oboreteiru: ["6DmcOgxZDyIbc4Xq6cklr2", "1838386842"],
+  Realize: ["5XvpDIZqga1XDpt8HcAUOA", "1757790975"],
+  Asanagi: ["6CUbPRA9vVWqBc7ncQ8sfY", "1834548535"],
+  Kousaten: ["30PNP1Wa8tKyxUOTyX8KXx", "1609923384"],
+  SoraAoiMama: ["7KuDruzY7dnXzRXgLL1Oi0", "1664317608"]
+});
+
+/*
  * Guide collections are snapshots of the linked platform pages, not permanent
  * charts. Their order is intentionally preserved when the guide uses the
  * default sort, so the number at the left is the rank within that collection.

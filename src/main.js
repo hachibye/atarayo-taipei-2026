@@ -34,6 +34,7 @@ import {
   NOTICES,
   PICS,
   SONGS,
+  STREAMING_IDS,
   GUIDE_COLLECTIONS,
   SONG_BPM,
   SETLIST_TOKYO,
@@ -799,6 +800,25 @@ function renderHome(){
 
             <p class="way-note">あたらよ的現場重點是<b>跟著歌曲情緒聆聽</b>，不是整場照表操課的固定口號或手勢。應援不是義務，安靜欣賞也完全正確。</p>
 
+            <div class="way-sec preflight-sec">
+              <h4>行前確認 <span>勾選狀態只保存在這台裝置</span></h4>
+              <div class="preflight-ticket">
+                <b>別忘了先取票</b>
+                <span>KKTIX 票券於演出前 5 日起開放全家 FamiPort 取票，預計 12/14 起可領取；出門前請確認已拿到實體票券。</span>
+              </div>
+              <div class="preflight-list">
+                ${[
+                  ["ticket", "KKTIX 實體票券"],
+                  ["phone", "手機"],
+                  ["id", "身分證件"],
+                  ["power", "行動電源"],
+                  ["rain", "雨具"],
+                  ["support", "應援物"],
+                  ["water", "水"]
+                ].map(([id, label]) => `<label><input type="checkbox" data-preflight="${id}"><span>${label}</span></label>`).join("")}
+              </div>
+            </div>
+
             <div class="way-sec">
               <h4>あたらよ的應援方式 <span>知道這些就足夠</span></h4>
               <ul class="way-ul">
@@ -863,6 +883,20 @@ function renderHome(){
       </div>
       </div>
 
+      <section class="session-song" aria-labelledby="session-song-title">
+        <div class="session-song-copy">
+          <span>SESSION PICK</span>
+          <b id="session-song-title">今天你是哪首 Atarayo？</b>
+          <small>同一次瀏覽結果固定，下次開啟會避開上一首。</small>
+        </div>
+        <button class="session-song-draw" type="button" id="session-song-draw">抽一首</button>
+        <div class="session-song-result" id="session-song-result" hidden>
+          <span>今日のあなたは……</span>
+          <b id="session-song-name" lang="ja"></b>
+          <button type="button" id="session-song-open">播放歌曲</button>
+        </div>
+      </section>
+
       <!-- 拍攝規範摘要 -->
       <aside class="home-note">
         <span class="home-note-ico">${FLASH_OFF_SVG}</span>
@@ -888,6 +922,8 @@ function renderHome(){
   document.getElementById("starter-btn").addEventListener("click", ()=>{ location.hash = "#/starter"; });
   document.getElementById("timeline-btn").addEventListener("click", ()=>{ location.hash = "#/timeline"; });
   setupAccordions();
+  setupPreflightChecklist();
+  setupSessionSong();
   setupNoticeViewer();
   setupSeatMap();
   setupHomeExtras();
@@ -1596,6 +1632,61 @@ function updateTodayCard(now){
   const left = h > 0 ? `${h} 小時 ${pad(m)} 分 ${pad(sec)} 秒` : `${m} 分 ${pad(sec)} 秒`;
   const cur  = curIdx >= 0 ? `<b>${escapeHtml(steps[curIdx].label)}</b>進行中<br>` : "";
   nowEl.innerHTML = `${cur}距離${escapeHtml(steps[nextIdx].label)}還有 <span class="left">${left}</span>`;
+}
+
+function setupPreflightChecklist(){
+  const inputs = [...document.querySelectorAll("[data-preflight]")];
+  if (!inputs.length) return;
+  let checked = {};
+  try { checked = JSON.parse(store("atarayo-preflight") || "{}"); } catch { checked = {}; }
+  inputs.forEach(input => {
+    input.checked = Boolean(checked[input.dataset.preflight]);
+    input.addEventListener("change", ()=>{
+      checked[input.dataset.preflight] = input.checked;
+      store("atarayo-preflight", JSON.stringify(checked));
+    });
+  });
+}
+
+function sessionSongChoice(){
+  let id = "";
+  try { id = sessionStorage.getItem("atarayo-session-song") || ""; } catch {}
+  let song = SONGS.find(item => item.id === id);
+  if (song) return song;
+
+  const previous = store("atarayo-last-session-song");
+  const choices = SONGS.filter(item => item.id !== previous);
+  const random = new Uint32Array(1);
+  if (window.crypto?.getRandomValues) window.crypto.getRandomValues(random);
+  else random[0] = Math.floor(Math.random() * 0xffffffff);
+  song = choices[random[0] % choices.length] || SONGS[0];
+  try { sessionStorage.setItem("atarayo-session-song", song.id); } catch {}
+  store("atarayo-last-session-song", song.id);
+  return song;
+}
+
+function setupSessionSong(){
+  const draw = document.getElementById("session-song-draw");
+  const result = document.getElementById("session-song-result");
+  const name = document.getElementById("session-song-name");
+  const open = document.getElementById("session-song-open");
+  if (!draw || !result || !name || !open) return;
+  const song = sessionSongChoice();
+  name.textContent = song.title;
+
+  let revealed = false;
+  try { revealed = sessionStorage.getItem("atarayo-session-song-revealed") === "1"; } catch {}
+  const show = ()=>{
+    result.hidden = false;
+    draw.hidden = true;
+    try { sessionStorage.setItem("atarayo-session-song-revealed", "1"); } catch {}
+  };
+  if (revealed) show();
+  draw.addEventListener("click", show);
+  open.addEventListener("click", ()=>{
+    setSongFrom("guide");
+    gotoSong(song);
+  });
 }
 
 /* ── 준비물 체크 · 주소 복사 · 공유 · 오프라인 상태 ───────────── */
@@ -2508,12 +2599,11 @@ function applySongTempo(song){
   iconClockStartedAt = performance.now();
 }
 
-function listeningSearchUrl(service, song){
-  const query = `${song.artist || "あたらよ"} ${song.title}`;
-  if (service === "spotify") {
-    return `https://open.spotify.com/search/${encodeURIComponent(query)}`;
-  }
-  return `https://music.apple.com/tw/search?term=${encodeURIComponent(query)}`;
+function listeningUrl(service, song){
+  const [spotifyId, appleMusicId] = STREAMING_IDS[song.id] || [];
+  if (service === "spotify" && spotifyId) return `https://open.spotify.com/track/${spotifyId}`;
+  if (service === "apple-music" && appleMusicId) return `https://music.apple.com/tw/song/${appleMusicId}`;
+  return "";
 }
 
 function setLyricsNote(text){
@@ -2621,8 +2711,10 @@ function renderSong(song){
   document.getElementById("next-song").title = `下一首：${next.title}`;
   document.getElementById("watch-on-yt").href =
     `https://www.youtube.com/watch?v=${encodeURIComponent(song.youtubeId)}`;
-  document.getElementById("listen-on-spotify").href = listeningSearchUrl("spotify", song);
-  document.getElementById("listen-on-apple-music").href = listeningSearchUrl("apple-music", song);
+  const spotifyLink = document.getElementById("listen-on-spotify");
+  const appleMusicLink = document.getElementById("listen-on-apple-music");
+  spotifyLink.href = listeningUrl("spotify", song);
+  appleMusicLink.href = listeningUrl("apple-music", song);
   const story = document.getElementById("song-story");
   const storyText = document.getElementById("song-story-text");
   const storyCopy = SONG_STORIES[song.id] || "";
