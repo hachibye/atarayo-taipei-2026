@@ -28,6 +28,9 @@
   a{color:inherit;}
   button{font-family:inherit;}
 
+  /* 歌名中的日文原題使用日文字型；中文譯名仍沿用介面字體。 */
+  [lang="ja"]{ font-family:'Noto Sans JP',Pretendard,system-ui,sans-serif; }
+
   /* ---------- utility ---------- */
   .eyebrow{
     font-family:'Gmarket Sans',sans-serif;

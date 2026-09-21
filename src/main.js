@@ -83,7 +83,7 @@ const SYNC_INTERVAL_MS   = 100;
 /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
    새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
    sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-const BUILD = "v1.6.13";
+const BUILD = "v1.6.14";
 
 const REPO_URL = "https://github.com/watain666/Vaundy-Taiwan-2026";
 const FEEDBACK_URL = `${REPO_URL}/issues`;
@@ -1065,6 +1065,13 @@ function setlistTitle(entry){
   return s ? s.title : (entry.title || entry.id);
 }
 
+/* 歌名通常是「中文譯名 (日文原題)」；只把括號內原題標成日文，
+   讓漢字由 Noto Sans JP 顯示，同時保留中文譯名原本的字體。 */
+function renderSongTitle(title){
+  return escapeHtml(String(title ?? "")).replace(/\(([^()]*)\)/g,
+    (_, original) => `(<span lang="ja">${original}</span>)`);
+}
+
 /* ── 셋리스트 보기 상태 ──────────────────────────────────────
    mode "order"  : 실제 공연 순서 (번호 있음, 토·일로 갈린 자리도 그대로)
    mode "random" : 순서를 감추고 곡을 하나씩 섞어서 보여 줌
@@ -1161,7 +1168,7 @@ function setlistRowHtml(item){
       <li class="set-item">
         <button class="set-row" data-id="${escapeHtml(e.id)}" ${exists ? "" : "disabled"}>
           <span class="set-num">${pad(item.n)}</span>
-          <span class="set-title">${escapeHtml(setlistTitle(e))}</span>
+          <span class="set-title">${renderSongTitle(setlistTitle(e))}</span>
           <span class="set-go">${exists ? "›" : ""}</span>
         </button>
       </li>`;
@@ -1178,7 +1185,7 @@ function setlistRowHtml(item){
           return `
           <button class="set-row sub" data-id="${escapeHtml(e.id)}" ${exists ? "" : "disabled"}>
             <span class="day-chip ${e.day === "日" ? "sun" : ""}">${e.day}</span>
-            <span class="set-title">${escapeHtml(setlistTitle(e))}</span>
+            <span class="set-title">${renderSongTitle(setlistTitle(e))}</span>
             <span class="set-go">${exists ? "›" : ""}</span>
           </button>`;
         }).join("")}
@@ -1193,7 +1200,7 @@ function setlistRandomRowHtml(x){
     <li class="set-item">
       <button class="set-row" data-id="${escapeHtml(x.id)}" ${exists ? "" : "disabled"}>
         <span class="set-num rand">♪</span>
-        <span class="set-title">${escapeHtml(setlistTitle(x))}</span>
+        <span class="set-title">${renderSongTitle(setlistTitle(x))}</span>
         <span class="set-go">${exists ? "›" : ""}</span>
       </button>
     </li>`;
@@ -1518,7 +1525,7 @@ function paintSongList(){
     <li data-no="${songNo(s)}">
       <button class="song-row" data-id="${escapeHtml(s.id)}">
         <span class="song-num">${pad(songNo(s))}</span>
-        <span class="song-title">${escapeHtml(s.title)}</span>
+        <span class="song-title">${renderSongTitle(s.title)}</span>
         ${songMarksHtml(s)}
       </button>
     </li>`).join("");
@@ -2302,7 +2309,7 @@ function renderSong(song){
   if (song.cover) page.style.setProperty("--song-cover", `url('${song.cover}')`);
   else            page.style.removeProperty("--song-cover");
 
-  document.getElementById("song-picker-title").textContent = song.title;
+  document.getElementById("song-picker-title").innerHTML = renderSongTitle(song.title);
   document.getElementById("song-page-heading").textContent = song.title;
   const lyricsCredit = document.getElementById("lyrics-credit");
   if (lyricsCredit) {
@@ -2353,7 +2360,7 @@ function renderSong(song){
     <li data-no="${songNo(s)}">
       <button class="song-sheet-item${s.id === song.id ? " current" : ""}" data-id="${s.id}" data-pos="${i}"${s.id === song.id ? ' aria-current="true"' : ""}>
         <span class="song-sheet-num">${pad(songNo(s))}</span>
-        <span class="song-sheet-name">${escapeHtml(s.title)}</span>
+        <span class="song-sheet-name">${renderSongTitle(s.title)}</span>
         ${s.id === song.id ? `<span class="song-sheet-now">目前播放</span>` : ""}
       </button>
     </li>`).join("");
