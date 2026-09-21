@@ -1053,15 +1053,44 @@
   }
   .lyrics-note .dot{color:var(--teal);}
   .karaoke-source-status{
-    flex:1 1 100%;
-    padding-left:20px;
-    color:#8f826d;
+    display:block;
+    width:min(280px,calc(100vw - 48px));
+    margin-top:6px;
+    padding:8px 10px;
+    border:1px solid var(--stage-line);
+    border-radius:8px;
+    background:var(--stage-raised);
+    color:var(--stage-muted);
     font-size:11px;
     line-height:1.45;
   }
   .karaoke-source-status[data-state="ready"]{color:var(--teal);}
   .karaoke-source-status[data-state="loading"],
   .karaoke-source-status[data-state="fallback"]{color:#b9a98a;}
+  .karaoke-source-popover{
+    position:absolute;
+    top:8px;right:8px;
+    z-index:4;
+  }
+  .karaoke-source-popover summary{
+    display:grid;
+    place-items:center;
+    width:28px;height:28px;
+    padding:0;
+    border:1px solid var(--stage-line);
+    border-radius:999px;
+    background:var(--stage-raised);
+    color:var(--stage-muted);
+    cursor:pointer;
+    list-style:none;
+  }
+  .karaoke-source-popover summary::-webkit-details-marker{display:none;}
+  .karaoke-source-popover summary svg{width:15px;height:15px;}
+  .karaoke-source-popover summary:hover,
+  .karaoke-source-popover summary:focus-visible{color:var(--cream);}
+  .karaoke-source-popover[data-state="ready"] summary{color:var(--teal);}
+  .karaoke-source-popover[data-state="loading"] summary,
+  .karaoke-source-popover[data-state="fallback"] summary{color:#b9a98a;}
 
   .lyrics-legend{
     max-width:720px;margin:14px auto 12px;padding:0 16px;

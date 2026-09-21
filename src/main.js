@@ -1784,6 +1784,10 @@ function buildSongShell(){
           <div class="video-wrap">
             <div class="video-frame">
               <div id="yt-player"></div>
+              <details class="karaoke-source-popover" id="karaoke-source-popover">
+                <summary aria-label="查看逐字時間同步資訊" title="逐字時間同步資訊">${INFO_SVG}</summary>
+                <span class="karaoke-source-status" id="karaoke-source-status" role="status" aria-live="polite"></span>
+              </details>
               <div class="video-status" id="video-status" role="status">正在載入影片…</div>
             </div>
             <a class="watch-on-yt" id="watch-on-yt" href="#" target="_blank" rel="noopener">在 YouTube 觀看 ↗</a>
@@ -1792,7 +1796,6 @@ function buildSongShell(){
           <div class="lyrics-note">
             <span class="dot">●</span>
             <span>點選歌詞跳至影片位置，醒目歌詞隨影片同步。</span>
-            <span class="karaoke-source-status" id="karaoke-source-status" role="status" aria-live="polite"></span>
           </div>
 
           <div class="lyrics-legend">
@@ -2631,6 +2634,8 @@ function setKaraokeSourceStatus(state, text){
   const el = document.getElementById("karaoke-source-status");
   if (!el) return;
   el.dataset.state = state || "";
+  const popover = el.closest(".karaoke-source-popover");
+  if (popover) popover.dataset.state = state || "";
   el.textContent = text || "";
 }
 
