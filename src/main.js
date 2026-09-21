@@ -83,7 +83,7 @@ const SYNC_INTERVAL_MS   = 100;
 /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
    새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
    sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-const BUILD = "v1.7.2";
+const BUILD = "v1.7.3";
 
 const REPO_URL = "https://github.com/watain666/Vaundy-Taiwan-2026";
 const FEEDBACK_URL = "https://www.threads.com/@brainginger/post/DdiLWztgen9";
@@ -103,8 +103,8 @@ function siteFooterHtml(){
         <a class="credits-fork" href="${ORIGINAL_SITE_URL}" target="_blank" rel="noopener" aria-label="Fork from SEOUL 응원가이드">
           Fork from SEOUL 응원가이드
         </a>
-        <a class="credits-fork" href="${KOREAN_AUTHOR_URL}" target="_blank" rel="noopener" aria-label="感謝韓國原作者 카쿠메">
-          感謝韓國原作者 카쿠메
+        <a class="credits-fork" href="${KOREAN_AUTHOR_URL}" target="_blank" rel="noopener" aria-label="Thanks to the original Korean creator, 카쿠메.">
+          Thanks to the original Korean creator, 카쿠메.
         </a>
         <a class="credits-link" href="${FEEDBACK_URL}" target="_blank" rel="noopener" aria-label="意見回饋" title="意見回饋">
           <span>意見回饋</span>
@@ -801,7 +801,7 @@ function renderHome(){
               <ul class="way-ul warn">
                 <li><b>禁止拍攝・錄音・錄影。</b>若有允許拍攝的段落，現場會另行通知</li>
                 <li>演出中請<b>調低手機螢幕亮度</b>。昏暗觀眾席中的亮螢幕，後方觀眾會看得非常清楚</li>
-                <li>請<b>避免使用手機閃光燈（手機螢火蟲）</b>。舞台演出連燈光完全熄滅的瞬間都經過設計，觀眾席的一道光可能破壞那個畫面
+                <li>請<b>避免使用手機閃光燈</b>。舞台演出連燈光完全熄滅的瞬間都經過設計，觀眾席的一道光可能破壞那個畫面
                   <span class="way-hint">若有全場一起舉燈的安排，演出中會另行通知</span></li>
                 <li>安靜歌曲・原聲樂段請<b>克制口號與歡呼</b>，很多人是來聽歌的</li>
                 <li>把手大幅揮過頭頂時，請留意<b>左右與後方觀眾的視線</b></li>
@@ -891,7 +891,7 @@ function renderHome(){
       <aside class="home-note">
         <span class="home-note-ico">${FLASH_OFF_SVG}</span>
         <div class="home-note-body">
-          <b>請避免使用手機閃光燈（手機螢火蟲）</b>
+          <b>請避免使用手機閃光燈</b>
           <p>舞台演出連燈光完全熄滅的瞬間都經過設計。觀眾席的一道光會打破黑暗，讓精心安排的畫面失去效果。</p>
           <p class="sub">若有全場一起舉燈的安排，演出中會另行通知。</p>
         </div>
