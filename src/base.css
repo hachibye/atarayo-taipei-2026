@@ -507,6 +507,22 @@
   .credits-fork:hover,
   .credits-fork:focus-visible{ color:var(--teal);text-decoration:underline; }
 
+  @media (max-width:600px){
+    .credits-links{
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
+      overflow:visible;
+      white-space:normal;
+    }
+    .credits-links .credits-repo{ display:none; }
+    .credits-links .credits-fork,
+    .credits-links .credits-link{
+      max-width:100%;
+      line-height:1.45;
+    }
+  }
+
   @media (max-width:400px){
     .credits{
       padding:22px 10px 40px;
