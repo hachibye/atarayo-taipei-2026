@@ -54,7 +54,7 @@ import {
 import { loadFurigana, loadKaraokeSources } from "./services/lazy-modules.js";
 import { store } from "./services/storage.js";
 import { traditionalChineseFor } from "./data/lyrics-zh-tw.js";
-import { SONG_STORIES, STARTER_PATHS, ATARAYO_TIMELINE } from "./editorial.js";
+import { SONG_STORIES, SESSION_SONG_PHRASES, STARTER_PATHS, ATARAYO_TIMELINE } from "./editorial.js";
 
 const app = document.getElementById("app");
 const songView = document.getElementById("song-view");
@@ -887,12 +887,14 @@ function renderHome(){
         <div class="session-song-copy">
           <span>SESSION PICK</span>
           <b id="session-song-title">今天你是哪首 Atarayo？</b>
-          <small>同一次瀏覽結果固定，下次開啟會避開上一首。</small>
         </div>
         <button class="session-song-draw" type="button" id="session-song-draw">抽一首</button>
         <div class="session-song-result" id="session-song-result" hidden>
-          <span>今日のあなたは……</span>
-          <b id="session-song-name" lang="ja"></b>
+          <div class="session-song-result-copy">
+            <span>今日のあなたは……</span>
+            <b id="session-song-name" lang="ja"></b>
+            <p id="session-song-phrase"></p>
+          </div>
           <button type="button" id="session-song-open">播放歌曲</button>
         </div>
       </section>
@@ -1669,10 +1671,12 @@ function setupSessionSong(){
   const draw = document.getElementById("session-song-draw");
   const result = document.getElementById("session-song-result");
   const name = document.getElementById("session-song-name");
+  const phrase = document.getElementById("session-song-phrase");
   const open = document.getElementById("session-song-open");
-  if (!draw || !result || !name || !open) return;
+  if (!draw || !result || !name || !phrase || !open) return;
   const song = sessionSongChoice();
   name.textContent = song.title;
+  phrase.textContent = SESSION_SONG_PHRASES[song.id] || "今天也讓一首歌陪你走一段路。";
 
   let revealed = false;
   try { revealed = sessionStorage.getItem("atarayo-session-song-revealed") === "1"; } catch {}

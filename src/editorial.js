@@ -33,6 +33,37 @@ export const SONG_STORIES = Object.freeze({
   SoraAoiMama: "兒時想像的未來，進入成人世界後被妥協與重複慢慢磨淡。主角對『本來不該是這樣』的生活感到疲憊，於是邀請重要的人一起逃向尚未被定義的地方。歌曲從窒息的自我懷疑，轉向奪回價值判斷：不必讓旁人理解，也不再把人生交給別人的標準。最後天空仍藍，眼淚也仍會落下，但兩人已決定由自己創造『我們的樣子』。這是一首溫柔卻堅決的出走宣言。"
 });
 
+export const SESSION_SONG_PHRASES = Object.freeze({
+  Suzukaze: "你珍惜稍縱即逝的幸福，也願意帶著離別的預感向前。",
+  Sakana: "你常把求救藏在沉默裡，卻正準備替自己發聲。",
+  HaruTonari: "你對靠近仍有些害怕，心裡卻已悄悄走進春天。",
+  Haku: "你不是忘不了，而是在為尚未寫完的自己留一頁空白。",
+  YozoraWoMushibande: "你白天很會撐住，夜裡才允許真正的心情浮上來。",
+  Bouai: "你想放下的從來不是愛，而是想起時仍會刺痛的部分。",
+  TsukiNoFune: "你不必等到無所畏懼；願意再走一步，就是你的勇氣。",
+  Shizuku: "你習慣先照顧別人的情緒，也該允許自己的眼淚落下。",
+  AkegataNoNatsu: "你總在失去後理解更多，遲來的溫柔仍會帶你前進。",
+  BokuWa: "你看似接受自己，其實仍期待有人讀懂未說完的那句話。",
+  ShounenKazeKaoru: "你沒有成為想像中的大人，卻比自己以為的更努力活著。",
+  KoisuruMonoNoAware: "你明白美好不會永遠，因此比誰都更認真收藏當下。",
+  JugatsuMukuchi: "你擅長把難過說得平靜，心裡卻仍在等待真正的告別。",
+  Natsugasumi: "你不急著抹去回憶，因為模糊的輪廓也是愛過的證明。",
+  MataNatsuWoOu: "你偶爾回頭追逐舊日，其實已慢慢把方向轉向前方。",
+  Usotsuki: "你對真心很敏銳；即使受過傷，仍沒有放棄相信。",
+  BokuraWaSoreWoAiToYonda: "你相信愛不只是一句話，而是想放棄時仍願意回頭。",
+  NatsuGaKuruTabi: "你把想念藏進季節裡，讓離開的人換一種方式陪伴。",
+  EightEight: "你記得重要的日子，也懂得帶著心裡的缺口繼續生活。",
+  Ureizakura: "你能在新的開始裡看見告別，也仍願意等待下一次花開。",
+  Outcry: "你已經忍耐很久，現在正學會用自己的聲音活著。",
+  Harururu: "你的復原有自己的速度；晚一些抵達的春天仍屬於你。",
+  AkaneChiru: "你知道安全感不能被催促，願意用一次次留下回答不安。",
+  Oboreteiru: "你正在分辨深愛與消耗，並把呼吸重新還給自己。",
+  Realize: "你不是沒有恐懼，只是在重要時刻仍會選擇站起來。",
+  Asanagi: "你珍惜舒服的沉默，也逐漸明白真心需要被說出口。",
+  Kousaten: "你接受有些錯過不是不愛，而是彼此要走向不同方向。",
+  SoraAoiMama: "你厭倦讓別人定義價值，正在把人生的方向拿回來。"
+});
+
 export const STARTER_PATHS = Object.freeze([
   { title: "第一次只想先聽代表作", text: "從〈10月無口な君を忘れる〉進入，再接〈夏霞〉與〈「僕は...」〉。三首分別抓住獨白式失戀、夏日殘像與青春自我懷疑，也是最容易聽見 Atarayo 核心氣質的路線。", songIds: ["JugatsuMukuchi", "Natsugasumi", "BokuWa"] },
   { title: "喜歡失戀系", text: "從關係崩裂到學會與記憶共存。前段較直接，後段更像深夜裡慢慢沉澱的餘韻。", songIds: ["Usotsuki", "Bouai", "Shizuku", "Ureizakura"] },
