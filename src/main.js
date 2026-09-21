@@ -79,7 +79,7 @@ const SYNC_INTERVAL_MS   = 100;
 /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
    새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
    sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-const BUILD = "v1.6.8";
+const BUILD = "v1.6.9";
 
 const REPO_URL = "https://github.com/watain666/Vaundy-Taiwan-2026";
 const FEEDBACK_URL = `${REPO_URL}/issues`;
@@ -1812,10 +1812,10 @@ function buildSongShell(){
               <div id="yt-player"></div>
               <details class="karaoke-source-popover" id="karaoke-source-popover">
                 <summary aria-label="查看同步資訊與中譯歌詞作者" title="同步資訊與中譯歌詞作者">${INFO_SVG}</summary>
-                <div class="karaoke-source-status" id="karaoke-source-status" role="status" aria-live="polite">
+                <span class="karaoke-source-status" id="karaoke-source-status" role="status" aria-live="polite">
                   <span id="karaoke-source-status-text"></span>
                   <span class="lyrics-credit" id="lyrics-credit" hidden></span>
-                </div>
+                </span>
               </details>
               <div class="video-status" id="video-status" role="status">正在載入影片…</div>
             </div>
