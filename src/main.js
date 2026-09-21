@@ -1818,7 +1818,10 @@ function buildSongShell(){
           <div class="lyrics-note">
             <span class="dot">●</span>
             <span>點選歌詞跳至影片位置，醒目歌詞隨影片同步。</span>
-            <span class="lyrics-credit" id="lyrics-credit" hidden></span>
+            <details class="lyrics-credit-popover" id="lyrics-credit-popover" hidden>
+              <summary aria-label="查看中譯歌詞作者" title="查看中譯歌詞作者">${INFO_SVG}</summary>
+              <span class="lyrics-credit" id="lyrics-credit"></span>
+            </details>
           </div>
 
           <div class="lyrics-legend">
@@ -2278,11 +2281,14 @@ function renderSong(song){
   document.getElementById("song-picker-title").textContent = song.title;
   document.getElementById("song-page-heading").textContent = song.title;
   const lyricsCredit = document.getElementById("lyrics-credit");
-  if (lyricsCredit) {
-    lyricsCredit.textContent = song.translationCredit
+  const lyricsCreditPopover = document.getElementById("lyrics-credit-popover");
+  if (lyricsCredit && lyricsCreditPopover) {
+    const hasCredit = Boolean(song.translationCredit);
+    lyricsCredit.textContent = hasCredit
       ? `中譯歌詞作者：${song.translationCredit}`
       : "";
-    lyricsCredit.hidden = !song.translationCredit;
+    lyricsCreditPopover.hidden = !hasCredit;
+    lyricsCreditPopover.removeAttribute("open");
   }
   // 어디서 들어왔는지에 따라 '뒤로' 버튼의 안내 글을 바꾼다
   const backBtn = document.getElementById("song-back-btn");
