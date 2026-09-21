@@ -79,11 +79,10 @@ const SYNC_INTERVAL_MS   = 100;
 /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
    새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
    sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-const BUILD = "v1.6.6";
+const BUILD = "v1.6.7";
 
 const REPO_URL = "https://github.com/watain666/Vaundy-Taiwan-2026";
 const FEEDBACK_URL = `${REPO_URL}/issues`;
-const FORK_REPO_URL = "https://github.com/limskyy123456-sudo/Vaundy-Seoul-2026";
 const ORIGINAL_SITE_URL = "https://vaundy-seoul-2026.pages.dev/";
 
 function siteFooterHtml(){
@@ -94,12 +93,9 @@ function siteFooterHtml(){
         <a class="credits-link" href="${REPO_URL}" target="_blank" rel="noopener" aria-label="GitHub Repo" title="GitHub Repo">
           ${GITHUB_SVG}
         </a>
-        <span class="credits-fork">
-          <span>Fork from</span>
-          <a href="${FORK_REPO_URL}" target="_blank" rel="noopener">limskyy123456-sudo/Vaundy-Seoul-2026</a>
-          <span>・</span>
-          <a href="${ORIGINAL_SITE_URL}" target="_blank" rel="noopener">原版</a>
-        </span>
+        <a class="credits-fork" href="${ORIGINAL_SITE_URL}" target="_blank" rel="noopener" aria-label="Fork from limskyy123456-sudo/Vaundy-Seoul-2026">
+          Fork from limskyy123456-sudo/Vaundy-Seoul-2026
+        </a>
         <a class="credits-link" href="${FEEDBACK_URL}" target="_blank" rel="noopener" aria-label="意見回饋">
           ${EXT_LINK_SVG}<span>意見回饋</span>
         </a>
@@ -1815,8 +1811,11 @@ function buildSongShell(){
             <div class="video-frame">
               <div id="yt-player"></div>
               <details class="karaoke-source-popover" id="karaoke-source-popover">
-                <summary aria-label="查看逐字時間同步資訊" title="逐字時間同步資訊">${INFO_SVG}</summary>
-                <span class="karaoke-source-status" id="karaoke-source-status" role="status" aria-live="polite"></span>
+                <summary aria-label="查看同步資訊與中譯歌詞作者" title="同步資訊與中譯歌詞作者">${INFO_SVG}</summary>
+                <div class="karaoke-source-status" id="karaoke-source-status" role="status" aria-live="polite">
+                  <span id="karaoke-source-status-text"></span>
+                  <span class="lyrics-credit" id="lyrics-credit" hidden></span>
+                </div>
               </details>
               <div class="video-status" id="video-status" role="status">正在載入影片…</div>
             </div>
@@ -1826,10 +1825,6 @@ function buildSongShell(){
           <div class="lyrics-note">
             <span class="dot">●</span>
             <span>點選歌詞跳至影片位置，醒目歌詞隨影片同步。</span>
-            <details class="lyrics-credit-popover" id="lyrics-credit-popover" hidden>
-              <summary aria-label="查看中譯歌詞作者" title="查看中譯歌詞作者">${INFO_SVG}</summary>
-              <span class="lyrics-credit" id="lyrics-credit"></span>
-            </details>
           </div>
 
           <div class="lyrics-legend">
@@ -1921,6 +1916,19 @@ function buildSongShell(){
       </div>
     </div>
   `;
+
+  const karaokeSourcePopover = document.getElementById("karaoke-source-popover");
+  let karaokeSourceCloseTimer = null;
+  if (karaokeSourcePopover){
+    karaokeSourcePopover.addEventListener("toggle", ()=>{
+      if (karaokeSourceCloseTimer) clearTimeout(karaokeSourceCloseTimer);
+      if (!karaokeSourcePopover.open) return;
+      karaokeSourceCloseTimer = setTimeout(()=>{
+        karaokeSourcePopover.removeAttribute("open");
+        karaokeSourceCloseTimer = null;
+      }, 2000);
+    });
+  }
 
   document.getElementById("song-back-btn").addEventListener("click", ()=>{ location.hash = songBackHash(); });
 
@@ -2289,14 +2297,12 @@ function renderSong(song){
   document.getElementById("song-picker-title").textContent = song.title;
   document.getElementById("song-page-heading").textContent = song.title;
   const lyricsCredit = document.getElementById("lyrics-credit");
-  const lyricsCreditPopover = document.getElementById("lyrics-credit-popover");
-  if (lyricsCredit && lyricsCreditPopover) {
+  if (lyricsCredit) {
     const hasCredit = Boolean(song.translationCredit);
     lyricsCredit.textContent = hasCredit
       ? `中譯歌詞作者：${song.translationCredit}`
       : "";
-    lyricsCreditPopover.hidden = !hasCredit;
-    lyricsCreditPopover.removeAttribute("open");
+    lyricsCredit.hidden = !hasCredit;
   }
   // 어디서 들어왔는지에 따라 '뒤로' 버튼의 안내 글을 바꾼다
   const backBtn = document.getElementById("song-back-btn");
@@ -2677,11 +2683,12 @@ function getPlayerDuration(){
 
 function setKaraokeSourceStatus(state, text){
   const el = document.getElementById("karaoke-source-status");
-  if (!el) return;
+  const textEl = document.getElementById("karaoke-source-status-text");
+  if (!el || !textEl) return;
   el.dataset.state = state || "";
   const popover = el.closest(".karaoke-source-popover");
   if (popover) popover.dataset.state = state || "";
-  el.textContent = text || "";
+  textEl.textContent = text || "";
 }
 
 function karaokeLineTiming(song, index){

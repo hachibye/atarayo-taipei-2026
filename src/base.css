@@ -489,14 +489,15 @@
     align-items:center;
     justify-content:center;
     flex-wrap:wrap;
-    gap:4px;
     min-width:0;
     max-width:100%;
     overflow-wrap:anywhere;
+    color:inherit;
+    text-decoration:none;
+    transition:color .2s ease;
   }
-  .credits-fork a{ color:inherit;text-decoration:none; }
-  .credits-fork a:hover,
-  .credits-fork a:focus-visible{ color:var(--teal);text-decoration:underline; }
+  .credits-fork:hover,
+  .credits-fork:focus-visible{ color:var(--teal);text-decoration:underline; }
 
   /* ---------- INFO ACCORDION (공연 정보 / 관객 입장안내) ---------- */
   /* 히어로(첫 화면) 안에 들어가는 공연 정보 카드 */
@@ -1086,46 +1087,20 @@
     flex-wrap:wrap;
   }
   .lyrics-note .dot{color:var(--teal);}
-  .lyrics-note{position:relative;}
-  .lyrics-credit-popover{
-    position:absolute;
-    top:-3px;right:16px;
-    z-index:4;
-  }
-  .lyrics-credit-popover summary{
-    display:grid;
-    place-items:center;
-    width:20px;height:20px;
-    padding:0;
-    border:1px solid var(--stage-line);
-    border-radius:999px;
-    background:var(--stage-raised);
-    color:var(--stage-muted);
-    cursor:pointer;
-    list-style:none;
-  }
-  .lyrics-credit-popover summary::-webkit-details-marker{display:none;}
-  .lyrics-credit-popover summary svg{width:13px;height:13px;}
-  .lyrics-credit-popover summary:hover,
-  .lyrics-credit-popover summary:focus-visible,
-  .lyrics-credit-popover[open] summary{color:var(--teal);}
   .lyrics-credit{
-    position:absolute;
-    top:calc(100% + 6px);right:0;
-    width:max-content;
-    max-width:calc(100vw - 32px);
-    padding:7px 9px;
-    border:1px solid var(--stage-line);
-    border-radius:8px;
-    background:var(--stage-raised);
+    display:block;
+    margin-top:7px;
+    padding-top:7px;
+    border-top:1px solid var(--stage-line);
     color:var(--stage-muted);
     font-size:11px;
     line-height:1.4;
-    white-space:normal;
   }
+  .lyrics-credit[hidden]{display:none;}
   .karaoke-source-status{
     display:block;
-    width:min(280px,calc(100vw - 48px));
+    box-sizing:border-box;
+    width:100%;
     margin-top:6px;
     padding:8px 10px;
     border:1px solid var(--stage-line);
