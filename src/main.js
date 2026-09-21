@@ -83,7 +83,7 @@ const SYNC_INTERVAL_MS   = 100;
 /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
    새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
    sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-const BUILD = "v1.7.4";
+const BUILD = "v1.7.5";
 
 const REPO_URL = "https://github.com/watain666/Vaundy-Taiwan-2026";
 const FEEDBACK_URL = "https://www.threads.com/@brainginger/post/DdiLWztgen9";
@@ -697,9 +697,9 @@ function renderHome(){
             <p class="way-note">台北場最新官方舞台／座位配置圖：</p>
             <div class="seat-wrap">
               <a class="seat-map-link" href="./images/taipei-stage-map.webp" target="_blank" rel="noopener">
-                <img class="seat-map-image" src="./images/taipei-stage-map.webp" alt="Vaundy ASIA ARENA TOUR 2026「HORO」台北場台北小巨蛋舞台與座位配置圖，含各區票價" loading="lazy" decoding="async">
+                <img class="seat-map-image" src="./images/taipei-stage-map-preview.webp" width="2772" height="3681" alt="Vaundy ASIA ARENA TOUR 2026「HORO」台北場台北小巨蛋舞台與座位配置圖，含各區票價；點擊查看原尺寸" loading="lazy" decoding="async">
               </a>
-              <p class="seat-map-caption">點擊圖片可開啟原尺寸查看。</p>
+              <p class="seat-map-caption">點擊圖片後才會載入壓縮原圖，可開啟原尺寸查看。</p>
             </div>
             <p class="way-note">圖中票價與票區依主辦單位公布的配置圖整理；實際座位、入場動線與現場安排仍以票券及演出當日公告為準。</p>
             <div class="info-book-links">
