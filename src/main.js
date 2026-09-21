@@ -2146,6 +2146,11 @@ function buildSongShell(){
           </div>
 
           <div class="lyrics-scroll">
+            <div class="lyrics-empty" id="lyrics-empty" role="status" aria-live="polite" hidden>
+              <span class="lyrics-empty-mark" aria-hidden="true">CC</span>
+              <strong id="lyrics-empty-title"></strong>
+              <p id="lyrics-empty-detail"></p>
+            </div>
             <ul class="lyrics-list" id="lyrics-list"></ul>
           </div>
         </div>
@@ -2618,6 +2623,21 @@ function setLyricsNote(text){
   if (row) row.hidden = !text;
 }
 
+function setLyricsPanelMessage(title = "", detail = "", state = ""){
+  const panel = document.getElementById("lyrics-empty");
+  const titleEl = document.getElementById("lyrics-empty-title");
+  const detailEl = document.getElementById("lyrics-empty-detail");
+  const list = document.getElementById("lyrics-list");
+  if (!panel || !titleEl || !detailEl) return;
+
+  const visible = Boolean(title);
+  titleEl.textContent = title;
+  detailEl.textContent = detail;
+  panel.dataset.state = state;
+  panel.hidden = !visible;
+  if (list) list.hidden = visible;
+}
+
 async function prepareSongReadings(song){
   const seq = ++japaneseReadingSeq;
   const engine = await loadFurigana();
@@ -2640,6 +2660,8 @@ function isTimedLyricMetadata(text){
 function renderLyricsList(song){
   const list = document.getElementById("lyrics-list");
   if (!list || !song || !Array.isArray(song.lyrics)) return;
+
+  setLyricsPanelMessage();
 
   list.innerHTML = song.lyrics.map((l,i)=>`
     <li>
@@ -2729,6 +2751,13 @@ function renderSong(song){
   }
 
   renderLyricsList(song);
+  if (song.lyricsMode === "remote-timed") {
+    setLyricsPanelMessage(
+      "正在載入歌詞…",
+      "正在查找日文歌詞與同步時間碼。",
+      "loading"
+    );
+  }
   setLyricsNote("正在載入日文歌詞與時間碼…");
   setKaraokeSourceStatus("loading", "歌詞逐字時間：正在尋找開源時間碼…");
 
@@ -3275,6 +3304,11 @@ async function loadKaraokeTiming(song){
   if (!api || typeof api.load !== "function" || typeof api.alignToLocalLyrics !== "function"){
     setKaraokeSourceStatus("miss", "歌詞與時間碼：載入模組失敗");
     setLyricsNote("歌詞暫時無法載入；仍可播放影片或前往串流平台聆聽。");
+    setLyricsPanelMessage(
+      "目前沒有載入到同步歌詞",
+      "請以官方影片提供的 CC 字幕為主，也可以稍後重新開啟本頁再試。",
+      "missing"
+    );
     return;
   }
 
@@ -3298,6 +3332,11 @@ async function loadKaraokeTiming(song){
   if (!timed){
     setKaraokeSourceStatus("miss", "歌詞與時間碼：這首歌目前找不到可用來源");
     setLyricsNote("這首歌目前查無同步歌詞；仍可播放影片或前往串流平台聆聽。");
+    setLyricsPanelMessage(
+      "這首歌目前沒有採集到同步歌詞",
+      "請以官方影片提供的 CC 字幕為主，也可以稍後重新開啟本頁再試。",
+      "missing"
+    );
     return;
   }
 
@@ -3314,6 +3353,11 @@ async function loadKaraokeTiming(song){
     if (!lyricLines.length){
       setKaraokeSourceStatus("miss", "歌詞與時間碼：來源沒有可顯示的內容");
       setLyricsNote("這首歌目前查無同步歌詞；仍可播放影片或前往串流平台聆聽。");
+      setLyricsPanelMessage(
+        "這首歌目前沒有採集到同步歌詞",
+        "請以官方影片提供的 CC 字幕為主，也可以稍後重新開啟本頁再試。",
+        "missing"
+      );
       return;
     }
 
