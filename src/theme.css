@@ -1,20 +1,20 @@
 @font-face{
   font-family:Pretendard;
-  src:url('./fonts/PretendardVariable.woff2') format('woff2');
+  src:url('../fonts/PretendardVariable.woff2') format('woff2');
   font-style:normal;
   font-weight:100 900;
   font-display:swap;
 }
 @font-face{
   font-family:'Gmarket Sans';
-  src:url('./fonts/GmarketSansMedium.woff') format('woff');
+  src:url('../fonts/GmarketSansMedium.woff') format('woff');
   font-style:normal;
   font-weight:400 500;
   font-display:swap;
 }
 @font-face{
   font-family:'Gmarket Sans';
-  src:url('./fonts/GmarketSansBold.woff') format('woff');
+  src:url('../fonts/GmarketSansBold.woff') format('woff');
   font-style:normal;
   font-weight:600 900;
   font-display:swap;
@@ -50,7 +50,7 @@ button{touch-action:manipulation;}
 }
 
 .hero{
-  background:var(--bg-deep) url('./images/poster.jpg') center 42%/cover no-repeat;
+  background:var(--bg-deep) url('../images/poster.jpg') center 42%/cover no-repeat;
 }
 .hero::after{
   background:rgba(23,5,4,.74);
@@ -339,7 +339,7 @@ button{touch-action:manipulation;}
   color:var(--cream);
 }
 .setlist-page::before{
-  background:url('./images/setlist-bg.jpg') center 34%/cover no-repeat;
+  background:url('../images/setlist-bg.jpg') center 34%/cover no-repeat;
   filter:grayscale(1) brightness(.38);
 }
 .setlist-page .song-topbar{background:var(--stage);border:0;}
@@ -414,7 +414,7 @@ button{touch-action:manipulation;}
 @media (max-width:600px){
   .song-search-box input,.sheet-search .song-search-box input{font-size:16px;}
   .setlist-page::before{
-    background:url('./images/setlist-bg.jpg') center top/152% auto no-repeat;
+    background:url('../images/setlist-bg.jpg') center top/152% auto no-repeat;
   }
 }
 @media (prefers-reduced-motion:reduce){

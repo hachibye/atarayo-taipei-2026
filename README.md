@@ -4,11 +4,22 @@
 
 專案儲存庫：<https://github.com/watain666/Vaundy-Taiwan-2026>
 
-## 1. 要上傳到儲存庫的檔案
+## 1. 專案結構與建置
 
 ```text
-index.html                  ← 應援指南主頁
-design.css                  ← 畫面設計與字體設定
+index.html                  ← 最小化 HTML 外殼與 PWA meta
+src/main.js                 ← 頁面路由、互動與渲染邏輯
+src/data.js                 ← 歌詞、歌單、座位與演出資料
+src/base.css                ← 基礎元件樣式
+src/theme.css               ← 主題與頁面外觀樣式
+src/app.css                 ← CSS 統一入口
+src/ui/icons.js             ← 共用 SVG 圖示與歌詞圖示模板
+src/services/storage.js     ← localStorage 安全封裝
+src/services/lazy-modules.js ← 注音與卡拉 OK 延後載入
+package.json                ← Vite 指令與相依套件
+package-lock.json           ← 鎖定建置版本
+vite.config.js              ← 相對路徑、靜態資產與 Service Worker 建置設定
+.github/workflows/pages.yml  ← GitHub Pages production 部署
 fonts/                      ← 離線使用的 Pretendard、Gmarket Sans 字體
 DESIGN.md                   ← 畫面設計原則
 sw.js                       ← 管理離線快取
@@ -20,17 +31,22 @@ apple-touch-icon.png        ← iPhone 主畫面圖示
 images/                     ← 現有圖片資源（海報、台北場舞台／座位配置圖等）
 ```
 
-所有檔案都要放在**同一個資料夾，也就是儲存庫根目錄**。網站使用相對路徑（`./`），因此無論部署在
-`https://帳號.github.io/儲存庫名稱/`，或日後綁定自訂網域，都能正常運作。
+原始碼仍使用相對路徑（`./`），因此本地直接以靜態伺服器開啟也能運作。正式部署時使用 Vite 產生
+`dist/`，會壓縮 CSS／JavaScript、分割延後載入的注音與卡拉 OK 模組，並保留 GitHub Pages 與自訂網域的相對路徑。
+
+```bash
+npm ci
+npm run build
+npm run preview
+```
 
 字體重新發布條件記載於 `fonts/OFL-Pretendard.txt` 與 `fonts/OFL-GmarketSans.txt`。
 
 ## 2. 開啟 GitHub Pages
 
-1. 在 GitHub 建立儲存庫，並上傳上述檔案（也可以直接拖曳上傳）。
-2. 進入儲存庫的 **Settings** → 左側選單 **Pages**。
-3. 將 Source 設為 **Deploy from a branch**，Branch 設為 **main / (root)**，然後按下 Save。
-4. 等待約 1～2 分鐘後，就會產生 `https://帳號.github.io/儲存庫名稱/` 網址。
+1. 將儲存庫的 **Settings** → **Pages** → **Build and deployment / Source** 設為 **GitHub Actions**。
+2. 推送到 `main` 後，`.github/workflows/pages.yml` 會執行 `npm ci`、`npm run build`，再發布 `dist/`。
+3. 等待 Actions 完成後，就會產生 `https://帳號.github.io/儲存庫名稱/` 網址。
 
 GitHub Pages 使用 HTTPS 提供網站，因此離線快取功能可以直接運作。
 
@@ -45,7 +61,7 @@ GitHub Pages 使用 HTTPS 提供網站，因此離線快取功能可以直接運
 
 歌曲頁面下方的膠囊式導覽列，可以切換上一首、目前歌曲清單與下一首。劇透歌單整理自 2026/09/05、09/06 東京場與 09/19、09/20 首爾場；首爾場順序與東京場相同，仍屬非官方參考。台北場正式歌單公布前，請不要將它視為台北場演出順序；歌單頁會先顯示劇透警告，讓使用者自行選擇查看方式後才會顯示內容。
 
-歌曲頁面的應援動畫（拍手、揮手、跳躍、轉臂與大合唱）會共用目前歌曲的 BPM 拍長，BPM 資料集中在 `index.html` 的 `SONG_BPM` 表格中。日文歌詞的漢字會在上方顯示 ruby 假名讀音；不熟悉假名時，可從下方工具列切換成 `Romaji`，整行日文（包含平假名、片假名與漢字）都會轉成羅馬拼音。
+歌曲頁面的應援動畫（拍手、揮手、跳躍、轉臂與大合唱）會共用目前歌曲的 BPM 拍長，BPM 資料集中在 `src/data.js` 的 `SONG_BPM` 表格中。日文歌詞的漢字會在上方顯示 ruby 假名讀音；不熟悉假名時，可從下方工具列切換成 `Romaji`，整行日文（包含平假名、片假名與漢字）都會轉成羅馬拼音。
 
 下方工具列也能分別切換「日文」與「中文」歌詞，兩個設定會保存在瀏覽器中；「簡潔模式」預設仍顯示日文，並保留同一套切換功能。
 
@@ -59,10 +75,10 @@ GitHub Pages 使用 HTTPS 提供網站，因此離線快取功能可以直接運
 
 ## 4. 修改內容後重新上傳
 
-修改歌詞或畫面並重新上傳時，請務必增加 **`sw.js` 頂端的 `CACHE_VERSION` 數字**。
+修改歌詞或畫面並重新上傳時，請務必增加 **`sw.js` 頂端的 `CACHE_VERSION` 數字**，並讓 `src/main.js` 的 `BUILD` 同步更新。
 
 ```js
-const CACHE_VERSION = "v151";   // → 改成 "v152"
+const CACHE_VERSION = "v153";   // → 改成 "v154"
 ```
 
 如果數字沒有變更，曾經造訪過網站的使用者仍可能看到舊內容。提高版本號後，下一次連線時會下載新檔案，畫面下方也會出現「新版本已準備好・重新整理」的提示，方便立即更新。

@@ -4,17 +4,25 @@
    ★ 가사나 화면을 고쳐서 다시 올릴 때는 아래 CACHE_VERSION 숫자를 꼭 올려 주세요.
      그래야 사람들 폰에 새 내용이 내려갑니다. (v1 → v2 → v3 …)
    ───────────────────────────────────────────────────────────── */
-const CACHE_VERSION = "v152";
+const CACHE_VERSION = "v153";
 const CACHE_NAME    = `horo-guide-${CACHE_VERSION}`;
+
+/* Vite production builds replace this with the hashed files in dist/assets.
+   The source version stays empty because it precaches the root files below. */
+const VITE_BUILD_ASSETS = [];
 
 /* 처음 방문할 때 미리 받아 둘 파일들.
    없는 파일이 있어도 설치가 실패하지 않도록 하나씩 따로 담습니다. */
 const PRECACHE = [
   "./",
   "./index.html",
+  "./src/main.js",
+  "./src/data.js",
+  "./src/app.css",
+  "./src/base.css",
+  "./src/theme.css",
   "./furigana.js",
   "./karaoke-sources.js",
-  "./design.css",
   "./fonts/PretendardVariable.woff2",
   "./fonts/GmarketSansMedium.woff",
   "./fonts/GmarketSansBold.woff",
@@ -42,7 +50,8 @@ const PRECACHE = [
   "./images/notice/10-vaws-card.jpg",
   "./images/notice/11-photo-booth.jpg",
   "./images/notice/12-quick-bites.jpg",
-  "./images/notice/13-sns-event.jpg"
+  "./images/notice/13-sns-event.jpg",
+  ...VITE_BUILD_ASSETS
 ];
 
 /* 구글 폰트처럼 다른 도메인에 있지만 저장해 두면 좋은 것들 */
