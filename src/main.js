@@ -3380,6 +3380,7 @@ async function loadKaraokeTiming(song){
       onStatus: event => {
         if (seq !== karaokeLoadSeq || !event) return;
         if (event.state === "cache") setKaraokeSourceStatus("loading", "歌詞逐字時間：已讀取本機快取，正在校正影片偏移…");
+        else if (event.state === "fallback-worker") setKaraokeSourceStatus("fallback", "歌詞與時間碼：LRCLIB 沒有結果，改查開源多來源…");
         else if (event.state === "fallback") setKaraokeSourceStatus("fallback", "歌詞逐字時間：前順位來源沒有結果，改查 AMLL TTML DB…");
         else if (event.state === "offline") setKaraokeSourceStatus("miss", "歌詞與時間碼：離線且沒有本機快取");
       }

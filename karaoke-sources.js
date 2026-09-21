@@ -11,10 +11,9 @@
  *   }
  *
  * Keeping this boundary separate means a provider can disappear without
- * changing the renderer.  The default worker is the public backend used by
- * Beautiful Lyrics Reborn; it races the open Musixmatch RichSync, QQ QRC,
- * KuGou KRC and NetEase YRC providers.  AMLL TTML DB is tried afterwards as
- * a direct, CORS-enabled fallback.
+ * changing the renderer.  LRCLIB is queried first for CORS-enabled synced
+ * LRC.  The Beautiful Lyrics Reborn worker (Musixmatch RichSync, QQ QRC,
+ * KuGou KRC and NetEase YRC) and AMLL TTML DB remain fallbacks.
  */
 (function (root) {
   "use strict";
@@ -22,8 +21,10 @@
   const CACHE_VERSION = "v2";
   const CACHE_PREFIX = "atarayo-karaoke-";
   const DEFAULT_WORKER = "https://lyrics.txw.qzz.io";
+  const LRCLIB_API = "https://lrclib.net/api";
   const AMLL_API = "https://api.amll.dev";
   const PROVIDER_ORDER = Object.freeze([
+    "LRCLIB",
     "Musixmatch RichSync",
     "QQ Music QRC",
     "KuGou KRC",
@@ -207,6 +208,35 @@
     return normaliseLines(lines, "Musixmatch RichSync");
   }
 
+  function parseSyncedLrc(text, duration) {
+    const entries = [];
+    String(text || "").split(/\r?\n/).forEach((rawLine) => {
+      const match = rawLine.match(/^\s*\[(\d+):(\d{1,2}(?:\.\d+)?)\]\s*(.*)$/);
+      if (!match) return;
+      const start = Number(match[1]) * 60 + Number(match[2]);
+      const lyric = String(match[3] || "").trim();
+      if (!lyric || !Number.isFinite(start)) return;
+      entries.push({ start, text: lyric });
+    });
+    if (!entries.length) return null;
+
+    const trackEnd = finite(duration);
+    const lines = entries.map((entry, index) => {
+      const next = entries[index + 1];
+      const end = next
+        ? Math.max(entry.start + 0.4, next.start)
+        : Math.max(entry.start + 2, trackEnd || entry.start + 4);
+      return {
+        start: entry.start,
+        end,
+        words: [{ text: entry.text, start: entry.start, end }]
+      };
+    });
+    const normalised = normaliseLines(lines, "LRCLIB 開源逐句歌詞");
+    if (normalised) normalised.precision = "line";
+    return normalised;
+  }
+
   function parseTtml(text) {
     if (typeof root.DOMParser !== "function") return null;
     let doc;
@@ -333,7 +363,46 @@
       const timed = normaliseBeautifulLyrics(payload, finite(options && options.duration) || finite(song && song.duration));
       if (timed) {
         timed.source = "開源多來源（Musixmatch / QQ / 酷狗 / 網易雲）";
-        timed.providerOrder = PROVIDER_ORDER.slice(0, 4);
+        timed.providerOrder = PROVIDER_ORDER.slice(1, 5);
+        return timed;
+      }
+    }
+    return null;
+  }
+
+  async function fetchLrclib(song, options) {
+    const wantedTitle = normaliseText(sourceTitle(song));
+    const expectedDuration = finite(options && options.duration) || finite(song && song.duration);
+    for (const artistName of sourceArtists(song)) {
+      const url = new URL(`${LRCLIB_API}/search`);
+      url.searchParams.set("track_name", sourceTitle(song));
+      url.searchParams.set("artist_name", artistName);
+      const items = await fetchJson(url.toString(), {
+        timeoutMs: (options && options.timeoutMs) || 9000,
+        headers: {
+          Accept: "application/json",
+          "Lrclib-Client": "atarayo-taipei-2026/0.1.0 (https://github.com/hachibye/atarayo-taipei-2026)"
+        }
+      });
+      if (!Array.isArray(items) || !items.length) continue;
+
+      const wantedArtist = normaliseText(artistName);
+      const candidates = items.filter((candidate) =>
+        normaliseText(candidate && (candidate.trackName || candidate.name)) === wantedTitle
+          && normaliseText(candidate && candidate.artistName).includes(wantedArtist)
+          && candidate.syncedLyrics
+      );
+      const durationDistance = (candidate) => {
+        const candidateDuration = finite(candidate && candidate.duration);
+        if (!expectedDuration || candidateDuration == null) return Number.POSITIVE_INFINITY;
+        return Math.abs(candidateDuration - expectedDuration);
+      };
+      const item = candidates.sort((a, b) => durationDistance(a) - durationDistance(b))[0];
+      if (!item) continue;
+
+      const timed = parseSyncedLrc(item.syncedLyrics, finite(item.duration) || expectedDuration);
+      if (timed) {
+        timed.providerOrder = ["LRCLIB"];
         return timed;
       }
     }
@@ -389,8 +458,12 @@
     }
 
     const request = (async () => {
-      notify(opts, { state: "loading", source: PROVIDER_ORDER.slice(0, 4).join(" → ") });
-      let timed = await fetchWorker(song, opts);
+      notify(opts, { state: "loading", source: "LRCLIB" });
+      let timed = await fetchLrclib(song, opts);
+      if (!timed) {
+        notify(opts, { state: "fallback-worker", source: PROVIDER_ORDER.slice(1, 5).join(" → ") });
+        timed = await fetchWorker(song, opts);
+      }
       if (!timed) {
         notify(opts, { state: "fallback", source: "AMLL TTML DB" });
         timed = await fetchAmll(song, opts);
@@ -561,6 +634,7 @@
     PROVIDER_ORDER,
     normaliseText,
     parseEnhancedLrc,
+    parseSyncedLrc,
     parseTtml,
     normaliseBeautifulLyrics,
     load,
