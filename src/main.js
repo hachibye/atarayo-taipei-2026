@@ -58,6 +58,8 @@ import { SONG_STORIES, STARTER_PATHS, ATARAYO_TIMELINE } from "./editorial.js";
 const app = document.getElementById("app");
 const songView = document.getElementById("song-view");
 let countdownTimer = null;
+let countdownClockOffsetMs = 0;
+let countdownClockSource = "device";
 let player = null;
 let syncTimer = null;
 let autoScrollEnabled = true;
@@ -1768,7 +1770,7 @@ function startCountdown(){
     const box = document.getElementById("countdown");
     if (!box) { stopCountdown(); return; }
 
-    const now     = Date.now();
+    const now     = Date.now() + countdownClockOffsetMs;
     updateTodayCard(now);                                                  // 공연 당일이면 오늘 일정 갱신
     const liveIdx = shows.findIndex(v => now >= v.start && now < v.end);   // 진행 중인 공연
     const nextIdx = shows.findIndex(v => v.start > now);                   // 아직 시작 전인 첫 공연
@@ -1791,17 +1793,50 @@ function startCountdown(){
     // 남은 시간을 24로 나누면, 공연이 내일이어도 20시간 남았을 때 D-00 이 되어
     // '오늘이 공연날'로 잘못 읽힌다. 날짜끼리 빼야 내일은 D-01 이 된다.
     const d = taipeiDayGap(now, shows[nextIdx].start);
-    // 시:분:초는 시작까지 남은 전체 시간 (D-01 이면 24시간을 넘을 수 있다)
-    const h = Math.floor(diff/3600000);
+    // 左側已顯示台北日數，右側只顯示扣除完整 24 小時後的時、分、秒。
+    const h = Math.floor(diff%86400000/3600000);
     const m = Math.floor(diff%3600000/60000);
     const s = Math.floor(diff%60000/1000);
     setPill(`D-${pad(d)}`, `${pad(h)}:${pad(m)}:${pad(s)}`, "count");
   }
 
   tick();
+  updateCountdownClockStatus();
+  calibrateCountdownClock().then(()=>{ updateCountdownClockStatus(); tick(); });
   countdownTimer = setInterval(tick, 1000);
 }
 function stopCountdown(){ if(countdownTimer){ clearInterval(countdownTimer); countdownTimer=null; } }
+
+function updateCountdownClockStatus(){
+  const pill = document.querySelector(".cd-pill");
+  if (pill) pill.title = countdownClockSource === "network"
+    ? "已參考網路伺服器時間校準"
+    : "目前依裝置時間計算";
+}
+
+/*
+ * 瀏覽器不能直接查詢 NTP。改以同源伺服器的 HTTP Date 標頭估算時鐘偏差，
+ * 並用一半來回延遲補償傳輸時間；Cloudflare Pages／Workers 皆會提供此標頭。
+ * 無網路、標頭缺失或延遲異常時，保留裝置時間，不影響網站使用。
+ */
+async function calibrateCountdownClock(){
+  try {
+    const started = Date.now();
+    const url = new URL(location.href);
+    url.hash = "";
+    url.searchParams.set("clock-check", String(started));
+    const response = await fetch(url, { method:"HEAD", cache:"no-store", credentials:"same-origin" });
+    const ended = Date.now();
+    const serverTime = Date.parse(response.headers.get("date") || "");
+    const roundTrip = ended - started;
+    if (!response.ok || !Number.isFinite(serverTime) || roundTrip < 0 || roundTrip > 10000) return;
+    countdownClockOffsetMs = serverTime + roundTrip / 2 - ended;
+    countdownClockSource = "network";
+  } catch {
+    countdownClockOffsetMs = 0;
+    countdownClockSource = "device";
+  }
+}
 
 /* ---------------- SONG DETAIL ---------------- */
 
