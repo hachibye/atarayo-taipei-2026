@@ -1791,7 +1791,7 @@ function buildSongShell(){
 
           <div class="lyrics-note">
             <span class="dot">●</span>
-            <span>點選歌詞即可跳至影片對應位置。歌詞醒目顯示會依影片播放狀態同步。</span>
+            <span>點選歌詞跳至影片位置，醒目歌詞隨影片同步。</span>
             <span class="karaoke-source-status" id="karaoke-source-status" role="status" aria-live="polite"></span>
           </div>
 
