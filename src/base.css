@@ -796,6 +796,11 @@
   }
   .info-book-link:hover{ border-color:var(--teal); color:var(--teal); }
   .info-book-link svg{ width:14px;height:14px; }
+  .info-book-links{
+    display:flex;flex-wrap:wrap;gap:8px;
+    margin-top:16px;
+  }
+  .info-book-links .info-book-link{ margin:0; }
   .info-divider{
     margin:22px 0 0;
     border:0;

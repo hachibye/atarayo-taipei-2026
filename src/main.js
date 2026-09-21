@@ -83,7 +83,7 @@ const SYNC_INTERVAL_MS   = 100;
 /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
    새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
    sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-const BUILD = "v1.6.14";
+const BUILD = "v1.6.15";
 
 const REPO_URL = "https://github.com/watain666/Vaundy-Taiwan-2026";
 const FEEDBACK_URL = "https://www.threads.com/@brainginger/post/DdiLWztgen9";
@@ -697,9 +697,14 @@ function renderHome(){
             <a class="info-book-link" href="https://ticketplus.com.tw/activity/6c3d8c24e0f00c9c84777615c001bebe" target="_blank" rel="noopener">
               ${EXT_LINK_SVG} 查看 Ticket Plus 售票頁面
             </a>
-            <a class="info-book-link" href="https://www.arena.taipei/" target="_blank" rel="noopener">
-              ${EXT_LINK_SVG} 前往台北小巨蛋官網
-            </a>
+            <div class="info-book-links">
+              <a class="info-book-link" href="https://www.arena.taipei/" target="_blank" rel="noopener">
+                ${EXT_LINK_SVG} 前往台北小巨蛋官網
+              </a>
+              <a class="info-book-link" href="https://twconcertview.com/venue/taipei-arena-center-stage/" target="_blank" rel="noopener">
+                ${EXT_LINK_SVG} 台灣各大場館視野
+              </a>
+            </div>
 
             <p class="info-footnote">※ 若主辦單位後續更新舞台、票區或票價，請以最新官方公告為準。</p>
           </div>
