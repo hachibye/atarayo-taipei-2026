@@ -1,11 +1,11 @@
   :root{
-    --bg-deep:#230805;
-    --bg-mid:#7a2712;
-    --bg-glow:#c8462a;
-    --ink:#170504;
-    --gold:#e9d9a3;
-    --gold-soft:#cdb87c;
-    --teal:#5ecdc4;
+    --bg-deep:#0d2029;
+    --bg-mid:#173945;
+    --bg-glow:#d87868;
+    --ink:#102630;
+    --gold:#f2dfce;
+    --gold-soft:#d4bfae;
+    --teal:#76c8c7;
     --sky:#3f8fd6;
     --cream:#f6efd9;
     --line:rgba(233,217,163,0.18);
@@ -53,14 +53,14 @@
        닫힌 상태에서 가운데처럼 보이게 하는 여백은 JS(layoutHeroCenter)가 한 번만 계산해 고정합니다. */
     justify-content:flex-start;
     padding:calc(44px + var(--safe-top, 0px)) 20px 36px;
-    background:var(--bg-deep) url('../images/poster.jpg') center 42%/cover no-repeat;
+    background:var(--bg-deep) url('../images/atarayo-rainy-night.png') center 52%/cover no-repeat;
     text-align:center;
     isolation:isolate;
   }
   .hero::after{
     content:"";
     position:absolute;inset:0;
-    background:rgba(23,5,4,.74);
+    background:rgba(7,24,33,.72);
     z-index:0;
   }
   .hero-inner{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;max-width:560px;}
@@ -251,6 +251,56 @@
     color:#b9a98a;
   }
 
+  .song-collections{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:8px;
+    max-width:640px;
+    margin:0 auto 14px;
+    padding:2px 0 8px;
+  }
+  .song-collection{
+    flex:none;
+    min-height:42px;
+    padding:10px 14px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:transparent;
+    color:#b9a98a;
+    font:700 12.5px/1 var(--font-tw-sans);
+    white-space:nowrap;
+    cursor:pointer;
+    transition:background .18s ease,color .18s ease,border-color .18s ease,transform .1s ease;
+  }
+  .song-collection:hover{color:var(--cream);border-color:var(--gold-soft);}
+  .song-collection:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .song-collection:active{transform:translateY(1px);}
+  .song-collection.active{background:var(--surface-raised);color:var(--cream);border-color:var(--gold-soft);}
+  .song-collection-summary{
+    max-width:640px;
+    margin:0 auto 18px;
+    padding:16px 18px;
+    border-left:3px solid var(--gold-soft);
+    background:var(--surface);
+  }
+  .song-collection-summary strong{
+    display:block;
+    margin-bottom:4px;
+    color:var(--cream);
+    font:700 15px/1.4 var(--font-tw-sans);
+  }
+  .song-collection-summary p{
+    margin:0 0 8px;
+    color:#b9a98a;
+    font:400 12.5px/1.55 var(--font-tw-sans);
+  }
+  .song-collection-summary a{
+    color:var(--gold-soft);
+    font:600 11.5px/1.4 var(--font-tw-sans);
+    text-underline-offset:3px;
+  }
+
   /* ── 곡 목록 검색 ─────────────────────────────────────────── */
   .song-search{
     position:sticky;
@@ -264,8 +314,8 @@
     content:"";
     position:absolute;
     top:0;bottom:0;
-    left:calc(50% - 50vw);
-    right:calc(50% - 50vw);
+    left:0;
+    right:0;
     background:rgba(33,12,9,0.96);
     opacity:0;
     transition:opacity .22s ease;
@@ -931,6 +981,117 @@
   }
   .info-book-link:hover{ border-color:var(--teal); color:var(--teal); }
   .info-book-link svg{ width:14px;height:14px; }
+  .tour-index{
+    margin-top:24px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+  }
+  .tour-index-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:14px;
+  }
+  .tour-index-head h3{
+    margin:0;
+    color:var(--cream);
+    font-size:16px;
+    line-height:1.35;
+  }
+  .tour-index-head a{
+    flex:none;
+    color:var(--gold-soft);
+    font-size:11px;
+    text-underline-offset:3px;
+  }
+  .tour-index-group{margin-top:17px;}
+  .tour-index-group h4{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+    margin:0 2px 7px;
+    color:var(--gold);
+    font-size:11.5px;
+    letter-spacing:.04em;
+  }
+  .tour-index-group h4 span{
+    color:#a99a80;
+    font-size:10.5px;
+    font-weight:500;
+    letter-spacing:0;
+  }
+  .tour-index-group.separate{
+    margin-top:22px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+  }
+  .tour-stop-list{
+    margin:0;
+    padding:0;
+    list-style:none;
+  }
+  .tour-stop-list li{
+    display:grid;
+    grid-template-columns:58px minmax(0,1fr) auto;
+    align-items:center;
+    gap:12px;
+    min-height:52px;
+    padding:8px 2px;
+    border-bottom:1px solid var(--line);
+  }
+  .tour-stop-list li:first-child{border-top:1px solid var(--line);}
+  .tour-stop-list li.current{
+    padding-left:8px;
+    background:rgba(246,239,217,.055);
+    box-shadow:inset 2px 0 0 var(--gold);
+  }
+  .tour-stop-list time{
+    color:var(--cream);
+    font-size:14px;
+    font-variant-numeric:tabular-nums;
+  }
+  .tour-stop-list time small{
+    margin-left:4px;
+    color:#a99a80;
+    font-size:9px;
+  }
+  .tour-stop-place{min-width:0;}
+  .tour-stop-place b{
+    display:block;
+    color:var(--cream);
+    font-size:12.5px;
+  }
+  .tour-stop-place > span{
+    display:block;
+    margin-top:1px;
+    color:#a99a80;
+    font-size:10.5px;
+    line-height:1.45;
+    overflow-wrap:anywhere;
+  }
+  .tour-stop-list em{
+    color:var(--gold-soft);
+    font-size:9.5px;
+    font-style:normal;
+    white-space:nowrap;
+  }
+  .tour-stop-list li > a{
+    display:grid;
+    width:32px;
+    height:32px;
+    place-items:center;
+    color:var(--gold-soft);
+    text-decoration:none;
+  }
+  .tour-stop-list li > a:hover,
+  .tour-stop-list li > a:focus-visible{color:var(--cream);}
+  .tour-index-note{
+    margin:12px 2px 0;
+    color:#a99a80;
+    font-size:10.5px;
+    line-height:1.65;
+  }
   .info-book-links{
     display:flex;flex-wrap:nowrap;gap:6px;
     margin-top:16px;
@@ -955,6 +1116,10 @@
   @media (max-width:400px){
     .info-facts{ grid-template-columns:1fr; gap:2px 0; }
     .info-facts dt{ margin-top:9px; }
+    .tour-index-head{align-items:flex-start;}
+    .tour-stop-list li{grid-template-columns:52px minmax(0,1fr) auto;gap:8px;}
+    .tour-index-group h4{display:block;}
+    .tour-index-group h4 span{display:block;margin-top:2px;}
   }
 
   /* 좁은 화면에서는 카드 안쪽 여백을 줄여 표가 쓸 수 있는 폭을 최대한 확보 */
@@ -1236,14 +1401,34 @@
     background:#000;
   }
   .video-frame iframe, .video-frame div{position:absolute;inset:0;width:100%;height:100%;border:0;}
-  .watch-on-yt{
-    display:inline-block;
-    margin-top:8px;
-    font-size:11px;
-    color:#8d7d62;
-    text-decoration:none;
+  .listening-links{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
   }
-  .watch-on-yt:hover{color:var(--teal);}
+  .listening-link{
+    min-height:34px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:7px 13px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:rgba(255,255,255,.035);
+    color:#b9a98a;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.02em;
+    text-decoration:none;
+    transition:color .18s ease, border-color .18s ease, background-color .18s ease;
+  }
+  .listening-link:hover,
+  .listening-link:focus-visible{
+    color:var(--teal);
+    border-color:currentColor;
+    background:rgba(255,255,255,.07);
+  }
 
 
   .lyrics-note{
@@ -2353,7 +2538,7 @@
     opacity:0;
     pointer-events:none;
   }
-  .song-page.venue .watch-on-yt,
+  .song-page.venue .listening-links,
   .song-page.venue .lyrics-note,
   .song-page.venue .lyrics-legend,
   .song-page.venue .venue-hint{ display:none; }
@@ -2493,7 +2678,7 @@
         rgba(19,6,5,0.88) 76%,
         #150605 94%,
         #130504 100%),
-      url('../images/setlist-bg.jpg') center 34%/cover no-repeat;
+      url('../images/atarayo-rainy-night.png') center 54%/cover no-repeat;
     z-index:0;
     pointer-events:none;
   }
@@ -2520,7 +2705,7 @@
           rgba(19,6,5,0.74) 74vw,
           #150605 101vw,
           #130504 100%),
-        url('../images/setlist-bg.jpg') center top/152% auto no-repeat;
+        url('../images/atarayo-rainy-night.png') center top/152% auto no-repeat;
     }
   }
   /* 사진 위에 얹히는 상단바 */
@@ -2561,6 +2746,30 @@
     color:#c3b294;
   }
   .spoiler-desc b{ color:var(--cream); }
+  .tour-scope{
+    width:100%;
+    max-width:520px;
+    margin:2px 0;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    text-align:left;
+  }
+  .tour-scope p{
+    display:grid;
+    grid-template-columns:88px 1fr;
+    gap:12px;
+    margin:0;
+    padding:9px 2px;
+    font-size:11.5px;
+    line-height:1.6;
+  }
+  .tour-scope p + p{ border-top:1px solid var(--line); }
+  .tour-scope b{ color:var(--cream);font-weight:700; }
+  .tour-scope span{ color:#b9a98a; }
+  .spoiler-source{ margin:0;font-size:12px; }
+  .spoiler-source a{ color:var(--gold-soft);text-underline-offset:3px; }
+  .spoiler-source a:hover,
+  .spoiler-source a:focus-visible{ color:var(--cream); }
   .spoiler-open{
     margin-top:10px;
     display:inline-flex;align-items:center;gap:8px;
@@ -2628,6 +2837,10 @@
   }
   .spoiler-choice .spoiler-open.soft span{ color:var(--gold-soft); }
 
+  @media (max-width:430px){
+    .tour-scope p{grid-template-columns:76px 1fr;gap:9px;font-size:11px;}
+  }
+
   /* 보기 방식을 고르기 전에는 목록을 표시하지 않는다. */
   .setlist-body{
     padding:4px 20px 30px;
@@ -2694,6 +2907,7 @@
     background:rgba(0,0,0,0.24);
     font-size:11.5px;line-height:1.65;color:#b9a98a;
   }
+  .set-shuffle[hidden]{ display:none; }
   .set-shuffle b{ color:var(--cream); }
   .set-shuffle button{
     flex:none;
@@ -2717,6 +2931,14 @@
     border-top:1px solid var(--line);
   }
   .set-item{ border-bottom:1px solid var(--line); }
+  .set-encore{
+    display:block;
+    padding:18px 6px 0 45px;
+    color:var(--gold-soft);
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:.16em;
+  }
   .set-row{
     width:100%;
     display:flex;align-items:center;gap:13px;
@@ -2776,11 +2998,6 @@
     border-color:rgba(94,205,196,0.36);
     background:rgba(94,205,196,0.12);
     color:var(--teal);
-  }
-  .setlist-note{
-    max-width:640px;margin:18px auto 0;
-    font-size:11.5px;line-height:1.9;
-    color:#7a6a52;
   }
   /* 가사 스크롤 영역을 감싸는 칸 — 짤방을 그 위에 겹쳐 놓기 위한 기준 */
   .lyrics-pane{

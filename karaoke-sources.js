@@ -19,8 +19,8 @@
 (function (root) {
   "use strict";
 
-  const CACHE_VERSION = "v1";
-  const CACHE_PREFIX = "horo-karaoke-";
+  const CACHE_VERSION = "v2";
+  const CACHE_PREFIX = "atarayo-karaoke-";
   const DEFAULT_WORKER = "https://lyrics.txw.qzz.io";
   const AMLL_API = "https://api.amll.dev";
   const PROVIDER_ORDER = Object.freeze([
@@ -106,11 +106,57 @@
     };
   }
 
-  function normaliseBeautifulLyrics(payload) {
+  function normaliseStaticLines(payload, duration) {
+    const rawLines = Array.isArray(payload && payload.Lines) ? payload.Lines : [];
+    const texts = rawLines.map((line) => String(line && (line.Text ?? line.text) || "").trim()).filter(Boolean);
+    if (!texts.length) return null;
+
+    const trackDuration = Math.max(30, finite(duration) || texts.length * 4.2 + 16);
+    const start = Math.min(12, trackDuration * 0.055);
+    const end = Math.max(start + texts.length * 1.2, trackDuration - Math.min(8, trackDuration * 0.035));
+    const weights = texts.map((text) => Math.max(2.2, Math.sqrt(Array.from(text).length) * 1.7));
+    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0) || 1;
+    let cursor = start;
+    const lines = texts.map((text, index) => {
+      const lineEnd = index === texts.length - 1
+        ? end
+        : cursor + (end - start) * weights[index] / totalWeight;
+      const line = {
+        start: cursor,
+        end: Math.max(cursor + 0.8, lineEnd),
+        words: [{ text, start: cursor, end: Math.max(cursor + 0.8, lineEnd) }]
+      };
+      cursor = line.end;
+      return line;
+    });
+    const normalised = normaliseLines(lines, "開源靜態歌詞");
+    if (normalised) normalised.precision = "estimated-line";
+    return normalised;
+  }
+
+  function normaliseBeautifulLyrics(payload, duration) {
     if (!payload || typeof payload !== "object") return null;
     const type = String(payload.Type ?? payload.type ?? "").toLowerCase();
-    if (type !== "syllable" && !Array.isArray(payload.Content) && !Array.isArray(payload.content)) return null;
+    if (type === "static") return normaliseStaticLines(payload, duration);
     const content = payload.Content || payload.content || [];
+    if (type === "line") {
+      const lines = content.map((entry) => {
+        if (!entry || String(entry.Type ?? entry.type ?? "").toLowerCase() !== "vocal") return null;
+        const text = String(entry.Text ?? entry.text ?? "").trim();
+        const start = finite(entry.StartTime ?? entry.start);
+        const end = finite(entry.EndTime ?? entry.end);
+        if (!text || start == null) return null;
+        return {
+          start,
+          end: end == null ? start + 3 : end,
+          words: [{ text, start, end: end == null ? start + 3 : end }]
+        };
+      }).filter(Boolean);
+      const normalised = normaliseLines(lines, "開源逐行歌詞");
+      if (normalised) normalised.precision = "line";
+      return normalised;
+    }
+    if (type !== "syllable" && !Array.isArray(payload.Content) && !Array.isArray(payload.content)) return null;
     const lines = [];
     content.forEach((entry) => {
       if (!entry || String(entry.Type ?? entry.type ?? "").toLowerCase() !== "vocal") return;
@@ -258,54 +304,72 @@
   }
 
   function sourceArtist(song) {
-    return String(song && (song.artist || song.karaokeArtist) || "Vaundy");
+    return String(song && (song.artist || song.karaokeArtist) || "Atarayo");
+  }
+
+  function sourceArtists(song) {
+    return [...new Set([
+      sourceArtist(song),
+      song && song.karaokeArtist,
+      "あたらよ",
+      "Atarayo"
+    ].filter(Boolean).map(String))];
   }
 
   async function fetchWorker(song, options) {
     const base = String((options && options.workerUrl) || DEFAULT_WORKER).replace(/\/$/, "");
-    const trackId = encodeURIComponent(`horo-${String(song && song.id || "song")}`);
-    const url = new URL(`${base}/lyrics/${trackId}`);
-    url.searchParams.set("track_name", sourceTitle(song));
-    url.searchParams.append("artist_name", sourceArtist(song));
-    const duration = finite(options && options.duration);
-    if (duration && duration > 0) url.searchParams.set("duration", String(Math.round(duration)));
-    const payload = await fetchJson(url.toString(), {
-      timeoutMs: (options && options.timeoutMs) || 12000,
-      headers: { Accept: "application/json", Authorization: "Bearer static-site" }
-    });
-    const timed = normaliseBeautifulLyrics(payload);
-    if (timed) {
-      timed.source = "開源多來源（Musixmatch / QQ / 酷狗 / 網易雲）";
-      timed.providerOrder = PROVIDER_ORDER.slice(0, 4);
+    const artists = sourceArtists(song);
+    for (let index = 0; index < artists.length; index += 1) {
+      const trackId = encodeURIComponent(`atarayo-${String(song && song.id || "song")}-${index}`);
+      const url = new URL(`${base}/lyrics/${trackId}`);
+      url.searchParams.set("track_name", sourceTitle(song));
+      url.searchParams.append("artist_name", artists[index]);
+      const duration = finite(options && options.duration);
+      if (duration && duration > 0) url.searchParams.set("duration", String(Math.round(duration)));
+      const payload = await fetchJson(url.toString(), {
+        timeoutMs: (options && options.timeoutMs) || 12000,
+        headers: { Accept: "application/json", Authorization: "Bearer static-site" }
+      });
+      const timed = normaliseBeautifulLyrics(payload, finite(options && options.duration) || finite(song && song.duration));
+      if (timed) {
+        timed.source = "開源多來源（Musixmatch / QQ / 酷狗 / 網易雲）";
+        timed.providerOrder = PROVIDER_ORDER.slice(0, 4);
+        return timed;
+      }
     }
-    return timed;
+    return null;
   }
 
   async function fetchAmll(song, options) {
-    const url = new URL(`${AMLL_API}/v1/lyrics/search`);
-    url.searchParams.set("musicName", sourceTitle(song));
-    url.searchParams.set("artistName", sourceArtist(song));
-    url.searchParams.set("pageSize", "10");
-    const search = await fetchJson(url.toString(), { timeoutMs: (options && options.timeoutMs) || 7000 });
-    const items = search && search.status === 200 && search.data && Array.isArray(search.data.items)
-      ? search.data.items : [];
     const wantedTitle = normaliseText(sourceTitle(song));
-    const wantedArtist = normaliseText(sourceArtist(song));
-    const item = items.find((candidate) => {
-      const titles = Array.isArray(candidate.musicNames) ? candidate.musicNames : [];
-      const artists = Array.isArray(candidate.artistNames) ? candidate.artistNames : [];
-      return titles.some((title) => normaliseText(title) === wantedTitle)
-        && artists.some((artist) => normaliseText(artist).includes(wantedArtist) || wantedArtist.includes(normaliseText(artist)));
-    }) || items[0];
-    if (!item) return null;
+    for (const artistName of sourceArtists(song)) {
+      const url = new URL(`${AMLL_API}/v1/lyrics/search`);
+      url.searchParams.set("musicName", sourceTitle(song));
+      url.searchParams.set("artistName", artistName);
+      url.searchParams.set("pageSize", "10");
+      const search = await fetchJson(url.toString(), { timeoutMs: (options && options.timeoutMs) || 7000 });
+      const items = search && search.status === 200 && search.data && Array.isArray(search.data.items)
+        ? search.data.items : [];
+      const wantedArtist = normaliseText(artistName);
+      const item = items.find((candidate) => {
+        const titles = Array.isArray(candidate.musicNames) ? candidate.musicNames : [];
+        const artists = Array.isArray(candidate.artistNames) ? candidate.artistNames : [];
+        return titles.some((title) => normaliseText(title) === wantedTitle)
+          && artists.some((artist) => normaliseText(artist).includes(wantedArtist) || wantedArtist.includes(normaliseText(artist)));
+      }) || items[0];
+      if (!item) continue;
 
-    const lyricUrl = new URL(`${AMLL_API}/v1/lyrics/get`);
-    lyricUrl.searchParams.set("id", String(item.id));
-    const fetched = await fetchJson(lyricUrl.toString(), { timeoutMs: (options && options.timeoutMs) || 7000 });
-    const ttml = fetched && fetched.status === 200 && fetched.data && fetched.data.lyrics;
-    const timed = ttml ? parseTtml(ttml) : null;
-    if (timed) timed.providerOrder = ["AMLL TTML DB"];
-    return timed;
+      const lyricUrl = new URL(`${AMLL_API}/v1/lyrics/get`);
+      lyricUrl.searchParams.set("id", String(item.id));
+      const fetched = await fetchJson(lyricUrl.toString(), { timeoutMs: (options && options.timeoutMs) || 7000 });
+      const ttml = fetched && fetched.status === 200 && fetched.data && fetched.data.lyrics;
+      const timed = ttml ? parseTtml(ttml) : null;
+      if (timed) {
+        timed.providerOrder = ["AMLL TTML DB"];
+        return timed;
+      }
+    }
+    return null;
   }
 
   async function load(song, options) {

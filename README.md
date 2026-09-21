@@ -1,91 +1,69 @@
-# 台北場應援指南 — 發佈到 GitHub
+# Atarayo Taipei 2026 Fan Guide
 
-這是 Vaundy ASIA ARENA TOUR 2026「HORO」台北場的繁體中文應援指南。
+Atarayo ASIA TOUR 2026『夕立が去ったその後で』台北場的非官方粉絲指南。網站整理演出資訊、官方座位圖、交通方式、官方 YouTube 影片預習與 2026 海外場參考歌單。
 
-專案儲存庫：<https://github.com/watain666/Vaundy-Taiwan-2026>
+## 專案來源
 
-## 1. 專案結構與建置
+本專案保留完整 Git 歷史，改作關係如下：
+
+1. 原始專案：[limskyy123456-sudo/Vaundy-Seoul-2026](https://github.com/limskyy123456-sudo/Vaundy-Seoul-2026)
+2. 繁中與 Vite 重構：[watain666/Vaundy-Taiwan-2026](https://github.com/watain666/Vaundy-Taiwan-2026)
+3. Atarayo 台北場改作：本 repository
+
+本機 remote 設定：
 
 ```text
-index.html                  ← 最小化 HTML 外殼與 PWA meta
-src/main.js                 ← 頁面路由、互動與渲染邏輯
-src/data.js                 ← 歌詞、歌單、座位與演出資料
-src/base.css                ← 基礎元件樣式
-src/theme.css               ← 主題與頁面外觀樣式
-src/app.css                 ← CSS 統一入口
-src/ui/icons.js             ← 共用 SVG 圖示與歌詞圖示模板
-src/services/storage.js     ← localStorage 安全封裝
-src/services/lazy-modules.js ← 注音與卡拉 OK 延後載入
-package.json                ← Vite 指令與相依套件
-package-lock.json           ← 鎖定建置版本
-vite.config.js              ← 相對路徑、靜態資產與 Service Worker 建置設定
-.github/workflows/pages.yml  ← GitHub Pages production 部署
-DESIGN.md                   ← 畫面設計原則
-sw.js                       ← 管理離線快取
-manifest.json               ← App 名稱、圖示與色彩
-icon-192.png                ← 主畫面圖示
-icon-512.png                ← 啟動畫面／大型圖示
-icon-maskable-512.png       ← 可適應圖示
-apple-touch-icon.png        ← iPhone 主畫面圖示
-images/                     ← 現有圖片資源（海報、台北場舞台／座位配置圖等）
+origin           https://github.com/hachibye/atarayo-taipei-2026.git
+taiwan-upstream  https://github.com/watain666/Vaundy-Taiwan-2026.git
+upstream         https://github.com/limskyy123456-sudo/Vaundy-Seoul-2026.git
 ```
 
-原始碼仍使用相對路徑（`./`），因此本地直接以靜態伺服器開啟也能運作。正式部署時使用 Vite 產生
-`dist/`，會壓縮 CSS／JavaScript、分割延後載入的注音與卡拉 OK 模組，並保留 GitHub Pages 與自訂網域的相對路徑。
+GitHub 的「Forked from」標籤只能在 GitHub 建立 fork 時產生，無法靠 `git remote` 或一般 push 補上。即使 repository 是獨立建立，本專案仍透過 Git 歷史、remote、README 與頁尾保留完整來源鏈。
+
+## 已整理內容
+
+- 演出：2026/12/19（六）19:00
+- 場館：台北流行音樂中心・表演廳
+- 售票：KKTIX，官方頁面目前標示完售
+- VIP Upgrade：NT$1,200，不含演唱會門票
+- 28 支 Atarayo 官方影片預習，包含馬來西亞專場 18 首完整入口
+- 每首歌曲的原創繁中導讀，整理故事、心境與情緒轉折（非官方解說／非逐句翻譯）
+- 「5 分鐘認識 Atarayo」入坑指南與依心情選歌的聆聽路線
+- 2020–2026 作品與現場 Timeline，終點為 2026/12/19 台北場
+- 官方座位圖與北流交通資訊
+- ASIA TOUR 2026 完整站點（含香港追加、再追加公演）
+- 2026 海外獨立專場：吉隆坡、曼谷（非本次亞巡站次）
+- 2026/07/24 馬來西亞獨立專場參考歌單（日文原題、非本次亞巡站次）
+- あたらよ現場風格與過往台北場合唱觀察
+- 深色與淺色模式
+
+台北場正式歌單尚未公布。網站中的劇透歌單來自 setlist.fm 使用者提交的 2026/07/24「ATARAYO ONE-MAN LIVE IN JAPAN EXPO MALAYSIA 2026」紀錄。這是同年度海外獨立專場，未列入 ASIA TOUR 2026『夕立が去ったその後で』官方站次，也不代表台北場實際演出曲目或順序。截至 2026/09/21，未找到可交叉驗證的 2026 日本國內場完整歌單。
+
+歌曲頁會在瀏覽器中向開源歌詞服務取得日文歌詞與時間碼，並在本機產生假名／羅馬字讀音。繁中欄位只會顯示專案內已有對應的內容；歌詞服務失效時，官方影片與 Spotify／Apple Music 連結仍可使用。
+
+## 開發
 
 ```bash
 npm ci
+npm run dev
 npm run build
 npm run preview
 ```
 
-介面文字使用台灣常見的裝置內建字體（PingFang TC、Microsoft JhengHei、Noto Sans CJK TC）；日文歌詞另外使用 Noto Sans JP，以避免裝置內建字體缺少日文漢字。
+開發伺服器會使用 `http://localhost:5173/`。請使用終端機顯示的 `localhost` 網址，不要直接開啟 `index.html`，也不要改成 `127.0.0.1`；YouTube 可能拒絕後兩者的內嵌播放器來源。
 
-應援動作動畫使用 WebM 優先、動畫 WebP 次之、GIF 最後回退；圖片只會在目前歌詞需要時載入。公告與 VAWS 圖片則在展開對應卡片後才建立，並使用瀏覽器的 lazy loading，避免首頁第一次開啟就下載大型資源。
+正式建置輸出在 `dist/`。Cloudflare Pages 可設定建置指令為 `npm run build`、輸出目錄為 `dist`；`public/_headers` 會一併部署安全標頭。專案既有 GitHub Actions 也可在推送到 `main` 後建置並部署 GitHub Pages。
 
-## 2. 開啟 GitHub Pages
+## 資料來源與素材
 
-1. 將儲存庫的 **Settings** → **Pages** → **Build and deployment / Source** 設為 **GitHub Actions**。
-2. 推送到 `main` 後，`.github/workflows/pages.yml` 會執行 `npm ci`、`npm run build`，再發布 `dist/`。
-3. 等待 Actions 完成後，就會產生 `https://帳號.github.io/儲存庫名稱/` 網址。
+- 演出資料：[Atarayo 官方巡演頁](https://atarayo-jp.com/contents/tour/asia_tour2026)
+- 馬來西亞獨立專場：[Atarayo 官方活動頁](https://atarayo-jp.com/contents/1075672)
+- 曼谷獨立專場：[Atarayo 官方活動頁](https://atarayo-jp.com/contents/1075674)
+- 台北場售票、票價與座位圖：[KKTIX 官方活動頁](https://binliveco.kktix.cc/events/kbrte)
+- 影片：[Atarayo 官方 YouTube 頻道](https://www.youtube.com/@Atarayo)
+- 2026 馬來西亞獨立專場歌單：[setlist.fm](https://www.setlist.fm/setlist/atarayo/2026/kl-convention-centre-kuala-lumpur-malaysia-4375d7df.html)
+- 過往台北場合唱觀察：[Atarayo TOUR 2025 in Taipei 觀眾紀錄](https://mapleleaf3659.github.io/ml-blog/articles/life/atarayo-tour-2025-in-taipei.html)
+- `images/atarayo-rainy-night.png`：為本專案生成的原創無文字主視覺，不是官方海報
+- `images/atarayo-seating*.png`：KKTIX 公開的台北場官方座位圖，版權屬原權利人
 
-GitHub Pages 使用 HTTPS 提供網站，因此離線快取功能可以直接運作。
-
-## 3. 開啟與確認
-
-- 用手機開啟網址並等待幾秒，讓快取完成儲存。
-- 開啟飛航模式後重新整理；如果歌詞與演出資訊仍能開啟，就代表離線功能成功。
-- Android：只在手機上顯示「安裝到主畫面」提示；關閉或完成一次後不再重複顯示。
-- iPhone：只在手機瀏覽器提示點擊分享按鈕 → **加入主畫面**；關閉或確認一次後不再重複顯示。桌面版不會顯示安裝提示。
-
-首頁與各頁面上方的「深色模式／淺色模式」按鈕可以切換配色。第一次開啟時會沿用裝置設定；手動選擇後，網站會記住你的選擇。首頁海報在兩種模式下都會維持原本偏暗的氛圍。
-
-歌曲頁面下方的膠囊式導覽列，可以切換上一首、目前歌曲清單與下一首。劇透歌單整理自 2026/09/05、09/06 東京場與 09/19、09/20 首爾場；首爾場順序與東京場相同，仍屬非官方參考。台北場正式歌單公布前，請不要將它視為台北場演出順序；歌單頁會先顯示劇透警告，讓使用者自行選擇查看方式後才會顯示內容。
-
-歌曲頁面的應援動畫（拍手、揮手、跳躍、轉臂與大合唱）會共用目前歌曲的 BPM 拍長，BPM 資料集中在 `src/data.js` 的 `SONG_BPM` 表格中。日文歌詞的漢字會在上方顯示 ruby 假名讀音；下方工具列的「讀音」會依序切換 `假名`、`羅馬字` 與 `假名+羅馬字`，方便同時對照。含大合唱的歌詞行會固定使用金黃色，繁中翻譯則維持一般字幕色。
-
-下方工具列也能分別切換「日文」與「中文」歌詞，兩個設定會保存在瀏覽器中；「簡潔模式」預設仍顯示日文，並保留同一套切換功能。
-
-`卡拉OK` 開關可以關閉逐字高亮；關閉後仍保留一般歌詞同步、日文讀音與其他工具列功能，設定同樣會保存。
-
-開啟 `卡拉OK` 時，頁面會先查詢 Musixmatch RichSync、QQ QRC、酷狗 KRC、網易雲 YRC 的開源聚合來源，再 fallback 到 AMLL TTML DB；取得後以歌詞文字對齊目前 YouTube 影片。每一行仍以現有手動錨點為準，來源只提供句內逐字節奏，因此不同版本的前奏或分行不會讓整段畫面漂移；最後仍保留原本依句時間估算的 fallback。逐字資料會以 `karaoke-sources.js` 的 `timed-lyrics-v1`（每句 `start`／`end` 加上 `words[]`）作為前端統一格式，不需要改動現有的翻譯、應援標記或手動句錨點。
-
-第一次在線上開啟歌曲時，逐字資料會存入瀏覽器的本機快取；之後即使演出場館沒有網路，已經載入過的歌曲仍可使用真實逐字時間。歌詞區下方會顯示來源、對齊行數與影片偏移，方便確認目前是開源逐字資料還是本地估算。
-
-只查看歌名時，歌單順序會以打散後的形式顯示。若要切換回演出順序，請在確認畫面再次選擇「顯示順序」。從首頁或歌曲頁面重新進入歌單時，會再次從劇透警告畫面開始。
-
-## 4. 修改內容後重新上傳
-
-修改歌詞或畫面並重新上傳時，請務必增加 **`sw.js` 頂端的 `CACHE_VERSION` 數字**，並讓 `src/main.js` 的 `BUILD` 同步更新。
-
-```js
-const CACHE_VERSION = "v1.7.5";   // → 改成下一個版本號
-```
-
-如果數字沒有變更，曾經造訪過網站的使用者仍可能看到舊內容。提高版本號後，下一次連線時會下載新檔案，畫面下方也會出現「新版本已準備好・重新整理」的提示，方便立即更新。
-
-## 5. 公告文字範例
-
-> 演出場館的行動網路可能不穩定。
-> **請在家先開啟一次網站。** 先開啟過一次，到了演出現場即使沒有網路，也能查看歌詞。
-> （只有 YouTube 影片需要網路連線。）
+本網站為非官方粉絲製作，與 Atarayo、唱片公司、主辦單位、售票平台及場館無隸屬或合作關係。活動規則如有變更，一律以官方公告為準。

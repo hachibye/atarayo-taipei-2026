@@ -2,11 +2,8 @@ let furiganaPromise = null;
 let karaokeSourcesPromise = null;
 
 export function loadFurigana(){
-  if (window.JP_FURIGANA || window.JP_ROMAJI) return Promise.resolve();
   if (!furiganaPromise){
-    furiganaPromise = import("../../furigana.js")
-      .then(() => undefined)
-      .catch(() => undefined);
+    furiganaPromise = import("./japanese-readings.js").catch(() => null);
   }
   return furiganaPromise;
 }

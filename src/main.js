@@ -8,7 +8,6 @@ import {
   SHARE_SVG,
   MD_SVG,
   NOTICE_SVG,
-  GIFT_SVG,
   CHEVRON_SVG,
   SEAT_SVG,
   MANNER_SVG,
@@ -30,10 +29,12 @@ import {
 import {
   SHOW_TIMELINE,
   SHOW_SCHEDULE,
+  ASIA_TOUR_STOPS,
+  OVERSEAS_ONE_MAN_STOPS,
   NOTICES,
-  VAWS_PICS,
   PICS,
   SONGS,
+  GUIDE_COLLECTIONS,
   SONG_BPM,
   SETLIST_TOKYO,
   SEAT_VIEW,
@@ -45,19 +46,14 @@ import {
 } from "./data.js";
 import {
   CHANT_VERSIONS,
-  CHANT_DIFFERENCES,
   DEFAULT_CHANT_VERSION,
   JP_CHANT_GUIDES,
   CHANT_REFERENCE_URL
 } from "./chant-guide.js";
 import { loadFurigana, loadKaraokeSources } from "./services/lazy-modules.js";
 import { store } from "./services/storage.js";
-
-const appBaseUrl = import.meta.env?.BASE_URL || "./";
-const manifestLink = document.createElement("link");
-manifestLink.rel = "manifest";
-manifestLink.href = `${appBaseUrl}manifest.json`;
-document.head.appendChild(manifestLink);
+import { traditionalChineseFor } from "./data/lyrics-zh-tw.js";
+import { SONG_STORIES, STARTER_PATHS, ATARAYO_TIMELINE } from "./editorial.js";
 
 const app = document.getElementById("app");
 const songView = document.getElementById("song-view");
@@ -67,18 +63,19 @@ let syncTimer = null;
 let autoScrollEnabled = true;
 let venueMode = false;          // 단축모드 (첫 실행 때 저장값을 읽어 옴)
 const READING_MODES = ["kana", "romaji", "both"];
-const storedReadingMode = store("horo-reading");
+const storedReadingMode = store("atarayo-reading");
 let readingMode = READING_MODES.includes(storedReadingMode) ? storedReadingMode : "kana";
-let showJapanese = store("horo-show-japanese") !== "0";
-let showChinese = store("horo-show-chinese") !== "0";
-const storedChantVersion = store("horo-chant-version");
-let chantVersion = storedChantVersion === "kr" ? "kr" : DEFAULT_CHANT_VERSION;
+let showJapanese = store("atarayo-show-japanese") !== "0";
+let showChinese = store("atarayo-show-chinese") !== "0";
+let chantVersion = DEFAULT_CHANT_VERSION;
 // 卡拉OK 預設關閉；若使用者曾手動選擇，則沿用保存的設定。
-let karaokeEnabled = store("horo-karaoke") === "1";
+let karaokeEnabled = store("atarayo-karaoke") === "1";
 let lastActiveIdx = -1;
 let karaokeActiveLine = null;
 let karaokeTiming = null;       // 對齊到目前 YouTube 影片的真實逐字時間
 let karaokeLoadSeq = 0;         // 換歌時忽略上一首尚未完成的網路回應
+let japaneseReadingEngine = null;
+let japaneseReadingSeq = 0;
 let syncTicks = 0;      // 동기화가 몇 번 돌았는지 (진단용)
 let syncErr   = "";     // 재생 위치 읽기 실패 메시지 (진단용)
 let iconClockStartedAt = performance.now();
@@ -90,31 +87,28 @@ let iconClockStartedAt = performance.now();
    SCROLL_DURATION_MS : 스크롤 애니메이션 길이(ms). 작을수록 빠르게 이동. */
 const SYNC_INTERVAL_MS   = 100;
 
-/* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
-   새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
-   sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-const BUILD = "v1.7.5";
+/* 顯示目前網站版本，方便回報問題時確認畫面版本。 */
+const BUILD = "v0.1.0";
 
-const REPO_URL = "https://github.com/watain666/Vaundy-Taiwan-2026";
-const FEEDBACK_URL = "https://www.threads.com/@brainginger/post/DdiLWztgen9";
-const ORIGINAL_SITE_URL = "https://vaundy-seoul-2026.pages.dev/";
-const KOREAN_AUTHOR_URL = "https://gall.dcinside.com/mgallery/board/view/?id=vaundy0606&no=35550";
-const TRANSLATION_CREDIT_URL = "https://home.gamer.com.tw/profile/index.php?owner=tsukilsao319";
-const CC_BY_NC_SA_URL = "https://creativecommons.org/licenses/by-nc-sa/4.0/";
+const REPO_URL = "https://github.com/hachibye/atarayo-taipei-2026";
+const FEEDBACK_URL = "https://github.com/hachibye/atarayo-taipei-2026/issues";
+const ORIGINAL_SITE_URL = "https://github.com/watain666/Vaundy-Taiwan-2026";
+const KOREAN_AUTHOR_URL = "https://github.com/limskyy123456-sudo/Vaundy-Seoul-2026";
+const TRANSLATION_CREDIT_URL = REPO_URL;
 
 function siteFooterHtml(){
   return `
     <footer class="credits">
-      <p class="credits-copy">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo;・TAIWAN FAN CHANT GUIDE（非官方粉絲製作）<span class="build">${BUILD}</span></p>
+      <p class="credits-copy">ATARAYO ASIA TOUR 2026・TAIPEI FAN GUIDE（非官方粉絲製作）<span class="build">${BUILD}</span></p>
       <nav class="credits-links" aria-label="專案連結">
         <a class="credits-link credits-repo" href="${REPO_URL}" target="_blank" rel="noopener" aria-label="GitHub Repo" title="GitHub Repo">
           ${GITHUB_SVG}
         </a>
-        <a class="credits-fork" href="${ORIGINAL_SITE_URL}" target="_blank" rel="noopener" aria-label="Fork from SEOUL 응원가이드">
-          Fork from SEOUL 응원가이드
+        <a class="credits-fork" href="${ORIGINAL_SITE_URL}" target="_blank" rel="noopener" aria-label="改作自 Vaundy Taiwan 2026">
+          改作自 Vaundy Taiwan 2026
         </a>
-        <a class="credits-fork" href="${KOREAN_AUTHOR_URL}" target="_blank" rel="noopener" aria-label="Thanks to the original Korean creator, 카쿠메.">
-          Thanks to the original Korean creator, 카쿠메.
+        <a class="credits-fork" href="${KOREAN_AUTHOR_URL}" target="_blank" rel="noopener" aria-label="原始專案 Vaundy Seoul 2026">
+          原始專案 Vaundy Seoul 2026
         </a>
         <a class="credits-link" href="${FEEDBACK_URL}" target="_blank" rel="noopener" aria-label="意見回饋" title="意見回饋">
           <span>意見回饋</span>
@@ -159,7 +153,7 @@ let currentSong = null;
 let songKeyHandler = null;   // 곡 화면 키보드 단축키(← → Esc) 핸들러
 
 const themePreference = window.matchMedia("(prefers-color-scheme: dark)");
-const storedTheme = store("horo-theme");
+const storedTheme = store("atarayo-theme");
 let currentTheme = storedTheme === "dark" ? "dark"
   : storedTheme === "light" ? "light"
   : themePreference.matches ? "dark" : "light";
@@ -171,7 +165,7 @@ function applyTheme(theme, save = false){
   currentTheme = theme;
   document.documentElement.dataset.theme = theme;
   document.querySelector('meta[name="theme-color"]').content = theme === "dark" ? "#151619" : "#f5f5f7";
-  if (save) store("horo-theme", theme);
+  if (save) store("atarayo-theme", theme);
   document.querySelectorAll("[data-theme-toggle]").forEach(button => {
     const label = theme === "dark" ? "淺色模式" : "深色模式";
     button.innerHTML = theme === "dark" ? SUN_SVG : MOON_SVG;
@@ -185,24 +179,8 @@ document.addEventListener("click", event => {
 });
 if (themePreference.addEventListener){
   themePreference.addEventListener("change", event => {
-    if (!store("horo-theme")) applyTheme(event.matches ? "dark" : "light");
+    if (!store("atarayo-theme")) applyTheme(event.matches ? "dark" : "light");
   });
-}
-
-function chantVersionControlHtml(scope = "guide"){
-  const label = scope === "song" ? "這首歌的應援版本" : "應援版本";
-  return `
-    <div class="chant-version-control" data-chant-version-control="${scope}">
-      <span class="chant-version-control-label">${label}</span>
-      <div class="chant-version-segment" role="group" aria-label="${label}">
-        <button type="button" class="chant-version-option" data-chant-version="jp" aria-pressed="false">
-          <span>${CHANT_VERSIONS.jp.label}</span>
-        </button>
-        <button type="button" class="chant-version-option" data-chant-version="kr" aria-pressed="false">
-          <span>${CHANT_VERSIONS.kr.label}</span>
-        </button>
-      </div>
-    </div>`;
 }
 
 function chantGuideFor(song = currentSong, version = chantVersion){
@@ -229,14 +207,9 @@ function renderChantVersionNote(song = currentSong){
   const el = document.getElementById("chant-version-note");
   if (!el) return;
 
-  if (chantVersion === "kr"){
-    el.innerHTML = `<b>${CHANT_VERSIONS.kr.label}</b>：使用韓國場應援標記。`;
-    return;
-  }
-
   const guide = chantGuideFor(song, "jp");
   if (!guide){
-    el.innerHTML = `<b>${CHANT_VERSIONS.jp.label}</b>：這首歌目前沒有獨立的日本版提示，暫沿用現有標記。`;
+    el.innerHTML = `<b>${CHANT_VERSIONS.jp.label}</b>：這首歌目前沒有經過查證的現場提示。`;
     return;
   }
 
@@ -248,7 +221,7 @@ document.addEventListener("click", event => {
   const button = event.target.closest("[data-chant-version]");
   if (!button) return;
   const next = button.dataset.chantVersion;
-  if (next !== "jp" && next !== "kr") return;
+  if (next !== "jp") return;
   setChantVersion(next);
 });
 
@@ -276,6 +249,12 @@ function router(){
   } else if (hash === "setlist") {
     leaveSongView();
     renderSetlist();
+  } else if (hash === "starter") {
+    leaveSongView();
+    renderStarterGuide();
+  } else if (hash === "timeline") {
+    leaveSongView();
+    renderTimeline();
   } else {
     leaveSongView();
     setSongFrom("guide");
@@ -304,7 +283,7 @@ function seatMapSvg(){
   const order = (g) => g === "w" || g === "stage" ? 1 : 0;
   const list = SEAT_BLOCKS.slice().sort((a, b) => order(a.grade) - order(b.grade));
   return `<svg class="seat-map" viewBox="-5 -5 ${SEAT_VIEW.w + 10} ${SEAT_VIEW.h + 10}"`
-       + ` role="img" aria-label="台北小巨蛋座位配置圖">`
+       + ` role="img" aria-label="場館座位配置圖">`
        + list.map(seatBlockSvg).join("")
        + `</svg>`;
 }
@@ -346,7 +325,6 @@ function refreshAccordion(el){
    · 탭하면 전체화면으로 크게 볼 수 있어요.
    ───────────────────────────────────────────────────────────── */
 let noticeReady = [];   // 실제로 불러와진 공지들 (공지 · 안내 카드)
-let vawsReady   = [];   // VAWS 카드 안에 들어가는 사진들
 let viewList    = [];   // 크게 보기가 지금 넘기고 있는 목록
 let viewIdx     = 0;
 let noticeTrigger = null;
@@ -354,7 +332,7 @@ let noticeTrigger = null;
 /* 사진 목록을 받아 눌러서 크게 볼 수 있는 격자를 만든다.
    · 파일이 없는 칸은 조용히 사라진다 (깨지지 않음)
    · 다 불러오면 카드 높이를 다시 재고, 오프라인용으로도 저장해 둔다
-   같은 코드를 '공지 · 안내' 와 'VAWS 회원 티켓 카드' 두 곳에서 같이 쓴다. */
+   公告圖卡共用同一套載入流程。 */
 function buildPicGrid(grid, list, ready, emptyEl){
   if (!grid || grid.dataset.loaded === "1") return;
   grid.dataset.loaded = "1";
@@ -366,7 +344,6 @@ function buildPicGrid(grid, list, ready, emptyEl){
     if (--pending > 0) return;
     if (emptyEl) emptyEl.hidden = ready.length > 0;
     refreshAccordion(grid);
-    cachePicsForOffline(ready);
   };
   if (!pending){ if (emptyEl) emptyEl.hidden = false; return; }
 
@@ -403,21 +380,6 @@ function setupNotices(){
   if (!grid || grid.dataset.loaded === "1") return;
   buildPicGrid(grid, NOTICES, noticeReady,
                document.getElementById("notice-empty"));
-}
-
-function setupVawsPics(){
-  const grid = document.getElementById("vaws-grid");
-  if (!grid || grid.dataset.loaded === "1") return;
-  buildPicGrid(grid, VAWS_PICS, vawsReady, null);
-}
-
-/* 공지 이미지도 오프라인용으로 저장해 둔다 (공연장에서 데이터가 안 터져도 보이도록) */
-function cachePicsForOffline(ready){
-  if (!("serviceWorker" in navigator) || !ready.length) return;
-  const urls = ready.map(n => n.src);
-  navigator.serviceWorker.ready
-    .then(reg => reg.active && reg.active.postMessage({ type:"CACHE_URLS", urls }))
-    .catch(()=>{});
 }
 
 function openViewer(list, i){
@@ -548,14 +510,14 @@ function setupSeatMap(){
     const b = id ? SEAT_BLOCKS.find(x => x.id === id) : null;
     if (!b){
       out.textContent = SEAT_HINT;
-      if (save) store("horo-seat", "");
+      if (save) store("atarayo-seat", "");
       refreshAccordion(out);
       return;
     }
     const g = blocks.find(el => el.dataset.id === id);
     if (g) g.classList.add("selected");
     out.innerHTML = seatReadoutHtml(b);
-    if (save) store("horo-seat", id);
+    if (save) store("atarayo-seat", id);
     refreshAccordion(out);
   };
 
@@ -576,7 +538,7 @@ function setupSeatMap(){
     if (e.target.closest(".seat-clear")) show(null, true);
   });
 
-  const saved = store("horo-seat");
+  const saved = store("atarayo-seat");
   if (saved && SEAT_BLOCKS.some(b => b.id === saved)) show(saved, false);
   else out.textContent = SEAT_HINT;
 }
@@ -586,8 +548,8 @@ function renderHome(){
     <section class="hero">
       ${themeToggleHtml("home-theme")}
       <div class="hero-inner">
-        <div class="eyebrow">ASIA ARENA TOUR 2026</div>
-        <h1 class="tour-title"><span>VAUNDY</span>&ldquo;HORO&rdquo;</h1>
+        <div class="eyebrow">ATARAYO ASIA TOUR 2026</div>
+        <h1 class="tour-title"><span>あたらよ</span>夕立が去ったその後で</h1>
 
         <div class="countdown" id="countdown">
           <div class="cd-pill">
@@ -599,14 +561,10 @@ function renderHome(){
 
         <div class="show-meta">
           <div class="show-row">
-            <span class="show-day">10.31<span class="dow">六</span></span>
+            <span class="show-day">12.19<span class="dow">六</span></span>
             <span class="show-time">19:00</span>
           </div>
-          <div class="show-row">
-            <span class="show-day">11.01<span class="dow">日</span></span>
-            <span class="show-time">19:00</span>
-          </div>
-          <div class="show-venue">TAIPEI ARENA, TAIPEI</div>
+          <div class="show-venue">TAIPEI MUSIC CENTER・CONCERT HALL</div>
         </div>
 
         <!-- 공연 당일에만 나타나는 오늘의 일정 -->
@@ -618,7 +576,7 @@ function renderHome(){
 
         <nav class="main-menu">
           <button class="menu-btn" id="guide-btn">
-            <span class="menu-btn-label">應援指南</span>
+            <span class="menu-btn-label">官方影片預習</span>
           </button>
         </nav>
 
@@ -635,106 +593,91 @@ function renderHome(){
             <div class="info-panel-title"><span class="bar">|</span> 演出概要 <span class="bar">|</span></div>
             <dl class="info-facts">
               <dt>演出名稱</dt>
-              <dd>Vaundy ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo; IN TAIPEI</dd>
+              <dd>Atarayo ASIA TOUR 2026『夕立が去ったその後で』in TAIPEI</dd>
 
               <dt>日期／時間</dt>
               <dd>
-                <span class="em">2026.10.31（六）19:00</span> ／ <span class="em">11.01（日）19:00</span>
-                <span class="sub">兩天皆 17:30 開場・時間以官方公告為準</span>
+                <span class="em">2026.12.19（六）19:00</span>
+                <span class="sub">開場時間與整隊流程請留意主辦單位演出前公告</span>
               </dd>
 
               <dt>地點</dt>
               <dd>
-                台北小巨蛋 Taipei Arena
-                <span class="sub">105037 臺北市松山區南京東路4段2號</span>
+                台北流行音樂中心・表演廳
+                <span class="sub">115 臺北市南港區市民大道八段99號</span>
               </dd>
 
               <dt>入場規則</dt>
               <dd>
-                全場實名制
-                <span class="sub">入場請攜帶票券及填寫的有效證件正本；外籍觀眾依售票平台規定攜帶護照正本</span>
+                1F 站席依票面序號入場，2F 座席對號入座
+                <span class="sub">票券於演出前 5 日開放至全家 FamiPort 取票</span>
               </dd>
 
               <dt>票價</dt>
               <dd>
                 <p class="info-price">
-                  <span>NT$ 5,880</span>
-                  <span>NT$ 4,880</span>
-                  <span>NT$ 3,880</span>
-                  <span>NT$ 2,880</span>
-                  <span>NT$ 800</span>
+                  <span>NT$ 3,800</span>
+                  <span>NT$ 3,600</span>
+                  <span>NT$ 3,200</span>
+                  <span>NT$ 3,000</span>
+                  <span>NT$ 2,600</span>
                 </p>
-                <span class="sub">另收購票手續費</span>
+                <span class="sub">無障礙席 NT$ 1,900 / 1,500；官方目前標示完售</span>
               </dd>
 
-              <dt>取票方式</dt>
+              <dt>VIP Upgrade</dt>
               <dd>
-                依 Ticket Plus 遠大售票平台提供
-                <span class="sub">實名制資料請務必填寫正確，入場規定以售票平台公告為準</span>
+                NT$ 1,200
+                <span class="sub">包含 Sound Check Party、Hi-Touch、紀念通行證與數位簽名海報；不含演唱會門票</span>
               </dd>
 
               <dt>購票</dt>
               <dd>
-                Ticket Plus 遠大售票
-                <span class="sub">票務、實名制與入場問題請依售票平台最新公告確認</span>
+                KKTIX
+                <span class="sub">主辦 B'in Live Entertainment，協辦 avex taiwan</span>
               </dd>
             </dl>
 
-            <a class="info-book-link" href="https://ticketplus.com.tw/activity/6c3d8c24e0f00c9c84777615c001bebe" target="_blank" rel="noopener">
-              ${EXT_LINK_SVG} 前往 Ticket Plus 售票頁面
+            <a class="info-book-link" href="https://binliveco.kktix.cc/events/kbrte" target="_blank" rel="noopener">
+              ${EXT_LINK_SVG} 查看 KKTIX 官方活動頁
             </a>
 
-            <hr class="info-divider">
+            <section class="tour-index" aria-labelledby="tour-index-title">
+              <div class="tour-index-head">
+                <h3 id="tour-index-title">2026 演出站點</h3>
+                <a href="https://atarayo-jp.com/contents/tour/asia_tour2026" target="_blank" rel="noopener">官方亞巡日程 ↗</a>
+              </div>
 
-            <div class="info-panel-title"><span class="bar">|</span> 觀眾入場資訊 <span class="bar">|</span></div>
-            <div class="info-table-wrap">
-              <table class="info-table">
-                <colgroup>
-                  <col class="info-col-label">
-                  <col class="info-col-day">
-                  <col class="info-col-day">
-                  <col class="info-col-note">
-                </colgroup>
-                <thead>
-                  <tr>
-                    <th>項目</th>
-                    <th>10/31（六）</th>
-                    <th>11/1（日）</th>
-                    <th>備註</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="label" data-label="項目">開場／入場</td>
-                    <td data-label="10/31（六）">17:30</td>
-                    <td data-label="11/1（日）">17:30</td>
-                    <td class="note" data-label="備註">官方已公布</td>
-                  </tr>
-                  <tr>
-                    <td class="label" data-label="項目">正式演出</td>
-                    <td data-label="10/31（六）">19:00</td>
-                    <td data-label="11/1（日）">19:00</td>
-                    <td class="note" data-label="備註">官方已公布</td>
-                  </tr>
-                  <tr>
-                    <td class="label" data-label="項目">周邊／物品寄放</td>
-                    <td data-label="10/31（六）">待公告</td>
-                    <td data-label="11/1（日）">待公告</td>
-                    <td class="note" data-label="備註">請以主辦與場館公告為準</td>
-                  </tr>
-                  <tr>
-                    <td class="label" data-label="項目">演出結束</td>
-                    <td data-label="10/31（六）">預計 21:00 左右</td>
-                    <td data-label="11/1（日）">預計 21:00 左右</td>
-                    <td class="note" data-label="備註">實際時間以現場為準</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <p class="info-footnote">※ 目前官方已確認開場與開演時間；周邊販售、物品寄放與入場動線公布後會再補上。<br>※ 最新資訊請以主辦單位、Ticket Plus 與台北小巨蛋公告為準。</p>
+              <div class="tour-index-group">
+                <h4>ASIA TOUR 2026 <span>夕立が去ったその後で</span></h4>
+                <ol class="tour-stop-list">
+                  ${ASIA_TOUR_STOPS.map(stop => `
+                    <li${stop.current ? ` class="current"` : ""}>
+                      <time datetime="2026-${stop.date.replace(".", "-")}">${stop.date}<small>${stop.dow}</small></time>
+                      <span class="tour-stop-place"><b>${stop.city}</b><span>${stop.venue}</span></span>
+                      ${stop.note ? `<em>${stop.note}</em>` : stop.current ? `<em>台北場</em>` : ""}
+                    </li>`).join("")}
+                </ol>
+              </div>
 
+              <div class="tour-index-group separate">
+                <h4>海外獨立專場 <span>非本次亞巡站次</span></h4>
+                <ol class="tour-stop-list">
+                  ${OVERSEAS_ONE_MAN_STOPS.map(stop => `
+                    <li>
+                      <time datetime="2026-${stop.date.replace(".", "-")}">${stop.date}<small>${stop.dow}</small></time>
+                      <span class="tour-stop-place">
+                        <b>${stop.city}</b>
+                        <span>${stop.event}<br>${stop.venue}・${stop.start} 開演</span>
+                      </span>
+                      <a href="${stop.url}" target="_blank" rel="noopener" aria-label="查看 ${stop.city} 官方演出資訊">↗</a>
+                    </li>`).join("")}
+                </ol>
+              </div>
 
-
+              <p class="tour-index-note">海外獨立專場是同年度的單獨海外演出，未列入 ASIA TOUR 2026『夕立が去ったその後で』官方巡演日程。</p>
+            </section>
+            <p class="info-footnote">※ 本站為非官方粉絲專案。售票、入場與演出規定均以 KKTIX、主辦單位及場館最新公告為準。</p>
           </div>
         </div>
       </div>
@@ -747,10 +690,10 @@ function renderHome(){
         </button>
         <div class="info-panel" inert aria-hidden="true">
           <div class="info-panel-inner">
-            <p class="way-note">台北場的場館地圖、MD、身分確認等<b>官方公告</b>會在公布後補上。</p>
+            <p class="way-note">主辦公布入場、周邊、VIP 報到等<b>官方圖卡</b>後會補上。</p>
             <div class="notice-grid" id="notice-grid"></div>
             <p class="notice-empty" id="notice-empty" hidden>
-              台北場官方公告圖片尚未公布，請先以主辦與場館公告為準。
+              詳細入場公告尚未公布，請先以主辦與場館公告為準。
             </p>
             <p class="info-footnote">※ 台北場官方公告圖片公布後再更新。</p>
           </div>
@@ -765,25 +708,22 @@ function renderHome(){
         </button>
         <div class="info-panel" inert aria-hidden="true">
           <div class="info-panel-inner">
-            <div class="info-panel-title"><span class="bar">|</span> 台北小巨蛋 Taipei Arena <span class="bar">|</span></div>
+            <div class="info-panel-title"><span class="bar">|</span> 台北流行音樂中心・表演廳 <span class="bar">|</span></div>
 
             <p class="way-note">台北場最新官方舞台／座位配置圖：</p>
             <div class="seat-wrap">
-              <a class="seat-map-link" href="./images/taipei-stage-map.webp" target="_blank" rel="noopener">
-                <img class="seat-map-image" src="./images/taipei-stage-map-preview.webp" width="2772" height="3681" alt="Vaundy ASIA ARENA TOUR 2026「HORO」台北場台北小巨蛋舞台與座位配置圖，含各區票價；點擊查看原尺寸" loading="lazy" decoding="async">
+              <a class="seat-map-link" href="./images/atarayo-seating.png" target="_blank" rel="noopener">
+                <img class="seat-map-image" src="./images/atarayo-seating-preview.png" width="720" height="960" alt="Atarayo ASIA TOUR 2026 台北場官方座位與票價配置圖，點擊查看原尺寸" loading="lazy" decoding="async">
               </a>
               <p class="seat-map-caption">點擊圖片後才會載入壓縮原圖，可開啟原尺寸查看。</p>
             </div>
             <p class="way-note">圖中票價與票區依主辦單位公布的配置圖整理；實際座位、入場動線與現場安排仍以票券及演出當日公告為準。</p>
             <div class="info-book-links">
-              <a class="info-book-link" href="https://ticketplus.com.tw/activity/6c3d8c24e0f00c9c84777615c001bebe" target="_blank" rel="noopener">
-                ${EXT_LINK_SVG} Ticket Plus 售票頁面
+              <a class="info-book-link" href="https://binliveco.kktix.cc/events/kbrte" target="_blank" rel="noopener">
+                ${EXT_LINK_SVG} KKTIX 官方活動頁
               </a>
-              <a class="info-book-link" href="https://www.arena.taipei/" target="_blank" rel="noopener">
-                ${EXT_LINK_SVG} 台北小巨蛋官網
-              </a>
-              <a class="info-book-link" href="https://twconcertview.com/venue/taipei-arena-center-stage/" target="_blank" rel="noopener">
-                ${EXT_LINK_SVG} 台灣各大場館視野
+              <a class="info-book-link" href="https://www.tmc.taipei/" target="_blank" rel="noopener">
+                ${EXT_LINK_SVG} 台北流行音樂中心官網
               </a>
             </div>
 
@@ -801,13 +741,12 @@ function renderHome(){
         <div class="info-panel" inert aria-hidden="true">
           <div class="info-panel-inner">
             <div class="way-addr">
-              <b>台北小巨蛋 Taipei Arena</b>
-              <span>105037 臺北市松山區南京東路4段2號</span>
+              <b>台北流行音樂中心 Taipei Music Center</b>
+              <span>115 臺北市南港區市民大道八段99號</span>
             </div>
             <div class="way-btns">
-              <a href="https://www.arena.taipei/cp.aspx?n=459956E830D4A8BB" target="_blank" rel="noopener">場館交通資訊</a>
-              <a href="https://web.metro.taipei/pages2026/WebStation/109" target="_blank" rel="noopener">台北捷運 G17</a>
-              <a href="https://www.google.com/maps/search/?api=1&query=Taipei+Arena+Taipei" target="_blank" rel="noopener">Google 地圖</a>
+              <a href="https://www.tmc.taipei/" target="_blank" rel="noopener">場館官網</a>
+              <a href="https://www.google.com/maps/search/?api=1&query=Taipei+Music+Center" target="_blank" rel="noopener">Google 地圖</a>
               <button type="button" id="copy-addr">複製地址</button>
             </div>
 
@@ -817,10 +756,10 @@ function renderHome(){
               <h4>捷運 <span>最推薦</span></h4>
 
               <div class="way-block">
-                <div class="way-block-t">① 松山新店線（綠線） → <b>G17 台北小巨蛋站</b></div>
+                <div class="way-block-t">板南線（藍線） → <b>BL21 昆陽站</b></div>
                 <ul class="way-ul">
-                  <li>搭乘台北捷運松山新店線至 G17 台北小巨蛋站，從<b> 2 號出口</b>出站即達。</li>
-                  <li>從其他捷運路線前往時，請先轉乘至松山新店線；出發前可用台北捷運官方網站確認路線與營運資訊。</li>
+                  <li>由昆陽站<b> 4 號出口</b>步行前往表演廳，建議預留 10 至 15 分鐘。</li>
+                  <li>演出日請依場館與主辦公布的實際入場動線前往。</li>
                 </ul>
               </div>
             </div>
@@ -828,7 +767,7 @@ function renderHome(){
             <div class="way-sec">
               <h4>公車</h4>
               <ul class="way-ul">
-                <li>可搜尋站名「臺北小巨蛋」或「捷運台北小巨蛋站」。</li>
+                <li>可搜尋「台北流行音樂中心」或「南港高中」。</li>
                 <li>公車路線、到站時間與演出日改道資訊，請以臺北市公車動態資訊及現場公告為準。</li>
               </ul>
             </div>
@@ -837,12 +776,12 @@ function renderHome(){
               <h4>開車／停車</h4>
               <ul class="way-ul warn">
                 <li>活動日周邊車流與停車需求高，建議不要把開車作為首選。</li>
-                <li>若需開車，請先查看台北小巨蛋官方停車與交通公告；場館車位有限，<b>停車不等於保證入場</b>。</li>
+                <li>若需開車，請先查看北流官方停車與交通公告；場館車位有限，<b>建議優先搭乘大眾運輸</b>。</li>
                 <li>散場時請依工作人員與交通管制指示離場，避免在場館周邊久候。</li>
               </ul>
             </div>
 
-            <p class="info-footnote">※ 地圖 App 需要網路連線。<br>※ 出口、交通管制、停車與臨時接駁若有變更，均以台北小巨蛋、台北捷運及主辦官方公告為準。</p>
+            <p class="info-footnote">※ 地圖 App 需要網路連線。出口、交通管制與停車資訊如有變更，以北流、台北捷運及主辦公告為準。</p>
           </div>
         </div>
       </div>
@@ -856,17 +795,18 @@ function renderHome(){
         <div class="info-panel" inert aria-hidden="true">
           <div class="info-panel-inner">
 
-            <p class="way-note">不知道應援口號也沒關係。<b>應援不是義務。</b>這份指南整理的是「知道後會更有趣的事」，不是必須背熟的作業。安靜站著欣賞也很棒。</p>
+            <p class="way-note">あたらよ的現場重點是<b>跟著歌曲情緒聆聽</b>，不是整場照表操課的固定口號或手勢。應援不是義務，安靜欣賞也完全正確。</p>
 
             <div class="way-sec">
-              <h4>第一次參加 <span>知道這些就足夠</span></h4>
+              <h4>あたらよ的應援方式 <span>知道這些就足夠</span></h4>
               <ul class="way-ul">
-                <li><b>不用全部跟著做。</b>只要在熟悉的歌曲、熟悉的段落一起應援，就能玩得很開心</li>
-                <li>不會日文也沒關係・大合唱多半是<b>「Hu Hu」、「DA-DA-DA」</b>這類聲音，記住發音就可以</li>
-                <li>本指南的動作全部都是<b>徒手</b>完成，不需要另外準備應援物品</li>
-                <li>晚一拍跟著周圍的人做也完全不奇怪</li>
-                <li>場館內網路訊號可能不穩。請<b>在家先開啟一次這個頁面</b>・歌詞會儲存在手機裡，沒有網路也能查看</li>
+                <li><b>慢歌與獨白先聽。</b>前奏、安靜段落與停頓不要預先喊口號，讓樂團帶領氣氛</li>
+                <li><b>節奏明顯時自然拍手或揮手。</b>以成員示意與現場多數觀眾的節奏為準，不需要背固定動作</li>
+                <li><b>合唱集中在被帶領的段落。</b>2025 台北觀眾紀錄提到〈朝凪〉和音與〈「僕は...」〉曾出現全場合唱，但不保證 2026 編排相同</li>
+                <li>不會日文也沒關係，熟悉副歌旋律、跟著掌聲回應 MC 就足夠</li>
+                <li>場館網路可能不穩，建議事前把票券、座位圖與交通資訊<b>截圖保存</b></li>
               </ul>
+              <p class="info-footnote">參考：<a href="https://mapleleaf3659.github.io/ml-blog/articles/life/atarayo-tour-2025-in-taipei.html" target="_blank" rel="noopener">2025 台北場觀眾紀錄 ↗</a>。這是過往現場觀察，不是官方制定應援。</p>
             </div>
 
             <div class="way-sec">
@@ -895,78 +835,39 @@ function renderHome(){
               </ul>
             </div>
 
-            <p class="info-footnote">※ 本指南由粉絲製作。拍攝、攜入、再次入場等官方規定，以 Ticket Plus、台北小巨蛋公告與<b>演出當天現場指示</b>為準。</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="info-card" id="vaws-card">
-        <button class="menu-row info-toggle" aria-expanded="false">
-          <span class="info-toggle-icon">${GIFT_SVG}</span>
-          <span class="info-toggle-label">VAWS 會員票卡</span>
-          <span class="info-toggle-chevron">${CHEVRON_SVG}</span>
-        </button>
-        <div class="info-panel" inert aria-hidden="true">
-          <div class="info-panel-inner">
-            <div class="info-panel-title"><span class="bar">|</span> 場館限定特典 <span class="bar">|</span></div>
-
-            <p class="way-note">VAWS MEMBERS 的「公演別原創票卡」為巡演場館限定企劃；台北場攤位位置、開放時間與領取方式目前尚待官方公告。</p>
-
-            <dl class="info-facts">
-              <dt>台北場</dt>
-              <dd>
-                <span class="em">台北小巨蛋 Taipei Arena</span>
-                <span class="sub">2026.10.31（六）・11.01（日）</span>
-              </dd>
-
-              <dt>對象</dt>
-              <dd>
-                <span class="em">VAWS MEMBERS 會員</span>
-                <span class="sub">是否可於演出當日新加入、兌換地點與流程，請等待官方公告</span>
-              </dd>
-
-              <dt>攤位資訊</dt>
-              <dd>
-                <span class="em">待官方公布</span>
-                <span class="sub">其他場次的攤位位置與營運時間不適用於台北場</span>
-              </dd>
-            </dl>
-
-            <ul class="way-ul warn">
-              <li>官方公布後，請依公告中的 QR 碼與兌換流程辦理。</li>
-              <li>攤位時間與數量可能依準備狀況、天氣及現場人流調整。</li>
-              <li>開場前後預計人潮較多，請預留時間。</li>
-            </ul>
-
-            <a class="info-book-link" href="https://member.vaundy.jp/feature/ASIAARENATOUR_2026" target="_blank" rel="noopener">
-              ${EXT_LINK_SVG} 查看 VAWS 官方巡演頁面
-            </a>
-
-            <p class="info-footnote">※ 以上內容以 VAWS MEMBERS 官方公告為準，詳細安排可能依演出當天現場狀況調整。</p>
+            <p class="info-footnote">※ 本指南由粉絲製作。拍攝、攜入與再次入場等規定，以 KKTIX、北流公告與<b>演出當天現場指示</b>為準。</p>
           </div>
         </div>
       </div>
 
       <div class="menu-links">
-        <a class="menu-chip" href="https://vaundy.jp/?lang=en" target="_blank" rel="noopener">
+        <button class="menu-chip" type="button" id="starter-btn">
+          <span class="chip-label">5 分鐘認識 Atarayo</span>
+          <span class="chip-note">入坑指南・依心情選歌</span>
+        </button>
+        <button class="menu-chip" type="button" id="timeline-btn">
+          <span class="chip-label">2020 → 2026</span>
+          <span class="chip-note">作品與旅程年表</span>
+        </button>
+        <a class="menu-chip" href="https://atarayo-jp.com/contents/tour/asia_tour2026" target="_blank" rel="noopener">
           <span class="chip-ico">${EXT_LINK_SVG}</span>
           <span class="chip-label">官方網站</span>
         </a>
         <button class="menu-chip spoiler" type="button" id="setlist-btn">
           <span class="chip-ico warn">${WARN_SVG}</span>
-          <span class="chip-label">東京/首爾參考歌單</span>
-          <span class="chip-note">含劇透</span>
+          <span class="chip-label">2026 馬來西亞場歌單</span>
+          <span class="chip-note">有劇透</span>
         </button>
       </div>
       </div>
 
-      <!-- 폰 플래시(폰 반딧불) 안내 — 접지 않고 바로 보이는 한 문단 -->
+      <!-- 拍攝規範摘要 -->
       <aside class="home-note">
         <span class="home-note-ico">${FLASH_OFF_SVG}</span>
         <div class="home-note-body">
-          <b>請避免使用手機閃光燈</b>
-          <p>舞台演出連燈光完全熄滅的瞬間都經過設計。觀眾席的一道光會打破黑暗，讓精心安排的畫面失去效果。</p>
-          <p class="sub">若有全場一起舉燈的安排，演出中會另行通知。</p>
+          <b>演出中禁止攝影、錄影與錄音</b>
+          <p>除非主辦單位在現場另行開放拍攝時段，請將手機收好並尊重舞台演出與周圍觀眾。</p>
+          <p class="sub">最新規範以主辦單位與現場工作人員指示為準。</p>
         </div>
       </aside>
 
@@ -982,6 +883,8 @@ function renderHome(){
 
   document.getElementById("guide-btn").addEventListener("click", ()=>{ location.hash = "#/guide"; });
   document.getElementById("setlist-btn").addEventListener("click", ()=>{ location.hash = "#/setlist"; });
+  document.getElementById("starter-btn").addEventListener("click", ()=>{ location.hash = "#/starter"; });
+  document.getElementById("timeline-btn").addEventListener("click", ()=>{ location.hash = "#/timeline"; });
   setupAccordions();
   setupNoticeViewer();
   setupSeatMap();
@@ -992,6 +895,119 @@ function renderHome(){
   layoutHeroCenter();
   // 웹폰트가 늦게 적용되면 높이가 달라지므로 한 번 더 보정
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(layoutHeroCenter);
+}
+
+function editorialSongLinks(songIds){
+  return songIds.map(id => SONGS.find(song => song.id === id)).filter(Boolean).map(song => `
+    <button class="editorial-song" type="button" data-song-id="${escapeHtml(song.id)}">
+      <span lang="ja">${escapeHtml(song.title)}</span><span aria-hidden="true">›</span>
+    </button>`).join("");
+}
+
+function bindEditorialPage(){
+  document.querySelector("[data-editorial-back]")?.addEventListener("click", ()=>{ location.hash = "#/"; });
+  app.querySelectorAll("[data-song-id]").forEach(button => {
+    button.addEventListener("click", ()=>{
+      const song = SONGS.find(item => item.id === button.dataset.songId);
+      if (!song) return;
+      setSongFrom("guide");
+      gotoSong(song);
+    });
+  });
+}
+
+function renderStarterGuide(){
+  app.innerHTML = `
+    <div class="editorial-page starter-page">
+      <div class="song-topbar">
+        <button class="back-btn" type="button" data-editorial-back aria-label="返回首頁">${BACK_SVG}</button>
+        <h1>Atarayo 入坑指南</h1>
+        ${themeToggleHtml()}
+      </div>
+      <main class="editorial-content">
+        <header class="editorial-hero">
+          <span class="editorial-kicker">5 MINUTES WITH ATARAYO</span>
+          <h2>先從一個捨不得天亮的夜晚開始</h2>
+          <p>不用先背完整歷史。認識 Atarayo，最好的方式是挑一種你熟悉的情緒，讓一首歌帶你走進下一首。</p>
+        </header>
+
+        <section class="primer-grid" aria-label="樂團簡介">
+          <article><span>01</span><h3>Atarayo 是誰</h3><p>2020 年從 YouTube 開始活動的日本三人樂團，自稱「悲しみをたべて育つバンド。」——把悲傷吃下，並從中生長的樂團。作品擅長讓一段私人記憶，變成每個人都曾有過的夜晚。</p></article>
+          <article><span>02</span><h3>團名的意思</h3><p>「あたらよ」來自日文「可惜夜」：美好得令人捨不得天亮的夜。那份明知終將結束、所以更想留住的心情，也貫穿他們的愛情、季節與青春書寫。</p></article>
+          <article><span>03</span><h3>三位團員</h3><p><b>ひとみ</b>（主唱／吉他）以貼近獨白的唱腔與詞曲描出情緒；<b>まーしー</b>（吉他）讓安靜與爆發之間有清楚層次；<b>たけお</b>（貝斯）以沉穩線條托住樂團的呼吸。</p></article>
+          <article><span>04</span><h3>音樂風格</h3><p>以日系流行搖滾為骨架，常從乾淨吉他與近距離人聲開始，再讓完整 Band Sound 推高情緒。編曲重視留白，爆發不是炫技，而是把前面忍住的話一次說完。</p></article>
+          <article><span>05</span><h3>常見主題</h3><p>失戀、沒說完的話、夏日殘像、深夜孤獨、青春自我懷疑，以及在離別之後仍選擇前進。Atarayo 的悲傷很少只停在絕望，通常會留下微弱但真實的出口。</p></article>
+        </section>
+
+        <section class="listening-paths" aria-labelledby="listening-paths-title">
+          <div class="editorial-section-head"><span>CHOOSE YOUR MOOD</span><h2 id="listening-paths-title">你今天想從哪裡開始？</h2></div>
+          ${STARTER_PATHS.map((path, index) => `
+            <article class="listening-path">
+              <div class="path-copy"><span>${pad(index + 1)}</span><h3>${escapeHtml(path.title)}</h3><p>${escapeHtml(path.text)}</p></div>
+              <div class="editorial-song-list">${editorialSongLinks(path.songIds)}</div>
+            </article>`).join("")}
+        </section>
+
+        <p class="editorial-source">人物與沿革依 <a href="https://atarayo-jp.com/profiles" target="_blank" rel="noopener">Atarayo 官方 Profile ↗</a> 整理；聆聽路線為本站編輯推薦。</p>
+      </main>
+      ${siteFooterHtml()}
+    </div>`;
+  bindEditorialPage();
+}
+
+function renderTimeline(){
+  app.innerHTML = `
+    <div class="editorial-page timeline-page">
+      <div class="song-topbar">
+        <button class="back-btn" type="button" data-editorial-back aria-label="返回首頁">${BACK_SVG}</button>
+        <h1>Atarayo 作品 Timeline</h1>
+        ${themeToggleHtml()}
+      </div>
+      <main class="editorial-content">
+        <header class="editorial-hero timeline-hero">
+          <span class="editorial-kicker">2020 — 2026</span>
+          <h2>從捨不得天亮的夜，走到台北</h2>
+          <p>歌曲、作品與一次次相見，沿著時間排成同一條路。</p>
+        </header>
+        <ol class="history-line">
+          ${ATARAYO_TIMELINE.map(entry => `
+            <li class="history-entry${entry.finale ? " finale" : ""}">
+              <time>${escapeHtml(entry.year)}</time>
+              <div class="history-card">
+                <h2>${escapeHtml(entry.title)}</h2>
+                <p>${escapeHtml(entry.body)}</p>
+                <div class="history-tags">${entry.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
+              </div>
+            </li>`).join("")}
+        </ol>
+        <p class="editorial-source">發行與重要沿革依 <a href="https://atarayo-jp.com/discography" target="_blank" rel="noopener">官方 Discography ↗</a>、<a href="https://atarayo-jp.com/profiles" target="_blank" rel="noopener">官方 Profile ↗</a> 與 <a href="https://atarayo-jp.com/contents/live" target="_blank" rel="noopener">官方 Live 資訊 ↗</a> 整理。</p>
+      </main>
+      ${siteFooterHtml()}
+    </div>`;
+  bindEditorialPage();
+  setupTimelineReveal();
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+function setupTimelineReveal(){
+  const line = document.querySelector(".history-line");
+  const entries = [...document.querySelectorAll(".history-entry")];
+  if (!line || !entries.length) return;
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)){
+    entries.forEach(entry => entry.classList.add("is-visible"));
+    return;
+  }
+
+  line.classList.add("timeline-ready");
+  const observer = new IntersectionObserver(records => {
+    records.forEach(record => {
+      if (!record.isIntersecting) return;
+      record.target.classList.add("is-visible");
+      observer.unobserve(record.target);
+    });
+  }, { rootMargin: "0px 0px -18% 0px", threshold: 0.12 });
+  entries.forEach(entry => observer.observe(entry));
 }
 
 /* 히어로(첫 화면) 내용을 세로 가운데처럼 보이도록 여백을 "한 번만" 계산해 고정합니다.
@@ -1050,7 +1066,6 @@ function setupOneAccordion(card){
       card.classList.add("open");
       btn.setAttribute("aria-expanded", "true");
       if (card.id === "notice-card") setupNotices();
-      if (card.id === "vaws-card") setupVawsPics();
       panel.style.maxHeight = panel.scrollHeight + "px";
       // 이후 내부 콘텐츠 크기 변화(폰트 로딩 등)에도 대응해 살짝 여유를 둠
       // (스크롤은 건드리지 않음 — 화면은 사용자가 직접 내리도록 둠)
@@ -1073,32 +1088,31 @@ function renderGuide(){
 
       <section class="songs-section">
         <div class="songs-head">
-          <h1>應援指南</h1>
-          <p>選擇歌曲，搭配影片查看歌詞與大合唱重點</p>
+          <h1>官方影片預習</h1>
+          <p>選一條路線，用 Atarayo 官方影片開始補歌</p>
           <div class="song-legend">
-            <span class="legend-item"><span class="legend-icon chant">${INLINE_ICONS.mic}</span>大合唱 <b class="legend-num">12</b> 行</span>
-            <span class="legend-item common"><span class="legend-icon clap">${INLINE_ICONS.clap}</span>拍手</span>
-            <span class="legend-item common"><span class="legend-icon wave">${INLINE_ICONS.wave}</span>揮手</span>
-            <span class="legend-item"><span class="legend-icon jump">${INLINE_ICONS.jump}</span>跳躍</span>
-            <span class="legend-item"><span class="legend-icon spin">${INLINE_ICONS.spin}</span>轉臂</span>
+            <span class="legend-item"><span class="legend-icon chant">${INLINE_ICONS.mic}</span>官方頻道</span>
+            <span class="legend-item common">非台北場正式歌單</span>
           </div>
-          <p class="song-legend-note">數字代表目前應援版本的大合唱歌詞行數。<br>切換歌曲時會依目前排序移動。<br>拍手・揮手提示會顯示在歌曲頁面。</p>
-          ${chantVersionControlHtml("guide")}
         </div>
-        <section class="chant-differences" aria-labelledby="chant-differences-title">
-          <div class="chant-differences-head">
-            <h2 id="chant-differences-title">日本版／韓國版差異</h2>
-            <span class="chant-differences-current">目前：<b data-chant-version-label></b></span>
-          </div>
-          <ul>${CHANT_DIFFERENCES.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
-          <p class="chant-differences-footnote">未列入日本版歌單的歌曲會暫沿用現有標記，現場仍以 Vaundy 與觀眾的即時引導為準。</p>
-        </section>
+        <div class="song-collections" role="group" aria-label="選擇預習方向">
+          ${GUIDE_COLLECTIONS.map((collection, index) => `
+            <button class="song-collection" type="button"
+                    data-collection="${escapeHtml(collection.id)}"
+                    aria-pressed="${index === 0 ? "true" : "false"}">${escapeHtml(collection.label)}</button>
+          `).join("")}
+        </div>
+        <div class="song-collection-summary" aria-live="polite">
+          <strong id="song-collection-title"></strong>
+          <p id="song-collection-description"></p>
+          <a id="song-collection-source" target="_blank" rel="noopener"></a>
+        </div>
         <div class="song-search-sentinel" id="song-search-sentinel"></div>
         <div class="song-search">
           <label class="search-label" for="song-search-input">搜尋歌曲</label>
           <div class="song-search-box">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
-            <input id="song-search-input" type="search" inputmode="search" autocomplete="off"
+            <input id="song-search-input" type="search" inputmode="search" autocomplete="off" maxlength="80" spellcheck="false"
                    placeholder="搜尋歌曲名稱・編號">
             <button type="button" class="song-search-clear" id="song-search-clear" aria-label="清除">✕</button>
           </div>
@@ -1106,9 +1120,8 @@ function renderGuide(){
         <div class="song-sorts" role="group" aria-label="歌曲清單排序">
           <button class="song-sort" type="button" data-sort="default">預設</button>
           <button class="song-sort" type="button" data-sort="title" id="sort-title">名稱</button>
-          <button class="song-sort" type="button" data-sort="chant" id="sort-chant">大合唱</button>
         </div>
-        <div class="song-search-meta"><span id="song-count">共 ${SONGS.length} 首</span></div>
+        <div class="song-search-meta"><span id="song-count"></span></div>
         <p class="song-empty" id="song-empty" hidden><b>找不到歌曲</b>請輸入部分歌曲名稱或歌曲編號</p>
         <ul class="song-list" id="song-list"></ul>
       </section>
@@ -1120,6 +1133,18 @@ function renderGuide(){
   document.getElementById("back-btn").addEventListener("click", ()=>{ location.hash = "#/"; });
   applyChantVersionUi();
 
+  app.querySelectorAll(".song-collection").forEach(button=>{
+    button.addEventListener("click", ()=>{
+      songCollection = button.dataset.collection;
+      songSort = "default";
+      store("atarayo-song-collection", songCollection);
+      store("atarayo-song-sort", songSort);
+      const input = document.getElementById("song-search-input");
+      if (input) input.value = "";
+      paintSongList();
+    });
+  });
+
   // 정렬 칩 — '떼창'은 다시 누르면 많은 순 ↔ 적은 순이 바뀐다
   app.querySelectorAll(".song-sort").forEach(b=>{
     b.addEventListener("click", ()=>{
@@ -1128,7 +1153,7 @@ function renderGuide(){
       if (kind === "chant")      songSort = (songSort === "chant-desc") ? "chant-asc" : "chant-desc";
       else if (kind === "title") songSort = (songSort === "title")      ? "title-desc" : "title";
       else                       songSort = kind;
-      store("horo-song-sort", songSort);
+      store("atarayo-song-sort", songSort);
       paintSongList();
     });
   });
@@ -1195,12 +1220,12 @@ function resetSetlistSpoiler(){
 /* 셋리스트에서 곡을 눌러 들어갔을 때, 그 곡이 셋리스트의 몇 번째였는지.
    이전/다음 곡이 셋리스트 순서를 그대로 따라가게 하려고 기억해 둔다. */
 let setlistPos = (()=>{
-  const n = parseInt(store("horo-set-pos"), 10);
+  const n = parseInt(store("atarayo-set-pos"), 10);
   return Number.isFinite(n) && n >= 0 ? n : -1;
 })();
 function setSetlistPos(i){
   setlistPos = i;
-  store("horo-set-pos", String(i));
+  store("atarayo-set-pos", String(i));
 }
 
 /* 토·일로 갈린 자리까지 풀어서 곡 하나하나를 낱개로 만든다.
@@ -1209,7 +1234,11 @@ function setSetlistPos(i){
 function setlistFlat(){
   const out = [];
   SETLIST_TOKYO.items.forEach(it =>
-    it.songs.forEach((e, i) => out.push({ key: it.n + ":" + i, id: e.id }))
+    it.songs.forEach((e, i) => out.push({
+      key: it.n + ":" + i,
+      id: e.id,
+      title: e.title || e.id
+    }))
   );
   return out;
 }
@@ -1221,13 +1250,13 @@ function makeSetlistShuffle(){
     const t = keys[i]; keys[i] = keys[j]; keys[j] = t;
   }
   setlistShuffle = keys;
-  store("horo-set-shuffle2", JSON.stringify(keys));
+  store("atarayo-set-shuffle2", JSON.stringify(keys));
 }
 
 function ensureSetlistShuffle(){
   const flat = setlistFlat();
   if (setlistShuffle && setlistShuffle.length === flat.length) return;
-  const saved = store("horo-set-shuffle2");
+  const saved = store("atarayo-set-shuffle2");
   if (saved){
     try {
       const arr = JSON.parse(saved);
@@ -1257,11 +1286,13 @@ function setlistNavList(){
 
 /* 공연 순서 한 줄 — 번호 + 제목. 토·일로 갈린 자리는 둘을 묶어서 보여 준다. */
 function setlistRowHtml(item){
+  const encore = item.encore ? `<span class="set-encore">ENCORE</span>` : "";
   if (item.songs.length === 1){
     const e = item.songs[0];
     const exists = SONGS.some(s => s.id === e.id);
     return `
       <li class="set-item">
+        ${encore}
         <button class="set-row" data-id="${escapeHtml(e.id)}" ${exists ? "" : "disabled"}>
           <span class="set-num">${pad(item.n)}</span>
           <span class="set-title">${renderSongTitle(setlistTitle(e))}</span>
@@ -1315,26 +1346,19 @@ function paintSetlist(){
 
   const countEl = document.getElementById("setlist-count");
   if (countEl) countEl.textContent = isOrder
-    ? `東京/首爾參考 ${SETLIST_TOKYO.items.length} 首・共 ${total} 首`
+    ? `共 ${total} 首`
     : `共 ${total} 首`;
 
   const metaEl = document.getElementById("setlist-mode-meta");
-  if (metaEl) metaEl.textContent = isOrder ? "劇透" : "隨機";
+  if (metaEl) metaEl.textContent = isOrder ? "演出順序" : "隨機";
 
   const shufEl = document.getElementById("set-shuffle");
   if (shufEl) shufEl.hidden = isOrder;
 
   const desc = document.getElementById("setlist-desc");
   if (desc) desc.innerHTML = isOrder
-    ? `${escapeHtml(SETLIST_TOKYO.dates)}<br>點選歌曲即可前往應援指南`
-    : `${escapeHtml(SETLIST_TOKYO.dates)}<br>目前將歌曲<b>打亂顯示，不公開演出順序</b>`;
-
-  const note = document.getElementById("setlist-note");
-  if (note) note.innerHTML = isOrder
-    ? `※ 這是整理自粉絲紀錄的非官方東京/首爾參考歌單，首爾場順序與東京場相同；台北場實際演出順序仍以官方公告為準。<br>
-       ※ 日期不同而有變化的曲目，已分為<b>六</b>・<b>日</b>。`
-    : `※ 這是整理自粉絲紀錄的非官方東京/首爾參考歌單，首爾場順序與東京場相同；台北場實際演出順序仍以官方公告為準。<br>
-       ※ 演出順序與日期差異曲目皆已隱藏。想查看完整內容，請在上方點選<b>演出順序</b>。`;
+    ? `${escapeHtml(SETLIST_TOKYO.dates)}<br><a href="${SETLIST_TOKYO.sourceUrl}" target="_blank" rel="noopener">查看 setlist.fm 原始紀錄 ↗</a>`
+    : `${escapeHtml(SETLIST_TOKYO.dates)}<br>目前已將參考歌單<b>隨機排列</b>`;
 
   app.querySelectorAll(".set-mode").forEach(b=>{
     const on = b.dataset.mode === setlistMode;
@@ -1363,60 +1387,64 @@ function renderSetlist(){
     <div class="setlist-page">
       <div class="song-topbar">
         <button class="back-btn" id="setlist-back-btn" aria-label="返回首頁" title="返回首頁">${BACK_SVG}</button>
-        <h1>歌單</h1>
+        <h1>參考歌單</h1>
         ${themeToggleHtml()}
       </div>
 
       <section class="spoiler-hero">
         <div class="spoiler-mark">${WARN_SVG}</div>
-        <h2 class="spoiler-title">劇透注意</h2>
+        <h2 class="spoiler-title">前方有 2026 歌單劇透</h2>
         <p class="spoiler-desc">
-          這個頁面包含<b>${SETLIST_TOKYO.label}的歌曲名稱與順序</b>。<br>
-          選擇查看方式前，不會顯示內容。
+          這裡整理的是<b>2026 年 7 月 24 日馬來西亞獨立專場</b>，不是台北場正式歌單。
         </p>
-        <button class="spoiler-safe" type="button" id="spoiler-safe">不看劇透，返回首頁</button>
+        <div class="tour-scope" aria-label="活動歸屬說明">
+          <p><b>本次亞巡</b><span>「夕立が去ったその後で」自 8 月 22 日大阪開跑，官方站次為日本四城、香港三場與台北。</span></p>
+          <p><b>馬來西亞場</b><span>正式名稱為「ATARAYO ONE-MAN LIVE IN JAPAN EXPO MALAYSIA 2026」，是同年度海外專場，但未列入本次亞巡。</span></p>
+        </div>
+        <p class="spoiler-source"><a href="https://atarayo-jp.com/contents/tour/asia_tour2026" target="_blank" rel="noopener">查看官方亞巡日程 ↗</a></p>
+        <p class="spoiler-desc">日本國內場目前沒有可驗證的公開歌單，台北場曲目與順序也可能不同。</p>
+        <button class="spoiler-safe" type="button" id="spoiler-safe">返回首頁</button>
 
         <div class="spoiler-choice">
           <button class="spoiler-open soft" type="button" data-mode="random">
-            <b>只看歌曲名稱<span class="tag">歌曲劇透</span></b>
-            <span>打亂顯示演出順序</span>
+            <b>只看曲目</b>
+            <span>打亂順序，降低劇透</span>
           </button>
           <button class="spoiler-open" type="button" data-mode="order">
-            <b>依演出順序查看<span class="tag">完整劇透</span></b>
-            <span>公開歌曲名稱與完整順序</span>
+            <b>查看完整曲序</b>
+            <span>包含安可位置</span>
           </button>
         </div>
       </section>
 
       <section class="setlist-body" id="setlist-body" hidden inert>
         <div class="setlist-head">
-          <h2>${escapeHtml(SETLIST_TOKYO.label)}歌單</h2>
+          <h2>${escapeHtml(SETLIST_TOKYO.label)}</h2>
           <p id="setlist-desc"></p>
         </div>
 
-        <div class="set-modes" role="group" aria-label="歌單查看方式">
-          <button class="set-mode" type="button" data-mode="order">演出順序<span class="set-mode-badge">劇透</span></button>
+        <div class="set-modes" role="group" aria-label="參考歌單查看方式">
+          <button class="set-mode" type="button" data-mode="order">演出順序</button>
           <button class="set-mode" type="button" data-mode="random">隨機順序</button>
         </div>
         <div class="set-order-confirm" id="set-order-confirm" role="group" aria-label="確認公開演出順序" hidden>
-          <p>演出順序將完整公開。</p>
+          <p>將顯示馬來西亞場的完整演出順序。</p>
           <button type="button" id="set-order-cancel">取消</button>
-          <button type="button" id="set-order-reveal">公開順序</button>
+          <button type="button" id="set-order-reveal">確認切換</button>
         </div>
 
         <div class="set-shuffle" id="set-shuffle" hidden>
-          <span><b>已將順序打亂。</b>先看看有哪些歌曲，把順序留到演出當天揭曉吧。</span>
+          <span><b>已將參考曲目打亂。</b>不會顯示原始曲序。</span>
           <button type="button" id="set-reshuffle">重新打亂</button>
         </div>
 
         <div class="setlist-meta">
           <span id="setlist-count"></span>
-          <span id="setlist-mode-meta">劇透</span>
+          <span id="setlist-mode-meta">預習</span>
         </div>
 
         <ul class="set-list" id="set-list"></ul>
 
-        <p class="setlist-note" id="setlist-note"></p>
       </section>
     </div>
   `;
@@ -1540,13 +1568,13 @@ function updateTodayCard(now){
   if (!steps){ card.hidden = true; todayBuiltKey = null; return; }
   card.hidden = false;
 
-  const times   = steps.map(v => new Date(`${key}T${v.t}:00+09:00`).getTime());
+  const times   = steps.map(v => new Date(`${key}T${v.t}:00+08:00`).getTime());
   const nextIdx = times.findIndex(t => t > now);
   const curIdx  = nextIdx === -1 ? steps.length - 1 : nextIdx - 1;
 
   if (todayBuiltKey !== key){
     todayBuiltKey = key;
-    const d = new Date(`${key}T12:00:00+09:00`);
+    const d = new Date(`${key}T12:00:00+08:00`);
     const dow = ["日","一","二","三","四","五","六"][d.getDay()];
     document.getElementById("today-title").textContent =
       `今日演出・${Number(key.slice(5,7))}/${Number(key.slice(8,10))}（${dow}）`;
@@ -1574,7 +1602,7 @@ function setupHomeExtras(){
   const copyBtn = document.getElementById("copy-addr");
   if (copyBtn){
     copyBtn.addEventListener("click", async ()=>{
-      const addr = "105037 臺北市松山區南京東路4段2號 台北小巨蛋 Taipei Arena";
+      const addr = "115 臺北市南港區市民大道八段99號 台北流行音樂中心 Taipei Music Center";
       try { await navigator.clipboard.writeText(addr); copyBtn.textContent = "已複製 ✓"; }
       catch(e){ copyBtn.textContent = addr; }
       setTimeout(()=>{ copyBtn.textContent = "複製地址"; }, 1600);
@@ -1586,8 +1614,8 @@ function setupHomeExtras(){
   if (shareBtn){
     shareBtn.addEventListener("click", async ()=>{
       const data = {
-        title: "VAUNDY \"HORO\" TAIPEI 應援指南",
-        text: "搭配影片查看各曲歌詞與大合唱、拍手、揮手重點",
+        title: "Atarayo ASIA TOUR 2026 台北場粉絲指南",
+        text: "演出資訊、座位、交通與官方影片預習",
         url: location.href.split("#")[0]
       };
       try {
@@ -1617,10 +1645,11 @@ function paintSongList(){
   const ul = document.getElementById("song-list");
   if (!ul) return;
 
-  ul.innerHTML = sortedSongs().map(s=>`
-    <li data-no="${songNo(s)}">
+  const list = sortedSongs();
+  ul.innerHTML = list.map((s, index)=>`
+    <li data-no="${index + 1}">
       <button class="song-row" data-id="${escapeHtml(s.id)}">
-        <span class="song-num">${pad(songNo(s))}</span>
+        <span class="song-num">${pad(index + 1)}</span>
         <span class="song-title">${renderSongTitle(s.title)}</span>
         ${songMarksHtml(s)}
       </button>
@@ -1659,6 +1688,22 @@ function paintSongList(){
       : "名稱";
   }
 
+  const collection = activeGuideCollection();
+  app.querySelectorAll(".song-collection").forEach(button=>{
+    const on = button.dataset.collection === collection.id;
+    button.classList.toggle("active", on);
+    button.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  const collectionTitle = document.getElementById("song-collection-title");
+  const collectionDescription = document.getElementById("song-collection-description");
+  const collectionSource = document.getElementById("song-collection-source");
+  if (collectionTitle) collectionTitle.textContent = collection.title;
+  if (collectionDescription) collectionDescription.textContent = collection.description;
+  if (collectionSource){
+    collectionSource.href = collection.sourceUrl;
+    collectionSource.textContent = `${collection.sourceLabel} · 查閱於 ${collection.checkedAt} ↗`;
+  }
+
   applyGuideFilter();
 }
 
@@ -1672,7 +1717,7 @@ function applyGuideFilter(){
   if (!input || !items.length) return;
 
   // "5", "05", "5번" 모두 5번 곡으로 인식
-  const q = squash(input.value).replace(/번$/, "");
+  const q = squash(input.value.slice(0, 80)).replace(/번$/, "");
   const isNum = /^\d{1,2}$/.test(q);
   let hit = 0;
 
@@ -1772,7 +1817,7 @@ function applySheetFilter(){
   const items = songView.querySelectorAll("#song-sheet-list > li");
   if (!input || !items.length) return;
 
-  const q = squash(input.value).replace(/번$/, "");
+  const q = squash(input.value.slice(0, 80)).replace(/번$/, "");
   const isNum = /^\d{1,2}$/.test(q);
   let hit = 0;
 
@@ -1893,7 +1938,7 @@ function goNeighbor(dir){
 function buildSongShell(){
   if (songShellBuilt) return;
   songShellBuilt = true;
-  venueMode = store("horo-venue") === "1";   // 지난번 설정 그대로
+  venueMode = store("atarayo-venue") === "1";   // 지난번 설정 그대로
 
   songView.innerHTML = `
     <div class="song-page" id="song-page">
@@ -1921,33 +1966,32 @@ function buildSongShell(){
             <div class="video-frame">
               <div id="yt-player"></div>
               <details class="karaoke-source-popover" id="karaoke-source-popover">
-                <summary aria-label="查看同步資訊與中譯歌詞作者" title="同步資訊與中譯歌詞作者">${INFO_SVG}</summary>
+                <summary aria-label="查看影片來源" title="查看影片來源">${INFO_SVG}</summary>
                 <span class="karaoke-source-status" id="karaoke-source-status" role="status" aria-live="polite">
                   <span id="karaoke-source-status-text"></span>
                   <span class="lyrics-credit" id="lyrics-credit" hidden></span>
-                  <span class="chant-source-info">
-                    <b>應援版本說明</b>：預設為日本版，可在歌詞上方切換日本版／韓國版；切換後大合唱標記會同步更新。<br>
-                    <a href="${CHANT_REFERENCE_URL}" target="_blank" rel="noopener">日本版參考：Canva《VAUNDY 應援教學》↗</a>
-                  </span>
+                  <span class="chant-source-info"><b>影片來源</b>：<a href="${CHANT_REFERENCE_URL}" target="_blank" rel="noopener">Atarayo 官方 YouTube 頻道 ↗</a></span>
                 </span>
               </details>
               <div class="video-status" id="video-status" role="status">正在載入影片…</div>
             </div>
-            <a class="watch-on-yt" id="watch-on-yt" href="#" target="_blank" rel="noopener">在 YouTube 觀看 ↗</a>
+            <div class="listening-links" aria-label="其他聆聽平台">
+              <a class="listening-link youtube" id="watch-on-yt" href="#" target="_blank" rel="noopener">YouTube ↗</a>
+              <a class="listening-link spotify" id="listen-on-spotify" href="#" target="_blank" rel="noopener">Spotify ↗</a>
+              <a class="listening-link apple-music" id="listen-on-apple-music" href="#" target="_blank" rel="noopener">Apple Music ↗</a>
+            </div>
+            <details class="song-story" id="song-story" open>
+              <summary><span>這首歌在唱什麼？</span><small>故事・心境・情緒轉折</small></summary>
+              <p id="song-story-text"></p>
+              <span class="song-story-note">本站依官方影片與歌詞意象撰寫的非官方導讀，不是官方解說或逐句翻譯。</span>
+            </details>
           </div>
 
           <div class="lyrics-note">
-            <span class="dot">●</span>
-            <span>點選歌詞跳至影片位置，醒目歌詞隨影片同步。</span>
+            <span id="lyrics-note-text">正在載入歌詞與時間碼…</span>
           </div>
 
-          <div class="lyrics-legend">
-            <span class="legend-item"><span class="legend-icon chant">${INLINE_ICONS.mic}</span>大合唱</span>
-            <span class="legend-item"><span class="legend-icon clap">${INLINE_ICONS.clap}</span>拍手</span>
-            <span class="legend-item"><span class="legend-icon wave">${INLINE_ICONS.wave}</span>揮手</span>
-          </div>
-          ${chantVersionControlHtml("song")}
-          <div class="chant-version-note" id="chant-version-note" role="status" aria-live="polite"></div>
+          <div class="chant-version-note" id="chant-version-note" hidden></div>
         </div>
 
         <div class="lyrics-pane">
@@ -2015,14 +2059,14 @@ function buildSongShell(){
           <span class="song-sheet-grip"></span>
           <div class="song-sheet-head">
             <span class="song-sheet-title" id="song-sheet-title">選擇歌曲</span>
-            <span class="song-sheet-count">${SONGS.length} 首</span>
+            <span class="song-sheet-count" id="song-sheet-count">${SONGS.length} 首</span>
             <button class="song-sheet-close" data-close-sheet aria-label="關閉">${CLOSE_SVG}</button>
           </div>
           <div class="sheet-search">
             <label class="search-label" for="sheet-search-input">搜尋歌曲</label>
             <div class="song-search-box">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
-              <input id="sheet-search-input" type="search" inputmode="search" autocomplete="off"
+              <input id="sheet-search-input" type="search" inputmode="search" autocomplete="off" maxlength="80" spellcheck="false"
                      placeholder="搜尋歌曲名稱・編號">
               <button type="button" class="song-search-clear" id="sheet-search-clear" aria-label="清除">✕</button>
             </div>
@@ -2156,33 +2200,33 @@ function buildSongShell(){
 
   document.getElementById("venue-btn").addEventListener("click", (e)=>{
     venueMode = !venueMode;
-    store("horo-venue", venueMode ? "1" : "");
+    store("atarayo-venue", venueMode ? "1" : "");
     applyVenueMode();
   });
 
   document.getElementById("reading-btn").addEventListener("click", ()=>{
     const current = READING_MODES.indexOf(readingMode);
     readingMode = READING_MODES[(current + 1) % READING_MODES.length];
-    store("horo-reading", readingMode);
+    store("atarayo-reading", readingMode);
     updateReadingUi();
     repaintJapaneseReadings();
   });
 
   document.getElementById("japanese-toggle").addEventListener("click", ()=>{
     showJapanese = !showJapanese;
-    store("horo-show-japanese", showJapanese ? "1" : "0");
+    store("atarayo-show-japanese", showJapanese ? "1" : "0");
     updateLyricDisplayUi();
   });
 
   document.getElementById("chinese-toggle").addEventListener("click", ()=>{
     showChinese = !showChinese;
-    store("horo-show-chinese", showChinese ? "1" : "0");
+    store("atarayo-show-chinese", showChinese ? "1" : "0");
     updateLyricDisplayUi();
   });
 
   document.getElementById("karaoke-btn").addEventListener("click", ()=>{
     karaokeEnabled = !karaokeEnabled;
-    store("horo-karaoke", karaokeEnabled ? "1" : "0");
+    store("atarayo-karaoke", karaokeEnabled ? "1" : "0");
     updateKaraokeUi();
   });
 
@@ -2247,13 +2291,13 @@ function repaintChantVersionLines(song = currentSong){
 }
 
 function setChantVersion(next){
-  if (next !== "jp" && next !== "kr" || next === chantVersion) {
+  if (next !== "jp" || next === chantVersion) {
     applyChantVersionUi();
     return;
   }
 
   chantVersion = next;
-  store("horo-chant-version", chantVersion);
+  store("atarayo-chant-version", chantVersion);
   songMarksCache.clear();
   chantBlockCache.clear();
   chantIdx = -1;
@@ -2429,14 +2473,73 @@ function applySongTempo(song){
   iconClockStartedAt = performance.now();
 }
 
+function listeningSearchUrl(service, song){
+  const query = `${song.artist || "あたらよ"} ${song.title}`;
+  if (service === "spotify") {
+    return `https://open.spotify.com/search/${encodeURIComponent(query)}`;
+  }
+  return `https://music.apple.com/tw/search?term=${encodeURIComponent(query)}`;
+}
+
+function setLyricsNote(text){
+  const note = document.getElementById("lyrics-note-text");
+  if (!note) return;
+  note.textContent = text || "";
+  const row = note.closest(".lyrics-note");
+  if (row) row.hidden = !text;
+}
+
+async function prepareSongReadings(song){
+  const seq = ++japaneseReadingSeq;
+  const engine = await loadFurigana();
+  if (!engine || currentSong !== song || seq !== japaneseReadingSeq) return;
+  japaneseReadingEngine = engine;
+  try {
+    await engine.prepareJapaneseReadings((song.lyrics || []).map(line => line.jp || ""));
+  } catch (error) {
+    return;
+  }
+  if (currentSong === song && seq === japaneseReadingSeq) repaintJapaneseReadings();
+}
+
+function isTimedLyricMetadata(text){
+  const value = String(text || "").trim();
+  return /^(?:詞|作詞|編曲|词|作词|编曲|曲|作曲|lyricist|composer|arranger)\s*[：:]/iu.test(value)
+    || /[-－—]\s*(?:あたらよ|Atarayo)(?:\s*\(\s*Atarayo\s*\))?\s*$/iu.test(value);
+}
+
+function renderLyricsList(song){
+  const list = document.getElementById("lyrics-list");
+  if (!list || !song || !Array.isArray(song.lyrics)) return;
+
+  list.innerHTML = song.lyrics.map((l,i)=>`
+    <li>
+      <button class="lyric-line${lineIsChant(l, song) ? " is-chant" : ""}" data-time="${l.time}" data-idx="${i}">
+        <span class="lyric-icons">${lyricIconsHtml(l, song)}</span>
+        <span class="lyric-body">
+          <span class="lyric-jp" lang="ja">${renderJapaneseLine(l.jp || "")}</span>
+          <span class="lyric-romaji" lang="ja-Latn">${readingMode === "both" ? renderRomajiLine(l.jp || "", false) : ""}</span>
+          <span class="lyric-zh">${withIcons(l.tr || "")}</span>
+          ${l.bg ? `<span class="lyric-bg">${renderKo(l.bg)}</span>` : ""}
+        </span>
+      </button>
+    </li>`).join("");
+
+  lastActiveIdx = -1;
+  karaokeActiveLine = null;
+  decorateKaraokeLines(song);
+  updateReadingUi();
+  updateLyricDisplayUi();
+  updateKaraokeUi();
+  updateLyricsPadding();
+  observeLyricLines();
+}
+
 function renderSong(song){
   buildSongShell();
 
-  loadFurigana().then(()=>{
-    if (currentSong === song) repaintJapaneseReadings();
-  });
-
   currentSong = song;
+  prepareSongReadings(song);
   lastActiveIdx = -1;
   karaokeActiveLine = null;
   karaokeTiming = null;
@@ -2483,26 +2586,26 @@ function renderSong(song){
   document.getElementById("next-song").title = `下一首：${next.title}`;
   document.getElementById("watch-on-yt").href =
     `https://www.youtube.com/watch?v=${encodeURIComponent(song.youtubeId)}`;
+  document.getElementById("listen-on-spotify").href = listeningSearchUrl("spotify", song);
+  document.getElementById("listen-on-apple-music").href = listeningSearchUrl("apple-music", song);
+  const story = document.getElementById("song-story");
+  const storyText = document.getElementById("song-story-text");
+  const storyCopy = SONG_STORIES[song.id] || "";
+  if (storyText) storyText.textContent = storyCopy;
+  if (story) {
+    story.hidden = !storyCopy;
+    story.open = Boolean(storyCopy);
+  }
 
-  document.getElementById("lyrics-list").innerHTML = song.lyrics.map((l,i)=>`
-    <li>
-      <button class="lyric-line${lineIsChant(l, song) ? " is-chant" : ""}" data-time="${l.time}" data-idx="${i}">
-        <span class="lyric-icons">${lyricIconsHtml(l, song)}</span>
-        <span class="lyric-body">
-          <span class="lyric-jp" lang="ja">${renderJapaneseLine(l.jp || "")}</span>
-          <span class="lyric-romaji" lang="ja-Latn">${readingMode === "both" ? renderRomajiLine(l.jp || "", false) : ""}</span>
-          <span class="lyric-zh">${withIcons(l.tr || "")}</span>
-          ${l.bg ? `<span class="lyric-bg">${renderKo(l.bg)}</span>` : ""}
-        </span>
-      </button>
-    </li>`).join("");
-  decorateKaraokeLines(song);
+  renderLyricsList(song);
+  setLyricsNote("正在載入日文歌詞與時間碼…");
   setKaraokeSourceStatus("loading", "歌詞逐字時間：正在尋找開源時間碼…");
 
-  document.getElementById("song-sheet-list").innerHTML = sheetSongs().map((s, i)=>`
-    <li data-no="${songNo(s)}">
+  const selectableSongs = sheetSongs();
+  document.getElementById("song-sheet-list").innerHTML = selectableSongs.map((s, i)=>`
+    <li data-no="${i + 1}">
       <button class="song-sheet-item${s.id === song.id ? " current" : ""}" data-id="${s.id}" data-pos="${i}"${s.id === song.id ? ' aria-current="true"' : ""}>
-        <span class="song-sheet-num">${pad(songNo(s))}</span>
+        <span class="song-sheet-num">${pad(i + 1)}</span>
         <span class="song-sheet-name">${renderSongTitle(s.title)}</span>
         ${s.id === song.id ? `<span class="song-sheet-now">目前播放</span>` : ""}
       </button>
@@ -2511,6 +2614,8 @@ function renderSong(song){
   const sheetTitle = document.getElementById("song-sheet-title");
   if (sheetTitle) sheetTitle.textContent =
     songFrom === "setlist" ? "歌單歌曲" : "選擇歌曲";
+  const sheetCount = document.getElementById("song-sheet-count");
+  if (sheetCount) sheetCount.textContent = `${selectableSongs.length} 首`;
 
   closeSongSheet();
   applySheetFilter();
@@ -2893,16 +2998,32 @@ function withIcons(str){
   if (str === undefined || str === null) return "";
   return escapeHtml(spaceCjkLatinText(str)).replace(ICON_TOKEN_RE, (m, key)=> INLINE_ICONS[key.toLowerCase()] || m);
 }
+
+function sanitiseRubyMarkup(markup){
+  const template = document.createElement("template");
+  template.innerHTML = String(markup || "");
+  const allowed = new Set(["RUBY", "RT", "RP"]);
+  const serialise = node => {
+    if (node.nodeType === Node.TEXT_NODE) return escapeHtml(node.nodeValue || "");
+    if (node.nodeType !== Node.ELEMENT_NODE) return "";
+    const body = [...node.childNodes].map(serialise).join("");
+    return allowed.has(node.tagName) ? `<${node.tagName.toLowerCase()}>${body}</${node.tagName.toLowerCase()}>` : body;
+  };
+  return [...template.content.childNodes].map(serialise).join("");
+}
+
 function renderKanaLine(str){
   const source = String(str ?? "");
-  const ruby = window.JP_FURIGANA && window.JP_FURIGANA[source];
+  const generated = japaneseReadingEngine && japaneseReadingEngine.furiganaFor(source);
+  const ruby = generated || (window.JP_FURIGANA && window.JP_FURIGANA[source]);
   if (!ruby) return withIcons(source);
-  return spaceCjkLatinMarkup(ruby).replace(ICON_TOKEN_RE, (m, key)=> INLINE_ICONS[key.toLowerCase()] || m);
+  return spaceCjkLatinMarkup(sanitiseRubyMarkup(ruby)).replace(ICON_TOKEN_RE, (m, key)=> INLINE_ICONS[key.toLowerCase()] || m);
 }
 
 function renderRomajiLine(str, includeIcons = true){
   const source = String(str ?? "");
-  const romaji = window.JP_ROMAJI && window.JP_ROMAJI[source];
+  const generated = japaneseReadingEngine && japaneseReadingEngine.romajiFor(source);
+  const romaji = generated || (window.JP_ROMAJI && window.JP_ROMAJI[source]);
   const value = typeof romaji === "string" ? romaji : source;
   return includeIcons
     ? withIcons(value)
@@ -3021,11 +3142,12 @@ async function loadKaraokeTiming(song){
 
   const api = await loadKaraokeSources();
   if (!api || typeof api.load !== "function" || typeof api.alignToLocalLyrics !== "function"){
-    setKaraokeSourceStatus("miss", "歌詞逐字時間：目前使用本地估算同步");
+    setKaraokeSourceStatus("miss", "歌詞與時間碼：載入模組失敗");
+    setLyricsNote("歌詞暫時無法載入；仍可播放影片或前往串流平台聆聽。");
     return;
   }
 
-  let duration = getPlayerDuration();
+  let duration = getPlayerDuration() || Number(song.duration) || null;
   let timed = null;
   try {
     timed = await api.load(song, {
@@ -3034,7 +3156,7 @@ async function loadKaraokeTiming(song){
         if (seq !== karaokeLoadSeq || !event) return;
         if (event.state === "cache") setKaraokeSourceStatus("loading", "歌詞逐字時間：已讀取本機快取，正在校正影片偏移…");
         else if (event.state === "fallback") setKaraokeSourceStatus("fallback", "歌詞逐字時間：前順位來源沒有結果，改查 AMLL TTML DB…");
-        else if (event.state === "offline") setKaraokeSourceStatus("miss", "歌詞逐字時間：離線且沒有快取，使用本地估算同步");
+        else if (event.state === "offline") setKaraokeSourceStatus("miss", "歌詞與時間碼：離線且沒有本機快取");
       }
     });
   } catch (error) {
@@ -3043,9 +3165,49 @@ async function loadKaraokeTiming(song){
   if (seq !== karaokeLoadSeq || !song || currentSong !== song) return;
 
   if (!timed){
-    setKaraokeSourceStatus("miss", "歌詞逐字時間：找不到可用來源，使用本地估算同步");
+    setKaraokeSourceStatus("miss", "歌詞與時間碼：這首歌目前找不到可用來源");
+    setLyricsNote("這首歌目前查無同步歌詞；仍可播放影片或前往串流平台聆聽。");
     return;
   }
+
+  if (song.lyricsMode === "remote-timed"){
+    const lyricLines = [];
+    const timingLines = [];
+    timed.lines.forEach(line => {
+      const text = String(line.text || (line.words || []).map(word => word.text || "").join("")).trim();
+      const start = Number(line.start);
+      if (!text || !Number.isFinite(start) || isTimedLyricMetadata(text)) return;
+      lyricLines.push({ time: start, jp: text, tr: traditionalChineseFor(song.id, text) });
+      timingLines.push(line);
+    });
+    if (!lyricLines.length){
+      setKaraokeSourceStatus("miss", "歌詞與時間碼：來源沒有可顯示的內容");
+      setLyricsNote("這首歌目前查無同步歌詞；仍可播放影片或前往串流平台聆聽。");
+      return;
+    }
+
+    song.lyrics = lyricLines;
+    karaokeTiming = {
+      ...timed,
+      songId: song.id,
+      matchedLines: lyricLines.length,
+      totalLines: lyricLines.length,
+      lines: timingLines
+    };
+    chantBlockCache.clear();
+    songMarksCache.clear();
+    renderLyricsList(song);
+    applyKaraokeTimingToDom(song);
+    prepareSongReadings(song);
+    const source = timed.source || "開源歌詞來源";
+    const timingLabel = timed.precision === "estimated-line" ? "估算逐句時間"
+      : timed.precision === "line" ? "逐句時間" : "逐字時間";
+    setKaraokeSourceStatus("ready", `歌詞與${timingLabel}：${source}（${lyricLines.length} 行）`);
+    setLyricsNote("");
+    updateLyricsSync(true);
+    return;
+  }
+
   const aligned = api.alignToLocalLyrics(timed, song.lyrics);
   if (!aligned){
     setKaraokeSourceStatus("miss", "歌詞逐字時間：來源歌詞與本頁不相符，使用本地估算同步");
@@ -3348,24 +3510,11 @@ function lyricIconsHtml(line, song = currentSong){
   return html;
 }
 
-function lineIsChantKr(line){
-  if (!line) return false;
-  if (line.bg) return true;
-  const hit = (part)=>{
-    if (typeof part === "string")
-      return hasIconToken(part, "mic") || hasIconToken(part, "chant");
-    if (!Array.isArray(part)) return false;
-    return part.some(seg => seg && (seg.tag === "chant"
-      || hasIconToken(seg.text, "mic") || hasIconToken(seg.text, "chant")));
-  };
-  return hit(line.ko) || hit(line.jp) || hit(line.tr);
-}
-
 function lineIsChantJp(line, song){
   if (!line || !song) return false;
   const guide = JP_CHANT_GUIDES[song.id];
-  // Canva 沒有整理到的歌曲，先沿用原有標記，但在畫面上明確說明。
-  if (!guide) return lineIsChantKr(line);
+  // 沒有人工查證資料的歌曲不推測合唱段落。
+  if (!guide) return false;
   const time = Number(line.time);
   return Number.isFinite(time) && guide.chantTimes.some(mark => Math.abs(Number(mark) - time) < 0.01);
 }
@@ -3374,12 +3523,9 @@ function lineIsChantJp(line, song){
    "떼창만 듣기" 가 쓰는 계산. 한 줄이 떼창인지 판단하는 기준은
    곡 목록 배지(songMarks)와 똑같다 — 기준이 갈리면 배지에는 떼창이
    있다고 뜨는데 재생은 건너뛰는 일이 생기므로 여기 한 곳에 모아 둔다.
-     · 日本版：使用 JP_CHANT_GUIDES 的歌詞時間點
-     · 韓國版：沿用 ko/jp/tr 的 [mic]、[chant]、tag:"chant" 與 bg */
+     只使用 JP_CHANT_GUIDES 內人工確認過的時間點。 */
 function lineIsChant(line, song = currentSong){
-  return chantVersion === "jp"
-    ? lineIsChantJp(line, song)
-    : lineIsChantKr(line);
+  return lineIsChantJp(line, song);
 }
 
 const CHANT_LEAD_SEC  = 1.2;   // 떼창 직전 한 박자 먼저 들어가 준비할 시간
@@ -3466,12 +3612,20 @@ function songMarks(song){
    "default" 등록순 · "title" 가나다순 · "chant-desc/asc" 떼창 줄 수
    여기서 정한 순서를 곡 화면의 이전/다음 곡, 곡 목록 시트도 함께 따른다. */
 let songSort = (()=>{
-  const v = store("horo-song-sort");
+  const v = store("atarayo-song-sort");
   return ["default","title","title-desc","chant-desc","chant-asc"].includes(v) ? v : "default";
 })();
 
-/* 곡의 원래 번호(1부터). 정렬을 바꿔도 이 번호는 그대로라 번호 검색이 계속 통한다. */
-function songNo(song){ return SONGS.findIndex(s => s.id === song.id) + 1; }
+let songCollection = (()=>{
+  const value = store("atarayo-song-collection");
+  return GUIDE_COLLECTIONS.some(collection => collection.id === value)
+    ? value
+    : GUIDE_COLLECTIONS[0].id;
+})();
+
+function activeGuideCollection(){
+  return GUIDE_COLLECTIONS.find(collection => collection.id === songCollection) || GUIDE_COLLECTIONS[0];
+}
 
 const startsHangul = (t)=> /^[\u3131-\u318E\uAC00-\uD7A3]/.test(String(t).trim());
 function byTitle(a, b){
@@ -3482,7 +3636,8 @@ function byTitle(a, b){
 }
 
 function sortedSongs(){
-  const list = SONGS.slice();
+  const songById = new Map(SONGS.map(song => [song.id, song]));
+  const list = activeGuideCollection().songIds.map(id => songById.get(id)).filter(Boolean);
   if (songSort === "title")      return list.sort(byTitle);
   if (songSort === "title-desc") return list.sort((a,b)=> byTitle(b,a));
   if (songSort === "chant-desc") return list.sort((a,b)=> songMarks(b).chant - songMarks(a).chant || byTitle(a,b));
@@ -3540,12 +3695,39 @@ function showVideoStatus(){
   const status = document.getElementById("video-status");
   if (!status) return;
   clearTimeout(videoStatusTimer);
+  status.classList.remove("is-fallback");
   status.hidden = playerReady;
   if (playerReady) return;
   status.textContent = "正在載入影片…";
   videoStatusTimer = setTimeout(()=>{
     if (!playerReady && status.isConnected) status.textContent = "影片連線延遲，請在下方開啟 YouTube。";
   }, 8000);
+}
+
+function showVideoFallback(song, message){
+  const status = document.getElementById("video-status");
+  if (!status || !song) return;
+  clearTimeout(videoStatusTimer);
+  status.hidden = false;
+  status.classList.add("is-fallback");
+  status.replaceChildren();
+  const thumbnail = document.createElement("img");
+  thumbnail.src = `https://i.ytimg.com/vi/${encodeURIComponent(song.youtubeId)}/hqdefault.jpg`;
+  thumbnail.alt = "";
+  thumbnail.loading = "eager";
+  const shade = document.createElement("span");
+  shade.className = "video-fallback-shade";
+  const copy = document.createElement("span");
+  copy.className = "video-fallback-copy";
+  copy.textContent = message;
+  const link = document.createElement("a");
+  link.className = "video-fallback-link";
+  link.href = `https://www.youtube.com/watch?v=${encodeURIComponent(song.youtubeId)}`;
+  link.target = "_blank";
+  link.rel = "noopener";
+  link.textContent = "在 YouTube 觀看 ▶";
+  shade.append(copy, link);
+  status.append(thumbnail, shade);
 }
 
 function ensurePlayer(){
@@ -3583,12 +3765,11 @@ function onPlayerReady(){
   }
 }
 
-function onPlayerError(){
-  clearTimeout(videoStatusTimer);
-  const status = document.getElementById("video-status");
-  if (!status) return;
-  status.hidden = false;
-  status.textContent = "無法播放影片，請在下方開啟 YouTube。";
+function onPlayerError(event){
+  const reason = event?.data === 101 || event?.data === 150
+    ? "YouTube 拒絕此網址的內嵌播放"
+    : "影片暫時無法載入";
+  showVideoFallback(currentSong, reason);
 }
 
 /* ── 볼륨 기억하기 ────────────────────────────────────────────
@@ -3855,9 +4036,7 @@ function seekTo(seconds) {
   }
 }
 
-/* ── 오프라인 캐시 · 홈 화면 설치 · 안내 배너 ─────────────────
-   서비스워커는 https 로 올렸을 때만 동작합니다.
-   (파일을 그냥 열었을 때(file://)는 조용히 건너뜁니다) */
+/* ── 共用訊息提示 ─────────────────────────────────────────── */
 const banner    = document.getElementById("app-banner");
 const bannerMsg = document.getElementById("app-banner-msg");
 const bannerBtn = document.getElementById("app-banner-action");
@@ -3885,101 +4064,6 @@ if (bannerX) bannerX.addEventListener("click", ()=>{
   if (bannerDismissAction) bannerDismissAction();
   else hideBanner();
 });
-
-const INSTALL_HINT_KEY = "horo-install-hint";
-function isStandaloneApp(){
-  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-}
-function installDeviceType(){
-  const ua = navigator.userAgent || "";
-  const ios = /iphone|ipad|ipod/i.test(ua)
-    || (/macintosh/i.test(ua) && Number(navigator.maxTouchPoints) > 1);
-  const android = /android/i.test(ua)
-    && (/mobile/i.test(ua) || (navigator.userAgentData && navigator.userAgentData.mobile === true));
-  return { ios, android };
-}
-function canShowInstallHint(){
-  if (!navigator.onLine || isStandaloneApp()) return false;
-  const device = installDeviceType();
-  return device.ios || device.android;
-}
-function installHintDismissed(){ return store(INSTALL_HINT_KEY) === "done"; }
-function dismissInstallHint(){
-  store(INSTALL_HINT_KEY, "done");
-  hideBanner();
-}
-function showInstallHint(html, btnLabel, onClick){
-  if (!canShowInstallHint() || installHintDismissed()) return;
-  showBanner(html, btnLabel, onClick, "install", dismissInstallHint);
-}
-
-/* 1) 서비스워커 등록 — 오프라인에서도 가사가 열리게 */
-if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
-  window.addEventListener("load", ()=>{
-    navigator.serviceWorker.register("./sw.js").then((reg)=>{
-      reg.addEventListener("updatefound", ()=>{
-        const sw = reg.installing;
-        if (!sw) return;
-        sw.addEventListener("statechange", ()=>{
-          // 이미 쓰고 있는 상태에서 새 버전이 준비된 경우에만 안내
-          if (sw.state === "installed" && navigator.serviceWorker.controller){
-            showBanner("<b>新版本</b>已準備完成，歌詞或介面可能已更新。",
-                       "重新整理",
-                       ()=>{ sw.postMessage({ type:"SKIP_WAITING" }); });
-          }
-        });
-      });
-    }).catch(()=>{});
-
-    let reloading = false;
-    navigator.serviceWorker.addEventListener("controllerchange", ()=>{
-      if (reloading) return;
-      reloading = true;
-      location.reload();
-    });
-  });
-}
-
-/* 2) 오프라인이 되면 알려 주기 — 가사는 되지만 영상은 안 된다는 안내 */
-function updateOnlineState(){
-  if (!navigator.onLine){
-    showBanner("目前處於<b>離線</b>狀態。仍可查看歌詞與應援提示，但無法播放影片。",
-               "", null, "offline");
-  } else if (banner && banner.classList.contains("offline")){
-    hideBanner();
-  }
-}
-window.addEventListener("online",  updateOnlineState);
-window.addEventListener("offline", updateOnlineState);
-
-/* 3) 아이폰은 설치 안내가 자동으로 뜨지 않으므로 한 번만 알려 줌 */
-function maybeShowInstallHint(){
-  const device = installDeviceType();
-  if (!device.ios || !canShowInstallHint() || installHintDismissed()) return;
-  showInstallHint("點選分享按鈕 <b>⎋</b> → <b>加入主畫面</b>，即可像 App 一樣使用。",
-                  "知道了",
-                  dismissInstallHint);
-}
-
-/* 안드로이드 크롬 — 설치 배너를 직접 띄움 */
-let deferredInstall = null;
-window.addEventListener("beforeinstallprompt", (e)=>{
-  e.preventDefault();
-  if (!canShowInstallHint() || installHintDismissed()) return;
-  deferredInstall = e;
-  showInstallHint("<b>安裝</b>到主畫面後，就能在場館直接開啟。",
-                  "安裝",
-                  async ()=>{
-                    const promptEvent = deferredInstall;
-                    dismissInstallHint();
-                    deferredInstall = null;
-                    if (!promptEvent) return;
-                    try { promptEvent.prompt(); await promptEvent.userChoice; } catch(err){}
-                  });
-});
-window.addEventListener("appinstalled", dismissInstallHint);
-
-setTimeout(()=>{ updateOnlineState(); maybeShowInstallHint(); }, 1500);
 
 window.addEventListener("hashchange", router);
 
