@@ -21,7 +21,9 @@ import {
   CHEV_RIGHT_SVG,
   TRACK_PREV_SVG,
   TRACK_NEXT_SVG,
-  CLOSE_SVG
+  CLOSE_SVG,
+  SUN_SVG,
+  MOON_SVG
 } from "./ui/icons.js";
 
 import {
@@ -56,7 +58,9 @@ let player = null;
 let syncTimer = null;
 let autoScrollEnabled = true;
 let venueMode = false;          // 단축모드 (첫 실행 때 저장값을 읽어 옴)
-let readingMode = store("horo-reading") === "romaji" ? "romaji" : "kana";
+const READING_MODES = ["kana", "romaji", "both"];
+const storedReadingMode = store("horo-reading");
+let readingMode = READING_MODES.includes(storedReadingMode) ? storedReadingMode : "kana";
 let showJapanese = store("horo-show-japanese") !== "0";
 let showChinese = store("horo-show-chinese") !== "0";
 // 卡拉OK 預設關閉；若使用者曾手動選擇，則沿用保存的設定。
@@ -79,12 +83,13 @@ const SYNC_INTERVAL_MS   = 100;
 /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
    새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
    sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-const BUILD = "v1.6.10";
+const BUILD = "v1.6.12";
 
 const REPO_URL = "https://github.com/watain666/Vaundy-Taiwan-2026";
 const FEEDBACK_URL = `${REPO_URL}/issues`;
 const ORIGINAL_SITE_URL = "https://vaundy-seoul-2026.pages.dev/";
 const TRANSLATION_CREDIT_URL = "https://home.gamer.com.tw/profile/index.php?owner=tsukilsao319";
+const CC_BY_NC_SA_URL = "https://creativecommons.org/licenses/by-nc-sa/4.0/";
 
 function siteFooterHtml(){
   return `
@@ -155,8 +160,9 @@ function applyTheme(theme, save = false){
   if (save) store("horo-theme", theme);
   document.querySelectorAll("[data-theme-toggle]").forEach(button => {
     const label = theme === "dark" ? "淺色模式" : "深色模式";
-    button.textContent = label;
+    button.innerHTML = theme === "dark" ? SUN_SVG : MOON_SVG;
     button.setAttribute("aria-label", `切換至${label}`);
+    button.setAttribute("title", `切換至${label}`);
   });
 }
 document.addEventListener("click", event => {
@@ -1871,9 +1877,9 @@ function buildSongShell(){
           <span class="venue-label">簡潔模式</span>
           <span class="venue-switch"><span class="venue-knob"></span></span>
         </button>
-        <button class="venue-toggle reading-toggle" id="reading-btn" aria-pressed="${readingMode === "romaji" ? "true" : "false"}" aria-label="切換日文讀音：目前顯示${readingMode === "romaji" ? "羅馬拼音" : "假名"}">
+        <button class="venue-toggle reading-toggle" id="reading-btn" aria-pressed="${readingMode !== "kana" ? "true" : "false"}" aria-label="切換日文讀音：目前顯示${readingModeLabel()}">
           <span class="venue-label">讀音</span>
-          <span class="reading-value" id="reading-value">${readingMode === "romaji" ? "Romaji" : "假名"}</span>
+          <span class="reading-value" id="reading-value">${readingModeLabel()}</span>
         </button>
         <button class="venue-toggle display-toggle${showJapanese ? " active" : ""}" id="japanese-toggle" aria-pressed="${showJapanese ? "true" : "false"}" aria-label="切換日文歌詞：目前${showJapanese ? "顯示" : "隱藏"}">
           <span class="venue-label">日文</span>
@@ -2045,7 +2051,8 @@ function buildSongShell(){
   });
 
   document.getElementById("reading-btn").addEventListener("click", ()=>{
-    readingMode = readingMode === "romaji" ? "kana" : "romaji";
+    const current = READING_MODES.indexOf(readingMode);
+    readingMode = READING_MODES[(current + 1) % READING_MODES.length];
     store("horo-reading", readingMode);
     updateReadingUi();
     repaintJapaneseReadings();
@@ -2300,9 +2307,19 @@ function renderSong(song){
   const lyricsCredit = document.getElementById("lyrics-credit");
   if (lyricsCredit) {
     const hasCredit = Boolean(song.translationCredit);
-    lyricsCredit.innerHTML = hasCredit
-      ? `中譯歌詞作者：<a href="${TRANSLATION_CREDIT_URL}" target="_blank" rel="noopener">${escapeHtml(song.translationCredit)}</a>`
-      : "";
+    if (hasCredit) {
+      const creditUrl = song.translationCreditUrl || TRANSLATION_CREDIT_URL;
+      const creditLink = `<a href="${creditUrl}" target="_blank" rel="noopener">${escapeHtml(song.translationCredit)}</a>`;
+      const sourceLink = song.translationSourceUrl
+        ? ` · <a href="${song.translationSourceUrl}" target="_blank" rel="noopener">出處</a>`
+        : "";
+      const licenseLink = song.translationLicenseUrl
+        ? ` · <a href="${song.translationLicenseUrl}" target="_blank" rel="noopener">${escapeHtml(song.translationLicense || "授權")}</a>`
+        : "";
+      lyricsCredit.innerHTML = `中譯歌詞作者：${creditLink}${sourceLink}${licenseLink}`;
+    } else {
+      lyricsCredit.innerHTML = "";
+    }
     lyricsCredit.hidden = !hasCredit;
   }
   // 어디서 들어왔는지에 따라 '뒤로' 버튼의 안내 글을 바꾼다
@@ -2322,8 +2339,10 @@ function renderSong(song){
       <button class="lyric-line${lineIsChant(l) ? " is-chant" : ""}" data-time="${l.time}" data-idx="${i}">
         <span class="lyric-icons">${lyricIconsHtml(l)}</span>
         <span class="lyric-body">
-          <span class="lyric-jp">${renderJapaneseLine(l.jp || "")}</span>
+          <span class="lyric-jp" lang="ja">${renderJapaneseLine(l.jp || "")}</span>
+          <span class="lyric-romaji" lang="ja-Latn">${readingMode === "both" ? renderRomajiLine(l.jp || "", false) : ""}</span>
           <span class="lyric-zh">${withIcons(l.tr || "")}</span>
+          ${l.bg ? `<span class="lyric-bg">${renderKo(l.bg)}</span>` : ""}
         </span>
       </button>
     </li>`).join("");
@@ -2434,12 +2453,14 @@ function applyVenueMode(){
 function updateReadingUi(){
   const btn = document.getElementById("reading-btn");
   const value = document.getElementById("reading-value");
-  const romaji = readingMode === "romaji";
-  if (value) value.textContent = romaji ? "Romaji" : "假名";
+  const label = readingModeLabel();
+  const page = document.getElementById("song-page");
+  if (page) page.classList.toggle("reading-both", readingMode === "both");
+  if (value) value.textContent = label;
   if (btn){
-    btn.classList.toggle("active", romaji);
-    btn.setAttribute("aria-pressed", romaji ? "true" : "false");
-    btn.setAttribute("aria-label", `切換日文讀音：目前顯示${romaji ? "羅馬拼音" : "假名"}`);
+    btn.classList.toggle("active", readingMode !== "kana");
+    btn.setAttribute("aria-pressed", readingMode !== "kana" ? "true" : "false");
+    btn.setAttribute("aria-label", `切換日文讀音：目前顯示${label}`);
   }
 }
 
@@ -2493,9 +2514,16 @@ function repaintJapaneseReadings(){
     const idx = Number(line.dataset.idx);
     const lyric = currentSong.lyrics && currentSong.lyrics[idx];
     const target = line.querySelector(".lyric-jp");
+    const romajiTarget = line.querySelector(".lyric-romaji");
     if (!lyric || !target) return;
     target.innerHTML = renderJapaneseLine(lyric.jp || "");
+    if (romajiTarget){
+      romajiTarget.innerHTML = readingMode === "both"
+        ? renderRomajiLine(lyric.jp || "", false)
+        : "";
+    }
     decorateKaraokeLine(target);
+    if (romajiTarget) decorateKaraokeLine(romajiTarget);
     assignKaraokeLineTiming(line, karaokeLineTiming(currentSong, idx));
     syncIconAnimationPhase(line, now);
   });
@@ -2643,15 +2671,28 @@ function withIcons(str){
   if (str === undefined || str === null) return "";
   return escapeHtml(String(str)).replace(ICON_TOKEN_RE, (m, key)=> INLINE_ICONS[key.toLowerCase()] || m);
 }
-function renderJapaneseLine(str){
+function renderKanaLine(str){
   const source = String(str ?? "");
-  if (readingMode === "romaji"){
-    const romaji = window.JP_ROMAJI && window.JP_ROMAJI[source];
-    return withIcons(typeof romaji === "string" ? romaji : source);
-  }
   const ruby = window.JP_FURIGANA && window.JP_FURIGANA[source];
   if (!ruby) return withIcons(source);
   return ruby.replace(ICON_TOKEN_RE, (m, key)=> INLINE_ICONS[key.toLowerCase()] || m);
+}
+
+function renderRomajiLine(str, includeIcons = true){
+  const source = String(str ?? "");
+  const romaji = window.JP_ROMAJI && window.JP_ROMAJI[source];
+  const value = typeof romaji === "string" ? romaji : source;
+  return includeIcons ? withIcons(value) : escapeHtml(value).replace(ICON_TOKEN_RE, "");
+}
+
+function readingModeLabel(mode = readingMode){
+  if (mode === "romaji") return "Romaji";
+  if (mode === "both") return "假名＋Romaji";
+  return "假名";
+}
+
+function renderJapaneseLine(str){
+  return readingMode === "romaji" ? renderRomajiLine(str) : renderKanaLine(str);
 }
 
 /*
@@ -2884,41 +2925,47 @@ function decorateKaraokeLine(target){
 
 function assignKaraokeLineTiming(line, timedLine){
   if (!line) return;
-  const target = line.querySelector(".lyric-jp");
-  const units = target && target._karaokeUnits || [];
-  units.forEach(unit => {
-    unit.start = null;
-    unit.end = null;
-    delete unit.el.dataset.karaokeStart;
-    delete unit.el.dataset.karaokeEnd;
-  });
-  if (!timedLine || !Array.isArray(timedLine.words) || !timedLine.words.length){
-    return;
-  }
+  const targets = [...line.querySelectorAll(".lyric-jp, .lyric-romaji")]
+    .filter(target => (target.textContent || "").trim());
+  let sourceKind = "line-proportional";
 
-  const texts = units.map(unit => unit.el.dataset.karaokeText || unit.el.textContent || "");
-  const mapped = window.KARAOKE_SOURCES && typeof window.KARAOKE_SOURCES.mapUnitsToWords === "function"
-    ? window.KARAOKE_SOURCES.mapUnitsToWords(texts, timedLine.words)
-    : { timings: [], matched: 0, total: 0 };
-  const enoughTextMatches = mapped.total > 0 && mapped.matched / mapped.total >= 0.6;
-  const timings = enoughTextMatches
-    ? mapped.timings
-    : (window.KARAOKE_SOURCES && typeof window.KARAOKE_SOURCES.allocateUnitTimings === "function"
-        ? window.KARAOKE_SOURCES.allocateUnitTimings(texts, Number(timedLine.start), Number(timedLine.end))
-        : []);
+  targets.forEach(target => {
+    const units = target._karaokeUnits || [];
+    units.forEach(unit => {
+      unit.start = null;
+      unit.end = null;
+      delete unit.el.dataset.karaokeStart;
+      delete unit.el.dataset.karaokeEnd;
+    });
+    if (!timedLine || !Array.isArray(timedLine.words) || !timedLine.words.length){
+      return;
+    }
 
-  units.forEach((unit, index) => {
-    const timing = timings[index];
-    if (!timing) return;
-    unit.start = Number(timing.start);
-    unit.end = Math.max(unit.start + 0.02, Number(timing.end));
-    /* Keep the timing on the element too.  Reading-mode changes replace
-       the inner HTML, and a DOM-backed value makes the romaji fallback
-       survive browser rendering/isolation differences just like kana. */
-    unit.el.dataset.karaokeStart = String(unit.start);
-    unit.el.dataset.karaokeEnd = String(unit.end);
+    const texts = units.map(unit => unit.el.dataset.karaokeText || unit.el.textContent || "");
+    const mapped = window.KARAOKE_SOURCES && typeof window.KARAOKE_SOURCES.mapUnitsToWords === "function"
+      ? window.KARAOKE_SOURCES.mapUnitsToWords(texts, timedLine.words)
+      : { timings: [], matched: 0, total: 0 };
+    const enoughTextMatches = mapped.total > 0 && mapped.matched / mapped.total >= 0.6;
+    const timings = enoughTextMatches
+      ? mapped.timings
+      : (window.KARAOKE_SOURCES && typeof window.KARAOKE_SOURCES.allocateUnitTimings === "function"
+          ? window.KARAOKE_SOURCES.allocateUnitTimings(texts, Number(timedLine.start), Number(timedLine.end))
+          : []);
+
+    if (enoughTextMatches) sourceKind = "word";
+    units.forEach((unit, index) => {
+      const timing = timings[index];
+      if (!timing) return;
+      unit.start = Number(timing.start);
+      unit.end = Math.max(unit.start + 0.02, Number(timing.end));
+      /* Keep the timing on the element too.  Reading-mode changes replace
+         the inner HTML, and a DOM-backed value makes the romaji fallback
+         survive browser rendering/isolation differences just like kana. */
+      unit.el.dataset.karaokeStart = String(unit.start);
+      unit.el.dataset.karaokeEnd = String(unit.end);
+    });
   });
-  line.dataset.karaokeSource = enoughTextMatches ? "word" : "line-proportional";
+  line.dataset.karaokeSource = sourceKind;
 }
 
 function decorateKaraokeLines(song){
@@ -2927,23 +2974,23 @@ function decorateKaraokeLines(song){
   if (!list || !song) return;
   list.querySelectorAll(".lyric-line").forEach(line => {
     const index = Number(line.dataset.idx);
-    const target = line.querySelector(".lyric-jp");
     const range = karaokeRange(song, index);
     if (range){
       line.dataset.karaokeStart = String(range.start);
       line.dataset.karaokeEnd = String(range.end);
     }
-    decorateKaraokeLine(target);
+    line.querySelectorAll(".lyric-jp, .lyric-romaji").forEach(decorateKaraokeLine);
     assignKaraokeLineTiming(line, karaokeLineTiming(song, index));
   });
 }
 
 function clearKaraokeLine(line){
   if (!line) return;
-  const target = line.querySelector(".lyric-jp");
-  const units = target && target._karaokeUnits || [];
-  units.forEach(unit => unit.el.classList.remove("karaoke-lit", "karaoke-current"));
-  units.forEach(unit => unit.el.style.removeProperty("--karaoke-word-progress"));
+  line.querySelectorAll(".lyric-jp, .lyric-romaji").forEach(target => {
+    const units = target._karaokeUnits || [];
+    units.forEach(unit => unit.el.classList.remove("karaoke-lit", "karaoke-current"));
+    units.forEach(unit => unit.el.style.removeProperty("--karaoke-word-progress"));
+  });
 }
 
 function updateKaraokeProgress(line, time){
@@ -2956,47 +3003,50 @@ function updateKaraokeProgress(line, time){
   karaokeActiveLine = line || null;
   if (!line || !Number.isFinite(time)) return;
 
-  const target = line.querySelector(".lyric-jp");
-  const units = target && target._karaokeUnits || [];
   const start = Number(line.dataset.karaokeStart);
   const end = Number(line.dataset.karaokeEnd);
-  if (!units.length || !Number.isFinite(start) || !Number.isFinite(end)) return;
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return;
 
-  const hasRealWordTiming = units.some(unit =>
-    (Number.isFinite(unit.start) && Number.isFinite(unit.end))
-    || (Number.isFinite(Number(unit.el.dataset.karaokeStart))
-      && Number.isFinite(Number(unit.el.dataset.karaokeEnd)))
-  );
-  if (hasRealWordTiming){
+  line.querySelectorAll(".lyric-jp, .lyric-romaji").forEach(target => {
+    const units = target._karaokeUnits || [];
+    if (!units.length) return;
+
+    const hasRealWordTiming = units.some(unit =>
+      (Number.isFinite(unit.start) && Number.isFinite(unit.end))
+      || (Number.isFinite(Number(unit.el.dataset.karaokeStart))
+        && Number.isFinite(Number(unit.el.dataset.karaokeEnd)))
+    );
+    if (hasRealWordTiming){
+      units.forEach(unit => {
+        const unitStart = Number.isFinite(unit.start)
+          ? Number(unit.start) : Number(unit.el.dataset.karaokeStart);
+        const unitEnd = Number.isFinite(unit.end)
+          ? Number(unit.end) : Number(unit.el.dataset.karaokeEnd);
+        if (!Number.isFinite(unitStart) || !Number.isFinite(unitEnd)){
+          unit.el.classList.remove("karaoke-lit", "karaoke-current");
+          unit.el.style.removeProperty("--karaoke-word-progress");
+          return;
+        }
+        const progress = Math.max(0, Math.min(1, (time - unitStart) / Math.max(0.02, unitEnd - unitStart)));
+        unit.el.classList.toggle("karaoke-lit", progress >= 1);
+        unit.el.classList.toggle("karaoke-current", progress > 0 && progress < 1);
+        unit.el.style.setProperty("--karaoke-word-progress", progress.toFixed(3));
+      });
+      return;
+    }
+
+    const progress = Math.max(0, Math.min(1, (time - start) / Math.max(0.01, end - start)));
+    const total = units.reduce((sum, unit) => sum + unit.weight, 0) || units.length;
+    const reached = progress * total;
+    let passed = 0;
     units.forEach(unit => {
-      const unitStart = Number.isFinite(unit.start)
-        ? Number(unit.start) : Number(unit.el.dataset.karaokeStart);
-      const unitEnd = Number.isFinite(unit.end)
-        ? Number(unit.end) : Number(unit.el.dataset.karaokeEnd);
-      if (!Number.isFinite(unitStart) || !Number.isFinite(unitEnd)){
-        unit.el.classList.remove("karaoke-lit", "karaoke-current");
-        unit.el.style.removeProperty("--karaoke-word-progress");
-        return;
-      }
-      const progress = Math.max(0, Math.min(1, (time - unitStart) / Math.max(0.02, unitEnd - unitStart)));
-      unit.el.classList.toggle("karaoke-lit", progress >= 1);
-      unit.el.classList.toggle("karaoke-current", progress > 0 && progress < 1);
-      unit.el.style.setProperty("--karaoke-word-progress", progress.toFixed(3));
+      const was = passed;
+      passed += unit.weight;
+      const lit = reached >= passed;
+      const current = !lit && reached > was;
+      unit.el.classList.toggle("karaoke-lit", lit);
+      unit.el.classList.toggle("karaoke-current", current);
     });
-    return;
-  }
-
-  const progress = Math.max(0, Math.min(1, (time - start) / Math.max(0.01, end - start)));
-  const total = units.reduce((sum, unit) => sum + unit.weight, 0) || units.length;
-  const reached = progress * total;
-  let passed = 0;
-  units.forEach(unit => {
-    const was = passed;
-    passed += unit.weight;
-    const lit = reached >= passed;
-    const current = !lit && reached > was;
-    unit.el.classList.toggle("karaoke-lit", lit);
-    unit.el.classList.toggle("karaoke-current", current);
   });
 }
 

@@ -407,6 +407,11 @@ export const SONGS = [
   {
     id: "hanaurana",
     title: "花占卜 (花占い)",
+    translationCredit: "Smiecj",
+    translationCreditUrl: "https://smiecj.com/2022/12/30/vaundy-hanauranai/",
+    translationSourceUrl: "https://smiecj.com/2022/12/30/vaundy-hanauranai/",
+    translationLicense: "CC BY-NC-SA 4.0",
+    translationLicenseUrl: "https://creativecommons.org/licenses/by-nc-sa/4.0/",
     youtubeId: "onhBN0qkUcE",
     lyrics: [
       { time: 1.5, jp: "[clap]街の夕焼けに溶けた僕たちはまだニ人だろうか",        ko: [{ text: "마치노 유-야케니 토케타 보쿠타치와 마다 후타리다로-카", tag: "clap"}],         tr: "我想知道我們兩個人是否仍然融化在街上的日落中" },
@@ -450,6 +455,9 @@ export const SONGS = [
   {
     id: "Yobigoe",
     title: "呼喚聲 (呼び声)",
+    translationCredit: "藍色小樹熊",
+    translationCreditUrl: "https://bluekokomurmur.com/lyrics/vaundy-yobigoe/",
+    translationSourceUrl: "https://bluekokomurmur.com/lyrics/vaundy-yobigoe/",
     youtubeId: "CI2x2aSi8aI",
     lyrics: [
       { time: 1, jp: "[clap]この惑星の真ん中で",        ko: [{ text: "코노 호시노 만나카데", tag: "clap"}],         tr: "在這顆星的中間" },
@@ -538,6 +546,9 @@ export const SONGS = [
   {
     id: "HowdoIknow'",
     title: "我怎麼會知道呢 (僕にはどうしてわかるんだろう)",
+    translationCredit: "藍色小樹熊",
+    translationCreditUrl: "https://bluekokomurmur.com/lyrics/vaundy-boku-niwa-doshite-wakarundarou/",
+    translationSourceUrl: "https://bluekokomurmur.com/lyrics/vaundy-boku-niwa-doshite-wakarundarou/",
     youtubeId: "x4aWXNWPrtY",
     lyrics: [
       { time: 28, jp: "今晩は降りる駅を変え僕の心に咲いていた",        ko: [{ text: "콘반와 오리루 에키오 카에 보쿠노 코코로니 사이테이타"}],         tr: "今晚我要改變我要下車的車站，我要" },
@@ -699,6 +710,9 @@ export const SONGS = [
   {
     id: "TokyoFlash",
     title: "東京 Flash (東京フラッシュ)",
+    translationCredit: "雨音子",
+    translationCreditUrl: "https://ameotoko1997.blog.fc2.com/blog-entry-375.html",
+    translationSourceUrl: "https://ameotoko1997.blog.fc2.com/blog-entry-375.html",
     youtubeId: "SIuF37EWaLU",
     lyrics: [
       { time: 22.5, jp: "相槌がうまくなったんだできてるできてる",        ko: [{ text: "아이즈치가 우마쿠 낫탄다"}, { text: " 데키테루 데키테루", tag: "chant"}],         tr: "我變得很擅長追趕。你做得好還是做得好？" },
@@ -1459,6 +1473,11 @@ export const SONGS = [
   {
     id: "SekainoHimitsu",
     title: "世界的秘密 (世界の秘密)",
+    translationCredit: "Smiecj",
+    translationCreditUrl: "https://smiecj.com/2023/05/07/vaundy-sekainohimitu/",
+    translationSourceUrl: "https://smiecj.com/2023/05/07/vaundy-sekainohimitu/",
+    translationLicense: "CC BY-NC-SA 4.0",
+    translationLicenseUrl: "https://creativecommons.org/licenses/by-nc-sa/4.0/",
     youtubeId: "xFoTFCHU70s",
     lyrics: [
       { time: 14,         ko: [{ text: "[clap]비트에 맞춰 박수", tag: "clap" }],     },
@@ -1552,6 +1571,9 @@ export const SONGS = [
    {
     id: "Timeparadox",
     title: "時間悖論 (タイムパラドックス)",
+    translationCredit: "藍色小樹熊",
+    translationCreditUrl: "https://bluekokomurmur.com/lyrics/vaundy-taimu-paradokkusu/",
+    translationSourceUrl: "https://bluekokomurmur.com/lyrics/vaundy-taimu-paradokkusu/",
     youtubeId: "ewhRE-BvJCg",
     lyrics: [
       { time: 11.5,         ko: [{ text: "[clap]비트에 맞춰 박수", tag: "clap" }],     },
@@ -1591,6 +1613,11 @@ export const SONGS = [
   {
     id: "TodomenoIchigeki",
     title: "最後一擊 (トドメの一撃)",
+    translationCredit: "Smiecj",
+    translationCreditUrl: "https://smiecj.com/2023/10/08/vaundy-todome/",
+    translationSourceUrl: "https://smiecj.com/2023/10/08/vaundy-todome/",
+    translationLicense: "CC BY-NC-SA 4.0",
+    translationLicenseUrl: "https://creativecommons.org/licenses/by-nc-sa/4.0/",
     youtubeId: "7xRWOylrLfI",
     lyrics: [
       { time: 7,         ko: [{ text: "[clap]비트에 맞춰 박수", tag: "clap" }],     },

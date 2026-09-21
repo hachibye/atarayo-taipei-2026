@@ -1398,19 +1398,23 @@
   .lyric-body{min-width:0;display:block;flex:1;}
   .lyric-jp{
     display:block;
+    font-family:'Noto Sans JP',Pretendard,system-ui,sans-serif;
     font-size:clamp(13px,3.6vw,14px);
     color:#a99a80;
     line-height:1.5;
   }
   /* 歌詞內的逐字 Karaoke 進度：未唱到的字維持暗色，唱到後沿用字幕藍。 */
-  .lyric-jp .karaoke-unit{
+  .lyric-jp .karaoke-unit,
+  .lyric-romaji .karaoke-unit{
     color:rgba(169,154,128,0.62);
     transition:color .08s linear, text-shadow .08s linear;
   }
-  .lyric-line.active .lyric-jp .karaoke-unit.karaoke-lit{
+  .lyric-line.active .lyric-jp .karaoke-unit.karaoke-lit,
+  .lyric-line.active .lyric-romaji .karaoke-unit.karaoke-lit{
     color:var(--clap);
   }
-  .lyric-line.active .lyric-jp .karaoke-unit.karaoke-current{
+  .lyric-line.active .lyric-jp .karaoke-unit.karaoke-current,
+  .lyric-line.active .lyric-romaji .karaoke-unit.karaoke-current{
     text-shadow:0 0 7px rgba(79,168,224,0.55);
   }
   .lyric-line.active .lyric-jp .karaoke-unit.karaoke-lit rt{
@@ -1418,8 +1422,11 @@
   }
   /* 關閉 Karaoke 時恢復整行日文原本的顏色，不影響句子同步與讀音切換。 */
   .song-page.karaoke-off .lyric-jp .karaoke-unit,
+  .song-page.karaoke-off .lyric-romaji .karaoke-unit,
   .song-page.karaoke-off .lyric-line.active .lyric-jp .karaoke-unit.karaoke-lit,
-  .song-page.karaoke-off .lyric-line.active .lyric-jp .karaoke-unit.karaoke-current{
+  .song-page.karaoke-off .lyric-line.active .lyric-jp .karaoke-unit.karaoke-current,
+  .song-page.karaoke-off .lyric-line.active .lyric-romaji .karaoke-unit.karaoke-lit,
+  .song-page.karaoke-off .lyric-line.active .lyric-romaji .karaoke-unit.karaoke-current{
     color:inherit;
     text-shadow:none;
   }
@@ -1439,15 +1446,43 @@
     letter-spacing:0;
   }
   .lyric-jp rp{ display:none; }
+  .lyric-romaji{
+    display:none;
+    margin-top:2px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:clamp(12px,3.4vw,14px);
+    font-weight:600;
+    line-height:1.45;
+    letter-spacing:.01em;
+    color:var(--ui-muted, #a9a9af);
+  }
+  .song-page.reading-both .lyric-romaji{ display:block; }
+  /* 合唱行固定使用金黃色；不依賴瀏覽器對 ruby 或按鈕 color 的繼承，
+     因此 Safari 與 Chrome 會得到同一個結果。 */
+  .lyric-line.is-chant .lyric-jp,
+  .lyric-line.is-chant .lyric-romaji,
+  .lyric-line.is-chant .lyric-bg{
+    color:var(--chant);
+  }
+  .lyric-line.is-chant .lyric-jp .karaoke-unit,
+  .lyric-line.is-chant .lyric-romaji .karaoke-unit{
+    color:rgba(245,148,44,.72);
+  }
+  .lyric-line.active.is-chant .lyric-jp .karaoke-unit.karaoke-lit,
+  .lyric-line.active.is-chant .lyric-romaji .karaoke-unit.karaoke-lit{
+    color:var(--chant);
+  }
+  .lyric-line.is-chant .lyric-jp rt{ color:rgba(245,210,145,.9); }
   .lyric-zh{
     display:block;
     font-size:clamp(15px,4.2vw,17px);
     font-weight:800;
     line-height:1.5;
-    color:var(--clap);
+    color:var(--ui-muted, #a9a9af);
   }
   /* 日文原文與繁中翻譯各自獨立顯示，兩種模式都沿用這兩個開關。 */
-  .song-page.hide-japanese .lyric-body > .lyric-jp{ display:none; }
+  .song-page.hide-japanese .lyric-body > .lyric-jp,
+  .song-page.hide-japanese .lyric-body > .lyric-romaji{ display:none; }
   .song-page.hide-chinese .lyric-body > .lyric-zh{ display:none; }
   /* 4번째 줄 — 코러스처럼 뒤에 깔리는 떼창 (백킹 코러스) */
   .lyric-bg{
@@ -2116,8 +2151,8 @@
   .venue-toggle.active .venue-switch{ background:#51432d; }
   .venue-toggle.active .venue-knob{ transform:translateX(11px); background:var(--gold); }
 
-  /* 日文讀音切換 — 假名適合熟悉日文的使用者，Romaji 會把整行日文都轉換 */
-  .reading-toggle{ min-width:92px; }
+  /* 日文讀音切換 — 假名、Romaji，或兩者同時顯示 */
+  .reading-toggle{ min-width:112px; }
   .reading-value{
     font-family:'Gmarket Sans',sans-serif;
     font-size:11px;
@@ -2160,6 +2195,11 @@
     line-height:1.5;
     margin:0 0 2px;
   }
+  .song-page.venue .lyric-romaji{
+    font-size:clamp(13px,3.8vw,17px);
+    line-height:1.45;
+    margin:0 0 2px;
+  }
   .song-page.venue .lyric-jp .ico,
   .song-page.venue .lyric-zh .ico{
     font-size:16px;
@@ -2170,7 +2210,7 @@
     font-size:clamp(19px,5.6vw,26px);
     line-height:1.45;
     margin-top:0;
-    color:var(--clap);
+    color:var(--ui-muted, #a9a9af);
   }
   .song-page.venue .lyric-line{ padding:15px 10px; }
   .song-page.venue .lyric-icons{ width:24px; }
