@@ -27,7 +27,7 @@ const PRECACHE = [
   ...VITE_BUILD_ASSETS
 ];
 
-/* 구글 폰트처럼 다른 도메인에 있지만 저장해 두면 좋은 것들 */
+/* Noto Sans JP 由遠端提供，快取後讓日文歌詞離線時仍能維持完整字形。 */
 const RUNTIME_HOSTS = ["fonts.googleapis.com", "fonts.gstatic.com"];
 
 self.addEventListener("install", (event) => {

@@ -19,6 +19,7 @@ import {
   STATIC_MIC_SVG,
   CHEV_LEFT_SVG,
   CHEV_RIGHT_SVG,
+  BACK_SVG,
   TRACK_PREV_SVG,
   TRACK_NEXT_SVG,
   CLOSE_SVG,
@@ -42,6 +43,13 @@ import {
   SEAT_DIRS,
   FLOOR_WAIT
 } from "./data.js";
+import {
+  CHANT_VERSIONS,
+  CHANT_DIFFERENCES,
+  DEFAULT_CHANT_VERSION,
+  JP_CHANT_GUIDES,
+  CHANT_REFERENCE_URL
+} from "./chant-guide.js";
 import { loadFurigana, loadKaraokeSources } from "./services/lazy-modules.js";
 import { store } from "./services/storage.js";
 
@@ -63,6 +71,8 @@ const storedReadingMode = store("horo-reading");
 let readingMode = READING_MODES.includes(storedReadingMode) ? storedReadingMode : "kana";
 let showJapanese = store("horo-show-japanese") !== "0";
 let showChinese = store("horo-show-chinese") !== "0";
+const storedChantVersion = store("horo-chant-version");
+let chantVersion = storedChantVersion === "kr" ? "kr" : DEFAULT_CHANT_VERSION;
 // 卡拉OK 預設關閉；若使用者曾手動選擇，則沿用保存的設定。
 let karaokeEnabled = store("horo-karaoke") === "1";
 let lastActiveIdx = -1;
@@ -178,6 +188,69 @@ if (themePreference.addEventListener){
     if (!store("horo-theme")) applyTheme(event.matches ? "dark" : "light");
   });
 }
+
+function chantVersionControlHtml(scope = "guide"){
+  const label = scope === "song" ? "這首歌的應援版本" : "應援版本";
+  return `
+    <div class="chant-version-control" data-chant-version-control="${scope}">
+      <span class="chant-version-control-label">${label}</span>
+      <div class="chant-version-segment" role="group" aria-label="${label}">
+        <button type="button" class="chant-version-option" data-chant-version="jp" aria-pressed="false">
+          <span>${CHANT_VERSIONS.jp.label}</span>
+        </button>
+        <button type="button" class="chant-version-option" data-chant-version="kr" aria-pressed="false">
+          <span>${CHANT_VERSIONS.kr.label}</span>
+        </button>
+      </div>
+    </div>`;
+}
+
+function chantGuideFor(song = currentSong, version = chantVersion){
+  if (!song) return null;
+  return version === "jp" ? (JP_CHANT_GUIDES[song.id] || null) : null;
+}
+
+function chantVersionLabel(version = chantVersion){
+  return CHANT_VERSIONS[version]?.label || CHANT_VERSIONS.jp.label;
+}
+
+function applyChantVersionUi(){
+  document.querySelectorAll("[data-chant-version]").forEach(button => {
+    const active = button.dataset.chantVersion === chantVersion;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+  document.querySelectorAll("[data-chant-version-label]").forEach(el => {
+    el.textContent = chantVersionLabel();
+  });
+}
+
+function renderChantVersionNote(song = currentSong){
+  const el = document.getElementById("chant-version-note");
+  if (!el) return;
+
+  if (chantVersion === "kr"){
+    el.innerHTML = `<b>${CHANT_VERSIONS.kr.label}</b>：使用韓國場應援標記。`;
+    return;
+  }
+
+  const guide = chantGuideFor(song, "jp");
+  if (!guide){
+    el.innerHTML = `<b>${CHANT_VERSIONS.jp.label}</b>：這首歌目前沒有獨立的日本版提示，暫沿用現有標記。`;
+    return;
+  }
+
+  const notes = (guide.notes || []).map(note => `<li>${escapeHtml(note)}</li>`).join("");
+  el.innerHTML = `<b>${CHANT_VERSIONS.jp.label}</b>：${notes ? `<ul>${notes}</ul>` : ""}`;
+}
+
+document.addEventListener("click", event => {
+  const button = event.target.closest("[data-chant-version]");
+  if (!button) return;
+  const next = button.dataset.chantVersion;
+  if (next !== "jp" && next !== "kr") return;
+  setChantVersion(next);
+});
 
 function pad(n){ return String(n).padStart(2,"0"); }
 
@@ -994,7 +1067,7 @@ function renderGuide(){
   app.innerHTML = `
     <div class="guide-page">
       <div class="song-topbar">
-        <button class="back-btn" id="back-btn">← 返回首頁</button>
+        <button class="back-btn" id="back-btn" aria-label="返回首頁" title="返回首頁">${BACK_SVG}</button>
         ${themeToggleHtml()}
       </div>
 
@@ -1009,8 +1082,17 @@ function renderGuide(){
             <span class="legend-item"><span class="legend-icon jump">${INLINE_ICONS.jump}</span>跳躍</span>
             <span class="legend-item"><span class="legend-icon spin">${INLINE_ICONS.spin}</span>轉臂</span>
           </div>
-          <p class="song-legend-note">數字代表大合唱歌詞的行數。<br>切換歌曲時會依目前排序移動。<br>拍手・揮手提示會顯示在歌曲頁面。</p>
+          <p class="song-legend-note">數字代表目前應援版本的大合唱歌詞行數。<br>切換歌曲時會依目前排序移動。<br>拍手・揮手提示會顯示在歌曲頁面。</p>
+          ${chantVersionControlHtml("guide")}
         </div>
+        <section class="chant-differences" aria-labelledby="chant-differences-title">
+          <div class="chant-differences-head">
+            <h2 id="chant-differences-title">日本版／韓國版差異</h2>
+            <span class="chant-differences-current">目前：<b data-chant-version-label></b></span>
+          </div>
+          <ul>${CHANT_DIFFERENCES.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+          <p class="chant-differences-footnote">未列入日本版歌單的歌曲會暫沿用現有標記，現場仍以 Vaundy 與觀眾的即時引導為準。</p>
+        </section>
         <div class="song-search-sentinel" id="song-search-sentinel"></div>
         <div class="song-search">
           <label class="search-label" for="song-search-input">搜尋歌曲</label>
@@ -1036,6 +1118,7 @@ function renderGuide(){
   `;
 
   document.getElementById("back-btn").addEventListener("click", ()=>{ location.hash = "#/"; });
+  applyChantVersionUi();
 
   // 정렬 칩 — '떼창'은 다시 누르면 많은 순 ↔ 적은 순이 바뀐다
   app.querySelectorAll(".song-sort").forEach(b=>{
@@ -1079,7 +1162,7 @@ function setlistTitle(entry){
 }
 
 /* 歌名通常是「中文譯名 (日文原題)」；只把括號內原題標成日文，
-   讓漢字由 Noto Sans JP 顯示，同時保留中文譯名原本的字體。 */
+   日文與中文歌詞都沿用台灣系統字體堆疊顯示。 */
 function renderSongTitle(title){
   return escapeHtml(String(title ?? "")).replace(/\(([^()]*)\)/g,
     (_, original) => `(<span lang="ja">${original}</span>)`);
@@ -1279,7 +1362,7 @@ function renderSetlist(){
   app.innerHTML = `
     <div class="setlist-page">
       <div class="song-topbar">
-        <button class="back-btn" id="setlist-back-btn">← 返回首頁</button>
+        <button class="back-btn" id="setlist-back-btn" aria-label="返回首頁" title="返回首頁">${BACK_SVG}</button>
         <h1>歌單</h1>
         ${themeToggleHtml()}
       </div>
@@ -1815,7 +1898,7 @@ function buildSongShell(){
   songView.innerHTML = `
     <div class="song-page" id="song-page">
       <div class="song-topbar">
-        <button class="back-btn" id="song-back-btn" aria-label="返回歌曲清單" title="返回歌曲清單">←</button>
+        <button class="back-btn" id="song-back-btn" aria-label="返回歌曲清單" title="返回歌曲清單">${BACK_SVG}</button>
         <h1 class="visually-hidden" id="song-page-heading"></h1>
         <nav class="song-dock" aria-label="切換歌曲">
         <div class="song-nav">
@@ -1842,6 +1925,10 @@ function buildSongShell(){
                 <span class="karaoke-source-status" id="karaoke-source-status" role="status" aria-live="polite">
                   <span id="karaoke-source-status-text"></span>
                   <span class="lyrics-credit" id="lyrics-credit" hidden></span>
+                  <span class="chant-source-info">
+                    <b>應援版本說明</b>：預設為日本版，可在歌詞上方切換日本版／韓國版；切換後大合唱標記會同步更新。<br>
+                    <a href="${CHANT_REFERENCE_URL}" target="_blank" rel="noopener">日本版參考：Canva《VAUNDY 應援教學》↗</a>
+                  </span>
                 </span>
               </details>
               <div class="video-status" id="video-status" role="status">正在載入影片…</div>
@@ -1859,6 +1946,8 @@ function buildSongShell(){
             <span class="legend-item"><span class="legend-icon clap">${INLINE_ICONS.clap}</span>拍手</span>
             <span class="legend-item"><span class="legend-icon wave">${INLINE_ICONS.wave}</span>揮手</span>
           </div>
+          ${chantVersionControlHtml("song")}
+          <div class="chant-version-note" id="chant-version-note" role="status" aria-live="polite"></div>
         </div>
 
         <div class="lyrics-pane">
@@ -2144,6 +2233,47 @@ let chantWaitUntil  = 0;       // 여기까지도 못 가면 포기하고 그냥
 
 function currentChantBlocks(){ return chantBlocks(currentSong); }
 
+function repaintChantVersionLines(song = currentSong){
+  const list = document.getElementById("lyrics-list");
+  if (!list || !song || !Array.isArray(song.lyrics)) return;
+  list.querySelectorAll(".lyric-line").forEach(line => {
+    const index = Number(line.dataset.idx);
+    const lyric = song.lyrics[index];
+    if (!lyric) return;
+    line.classList.toggle("is-chant", lineIsChant(lyric, song));
+    const icons = line.querySelector(".lyric-icons");
+    if (icons) icons.innerHTML = lyricIconsHtml(lyric, song);
+  });
+}
+
+function setChantVersion(next){
+  if (next !== "jp" && next !== "kr" || next === chantVersion) {
+    applyChantVersionUi();
+    return;
+  }
+
+  chantVersion = next;
+  store("horo-chant-version", chantVersion);
+  songMarksCache.clear();
+  chantBlockCache.clear();
+  chantIdx = -1;
+  chantDone = false;
+  chantWantSec = null;
+  chantWaitUntil = 0;
+  applyChantVersionUi();
+
+  if (currentSong) {
+    repaintChantVersionLines(currentSong);
+    renderChantVersionNote(currentSong);
+    syncChantUi();
+    paintChantBar();
+    if (chantOnly && currentChantBlocks().length) jumpToChant(0);
+    else if (isSongViewActive()) updateLyricsSync(true);
+  }
+
+  if (document.getElementById("song-list")) paintSongList();
+}
+
 /* 화면(버튼·흐리게 처리)을 지금 상태에 맞춘다.
    떼창이 아예 없는 곡에서는 흐리게 처리를 하지 않는다 — 안 그러면
    가사 전체가 흐려져서 읽을 수가 없다. */
@@ -2356,8 +2486,8 @@ function renderSong(song){
 
   document.getElementById("lyrics-list").innerHTML = song.lyrics.map((l,i)=>`
     <li>
-      <button class="lyric-line${lineIsChant(l) ? " is-chant" : ""}" data-time="${l.time}" data-idx="${i}">
-        <span class="lyric-icons">${lyricIconsHtml(l)}</span>
+      <button class="lyric-line${lineIsChant(l, song) ? " is-chant" : ""}" data-time="${l.time}" data-idx="${i}">
+        <span class="lyric-icons">${lyricIconsHtml(l, song)}</span>
         <span class="lyric-body">
           <span class="lyric-jp" lang="ja">${renderJapaneseLine(l.jp || "")}</span>
           <span class="lyric-romaji" lang="ja-Latn">${readingMode === "both" ? renderRomajiLine(l.jp || "", false) : ""}</span>
@@ -2390,6 +2520,8 @@ function renderSong(song){
   songView.inert = false;
   app.style.display = "none";
 
+  applyChantVersionUi();
+  renderChantVersionNote(song);
   syncChantUi();                         // 떼창만 듣기 상태 반영
   paintChantBar();
   applyVenueMode();                      // 단축모드 상태 반영 (글자 크기 등)
@@ -2778,7 +2910,7 @@ function renderRomajiLine(str, includeIcons = true){
 }
 
 function readingModeLabel(mode = readingMode){
-  if (mode === "romaji") return "Romaji";
+  if (mode === "romaji") return "羅馬字";
   if (mode === "both") return "假名+羅馬字";
   return "假名";
 }
@@ -2850,7 +2982,7 @@ function applyKaraokeTimingToDom(song){
     }
     assignKaraokeLineTiming(line, timed);
   });
-  chantBlockCache.delete(song.id);
+  chantBlockCache.clear();
   syncChantUi();
   paintChantBar();
 }
@@ -3181,12 +3313,12 @@ function renderKo(ko){
   }).join("");
 }
 
-// 한 줄의 ko / bg 조각들을 훑어서 그 줄에 떼창/박수가 포함돼 있는지 판단하고,
-// 해당하는 아이콘을 만들어 줍니다.
-// bg(코러스처럼 뒤에 깔리는 떼창)가 있으면 그 자체로 떼창으로 취급합니다.
-function lyricIconsHtml(line){
+// 한 줄의 ko / bg 조각들을 훑어서 박수·동작 아이콘과 현재 선택한
+// 응원 버전의 대합창 아이콘을 만들어 줍니다.
+function lyricIconsHtml(line, song = currentSong){
   const ko = line.ko, bg = line.bg;
-  let hasChant = false, hasClap = false, wave = false;
+  const hasChant = lineIsChant(line, song);
+  let hasClap = false, wave = false;
   const scan = (arr) => {
     if (typeof arr === "string"){
       if (hasIconToken(arr, "wave")) wave = true;
@@ -3195,8 +3327,7 @@ function lyricIconsHtml(line){
     }
     if (!Array.isArray(arr)) return;
     arr.forEach(seg => {
-      if (seg.tag === "chant") hasChant = true;
-      else if (seg.tag === "clap") hasClap = true;
+      if (seg.tag === "clap") hasClap = true;
       if (hasIconToken(seg.text, "wave")) wave = true;
       if (hasIconToken(seg.text, "clap")) hasClap = true;
     });
@@ -3208,7 +3339,6 @@ function lyricIconsHtml(line){
     if (hasIconToken(t, "clap")) hasClap = true;
   });
   if (bg){
-    hasChant = true;      // 코러스 떼창도 떼창
     scan(bg);
   }
   let html = "";
@@ -3218,14 +3348,7 @@ function lyricIconsHtml(line){
   return html;
 }
 
-/* ── 떼창 구간 ───────────────────────────────────────────────
-   "떼창만 듣기" 가 쓰는 계산. 한 줄이 떼창인지 판단하는 기준은
-   곡 목록 배지(songMarks)와 똑같다 — 기준이 갈리면 배지에는 떼창이
-   있다고 뜨는데 재생은 건너뛰는 일이 생기므로 여기 한 곳에 모아 둔다.
-     · ko/jp/tr 어디든 [mic] · [chant] 아이콘이 있거나
-     · ko 조각에 tag:"chant" 가 붙어 있거나
-     · bg(뒤에 깔리는 코러스)가 있는 줄 */
-function lineIsChant(line){
+function lineIsChantKr(line){
   if (!line) return false;
   if (line.bg) return true;
   const hit = (part)=>{
@@ -3238,6 +3361,27 @@ function lineIsChant(line){
   return hit(line.ko) || hit(line.jp) || hit(line.tr);
 }
 
+function lineIsChantJp(line, song){
+  if (!line || !song) return false;
+  const guide = JP_CHANT_GUIDES[song.id];
+  // Canva 沒有整理到的歌曲，先沿用原有標記，但在畫面上明確說明。
+  if (!guide) return lineIsChantKr(line);
+  const time = Number(line.time);
+  return Number.isFinite(time) && guide.chantTimes.some(mark => Math.abs(Number(mark) - time) < 0.01);
+}
+
+/* ── 떼창 구간 ───────────────────────────────────────────────
+   "떼창만 듣기" 가 쓰는 계산. 한 줄이 떼창인지 판단하는 기준은
+   곡 목록 배지(songMarks)와 똑같다 — 기준이 갈리면 배지에는 떼창이
+   있다고 뜨는데 재생은 건너뛰는 일이 생기므로 여기 한 곳에 모아 둔다.
+     · 日本版：使用 JP_CHANT_GUIDES 的歌詞時間點
+     · 韓國版：沿用 ko/jp/tr 的 [mic]、[chant]、tag:"chant" 與 bg */
+function lineIsChant(line, song = currentSong){
+  return chantVersion === "jp"
+    ? lineIsChantJp(line, song)
+    : lineIsChantKr(line);
+}
+
 const CHANT_LEAD_SEC  = 1.2;   // 떼창 직전 한 박자 먼저 들어가 준비할 시간
 const CHANT_TAIL_SEC  = 0.6;   // 마지막 글자가 잘리지 않도록 뒤에 남기는 여유
 const CHANT_GAP_MERGE = 7;     // 떼창 사이가 이보다 짧으면 끊지 않고 이어서 듣는다
@@ -3247,16 +3391,17 @@ const chantBlockCache = new Map();
    from/to 는 가사 줄 번호, start/end 는 영상에서의 초. */
 function chantBlocks(song){
   if (!song) return [];
-  if (chantBlockCache.has(song.id)) return chantBlockCache.get(song.id);
+  const cacheKey = `${chantVersion}:${song.id}`;
+  if (chantBlockCache.has(cacheKey)) return chantBlockCache.get(cacheKey);
 
   const lines = song.lyrics || [];
   const lineEnd = (i)=> lines[i + 1] ? playbackTimeForLine(song, i + 1)
                                      : playbackTimeForLine(song, i) + 8;
   const raw = [];
   for (let i = 0; i < lines.length; i++){
-    if (!lineIsChant(lines[i])) continue;
+    if (!lineIsChant(lines[i], song)) continue;
     let e = i;
-    while (e + 1 < lines.length && lineIsChant(lines[e + 1])) e++;
+    while (e + 1 < lines.length && lineIsChant(lines[e + 1], song)) e++;
     raw.push({
       from: i, to: e,
       start: Math.max(0, playbackTimeForLine(song, i) - CHANT_LEAD_SEC),
@@ -3271,7 +3416,7 @@ function chantBlocks(song){
     if (last && b.start - last.end < CHANT_GAP_MERGE){ last.end = b.end; last.to = b.to; }
     else out.push({ from:b.from, to:b.to, start:b.start, end:b.end });
   });
-  chantBlockCache.set(song.id, out);
+  chantBlockCache.set(cacheKey, out);
   return out;
 }
 
@@ -3282,26 +3427,23 @@ function chantBlocks(song){
 const songMarksCache = new Map();
 
 function songMarks(song){
-  if (songMarksCache.has(song.id)) return songMarksCache.get(song.id);
+  const cacheKey = `${chantVersion}:${song.id}`;
+  if (songMarksCache.has(cacheKey)) return songMarksCache.get(cacheKey);
 
   const mark = { chant: 0, clap: false, wave: false, jump: false, spin: false };
 
   (song.lyrics || []).forEach(line => {
-    let lineChant = false;
-
     const scanText = (t) => {
       if (typeof t !== "string") return;
       if (hasIconToken(t, "wave")) mark.wave = true;
       if (hasIconToken(t, "clap")) mark.clap = true;
       if (hasIconToken(t, "jump")) mark.jump = true;
       if (hasIconToken(t, "spin") || hasIconToken(t, "turn")) mark.spin = true;
-      if (hasIconToken(t, "mic")  || hasIconToken(t, "chant")) lineChant = true;
     };
     const scanPart = (part) => {
       if (typeof part === "string"){ scanText(part); return; }
       if (!Array.isArray(part)) return;
       part.forEach(seg => {
-        if (seg.tag === "chant") lineChant = true;
         if (seg.tag === "clap")  mark.clap = true;
         scanText(seg.text);
       });
@@ -3310,13 +3452,13 @@ function songMarks(song){
     scanPart(line.ko);
     scanText(line.jp);
     scanText(line.tr);
-    if (line.bg){ lineChant = true; scanPart(line.bg); }   // 뒤에 깔리는 코러스도 떼창
+    if (line.bg) scanPart(line.bg);   // 背景和聲仍保留動作圖示
 
     // 판단 기준은 lineIsChant 한 곳에서만 (떼창만 듣기와 어긋나지 않도록)
-    if (lineChant || lineIsChant(line)) mark.chant++;
+    if (lineIsChant(line, song)) mark.chant++;
   });
 
-  songMarksCache.set(song.id, mark);
+  songMarksCache.set(cacheKey, mark);
   return mark;
 }
 
@@ -3353,7 +3495,7 @@ function sortedSongs(){
 function songMarksHtml(song){
   const m = songMarks(song);
   let html = "";
-  if (m.chant) html += `<span class="song-mark chant" title="大合唱 ${m.chant} 行" aria-label="大合唱 ${m.chant} 行">${useSvg("i-mic")}<b>${m.chant}</b></span>`;
+  if (m.chant) html += `<span class="song-mark chant" title="${chantVersionLabel()}大合唱 ${m.chant} 行" aria-label="${chantVersionLabel()}大合唱 ${m.chant} 行">${useSvg("i-mic")}<b>${m.chant}</b></span>`;
   if (m.clap)  html += `<span class="song-mark dot clap common" title="拍手" aria-label="拍手">${useSvg("i-hand")}</span>`;
   if (m.wave)  html += `<span class="song-mark dot wave common" title="揮手" aria-label="揮手">${useSvg("i-wave")}</span>`;
   if (m.jump)  html += `<span class="song-mark dot jump" title="跳躍" aria-label="跳躍">${useSvg("i-jump")}</span>`;
