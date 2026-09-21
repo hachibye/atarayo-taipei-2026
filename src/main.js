@@ -879,7 +879,6 @@ function renderHome(){
       <div class="menu-links">
         <button class="menu-chip" type="button" id="starter-btn">
           <span class="chip-label">5 分鐘認識 Atarayo</span>
-          <span class="chip-note">入坑指南・依心情選歌</span>
         </button>
         <button class="menu-chip" type="button" id="timeline-btn">
           <span class="chip-label">2020 → 2026</span>
