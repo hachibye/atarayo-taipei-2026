@@ -1,7 +1,7 @@
 {
   "name": "atarayo-taipei-2026-guide",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,9 +9,11 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "vite": "^7.1.7"
+    "vite": "^7.1.7",
+    "wrangler": "^4.136.0"
   },
   "dependencies": {
+    "@tabler/icons": "^3.47.0",
     "kuromoji": "^0.1.2",
     "kuroshiro": "^1.2.0"
   }

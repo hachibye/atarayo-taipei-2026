@@ -4,6 +4,8 @@ Atarayo ASIA TOUR 2026『夕立が去ったその後で』台北場的非官方�
 
 網站：[atarayo-taipei-2026.pages.dev](https://atarayo-taipei-2026.pages.dev/)
 
+目前版本：**v1.0.0**
+
 ## 專案來源
 
 本專案保留完整 Git 歷史，改作關係如下：
@@ -32,9 +34,10 @@ GitHub 的「Forked from」標籤只能在 GitHub 建立 fork 時產生，無法
 - 歌曲頁整合官方 YouTube 影片、Spotify 與 Apple Music 對應單曲直連
 - 開源同步歌詞、假名／羅馬字讀音與繁中翻譯；載入失敗時會明確提示改看官方影片 CC 字幕
 - 每首歌曲的原創繁中導讀，整理故事、心境與情緒轉折（非官方解說／非逐句翻譯）
-- 「今天你是哪首 Atarayo？」每日抽歌與歌曲短語；同一裝置同一天固定，於台灣時間 00:00 重置
+- 左側懸浮抽歌按鈕與歌曲短語；同一裝置同一天固定，於台灣時間 00:00（GMT+8）重置
+- 依官方 Discography 去重整理的 54 首歌曲，可每日送出一次「我正在聽」與 emoji 心情，並查看匿名彙總分布
 - 「5 分鐘認識 Atarayo」入坑指南與依心情選歌的聆聽路線
-- 2020–2026 作品與現場 Timeline，終點為 2026/12/19 台北場
+- 2020-2026 作品與現場 Timeline，終點為 2026/12/19 台北場
 - 官方座位圖與北流交通資訊
 - 獨立的行前確認清單，包含取票提醒與隨身物品；勾選狀態只保存在使用者裝置
 - ASIA TOUR 2026 完整站點（含香港追加、再追加公演）
@@ -45,7 +48,7 @@ GitHub 的「Forked from」標籤只能在 GitHub 建立 fork 時產生，無法
 
 台北場正式歌單尚未公布。網站中的劇透歌單來自 setlist.fm 使用者提交的 2026/07/24「ATARAYO ONE-MAN LIVE IN JAPAN EXPO MALAYSIA 2026」紀錄。這是同年度海外獨立專場，未列入 ASIA TOUR 2026『夕立が去ったその後で』官方站次，也不代表台北場實際演出曲目或順序。截至 2026/09/21，未找到可交叉驗證的 2026 日本國內場完整歌單。
 
-歌曲頁會在瀏覽器中向開源歌詞服務取得日文歌詞與時間碼，並在本機產生假名／羅馬字讀音。繁中欄位只會顯示專案內已有對應的內容；若來源查無資料、離線或逾時，歌詞區會顯示狀態與官方影片 CC 字幕提醒，官方影片及 Spotify／Apple Music 連結仍可使用。每日抽歌使用瀏覽器本機儲存空間保留當日結果，不會把個人資料傳回伺服器。
+歌曲頁會在瀏覽器中向開源歌詞服務取得日文歌詞與時間碼，並在本機產生假名／羅馬字讀音。繁中欄位只會顯示專案內已有對應的內容；若來源查無資料、離線或逾時，歌詞區會顯示狀態與官方影片 CC 字幕提醒，官方影片及 Spotify／Apple Music 連結仍可使用。每日抽歌保存在瀏覽器；聆聽歌曲與心情則透過 Cloudflare Pages Function 寫入 D1。資料庫只保存台灣日期、隨機裝置識別碼的 SHA-256 雜湊、歌曲與心情，不保存姓名、信箱或原始識別碼。
 
 ## 開發
 
@@ -54,11 +57,14 @@ npm ci
 npm run dev
 npm run build
 npm run preview
+npx wrangler pages dev dist
 ```
 
-開發伺服器會使用 `http://localhost:5173/`。請使用終端機顯示的 `localhost` 網址，不要直接開啟 `index.html`，也不要改成 `127.0.0.1`；YouTube 可能拒絕後兩者的內嵌播放器來源。
+Vite 開發伺服器通常使用 `http://localhost:5173/`，只供前端畫面開發。若要連同 Pages Function 與本機 D1 一起測試，先建置再執行 `npx wrangler pages dev dist`。請使用終端機顯示的 `localhost` 網址，不要直接開啟 `index.html`，也不要改成 `127.0.0.1`；YouTube 可能拒絕後兩者的內嵌播放器來源。
 
-正式建置輸出在 `dist/`。Cloudflare Pages 可設定建置指令為 `npm run build`、輸出目錄為 `dist`；目前正式網站部署於 [atarayo-taipei-2026.pages.dev](https://atarayo-taipei-2026.pages.dev/)，`public/_headers` 會一併部署安全標頭。專案既有 GitHub Actions 也可在推送到 `main` 後建置並部署 GitHub Pages。
+正式建置輸出在 `dist/`。Cloudflare Pages 的建置指令為 `npm run build`，`wrangler.toml` 會將部署輸出固定為 `dist`，避免直接發布未經 Vite 打包的原始碼；目前正式網站部署於 [atarayo-taipei-2026.pages.dev](https://atarayo-taipei-2026.pages.dev/)，`public/_headers` 會一併部署安全標頭。專案既有 GitHub Actions 也可在推送到 `main` 後建置並部署 GitHub Pages。
+
+匿名統計使用 `PULSE_DB` D1 binding。API 只接受同源 JSON、限制 request body 大小，歌曲與心情必須通過固定白名單，所有 SQL 都使用 D1 prepared statement 綁定參數；`(taipei_date, voter_hash)` 唯一鍵與 API 邏輯共同阻止同一匿名裝置在同一天改票。
 
 ## 資料來源與素材
 
@@ -67,9 +73,11 @@ npm run preview
 - 曼谷獨立專場：[Atarayo 官方活動頁](https://atarayo-jp.com/contents/1075674)
 - 台北場售票、票價與座位圖：[KKTIX 官方活動頁](https://binliveco.kktix.cc/events/kbrte)
 - 影片：[Atarayo 官方 YouTube 頻道](https://www.youtube.com/@Atarayo)
+- 曲目：[Atarayo 官方 Discography](https://atarayo-jp.com/discography)
 - 2026 馬來西亞獨立專場歌單：[setlist.fm](https://www.setlist.fm/setlist/atarayo/2026/kl-convention-centre-kuala-lumpur-malaysia-4375d7df.html)
 - 過往台北場合唱觀察：[Atarayo TOUR 2025 in Taipei 觀眾紀錄](https://mapleleaf3659.github.io/ml-blog/articles/life/atarayo-tour-2025-in-taipei.html)
 - `images/atarayo-rainy-night.png`：為本專案生成的原創無文字主視覺，不是官方海報
 - `images/atarayo-seating*.png`：KKTIX 公開的台北場官方座位圖，版權屬原權利人
+- 互動圖示：[Tabler Icons](https://tabler.io/icons)，MIT License；完整聲明見 `public/THIRD_PARTY_NOTICES.txt`
 
 本網站為非官方粉絲製作，與 Atarayo、唱片公司、主辦單位、售票平台及場館無隸屬或合作關係。活動規則如有變更，一律以官方公告為準。

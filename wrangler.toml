@@ -1,0 +1,9 @@
+name = "atarayo-taipei-2026"
+compatibility_date = "2026-09-21"
+pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "PULSE_DB"
+database_name = "atarayo-taipei-2026-pulse"
+database_id = "ab2bade8-2b73-4c0b-81c1-202055c25619"
+migrations_dir = "migrations"

@@ -56,11 +56,21 @@ import { loadFurigana, loadKaraokeSources } from "./services/lazy-modules.js";
 import { store } from "./services/storage.js";
 import { traditionalChineseFor } from "./data/lyrics-zh-tw.js";
 import { SONG_STORIES, SESSION_SONG_PHRASES, STARTER_PATHS, ATARAYO_TIMELINE } from "./editorial.js";
+import { ATARAYO_DISCOGRAPHY, LISTENING_MOODS } from "./data/discography.js";
+import TABLER_CARDS_SVG from "@tabler/icons/outline/cards.svg?raw";
+import TABLER_MESSAGE_SVG from "@tabler/icons/outline/message-circle.svg?raw";
+import TABLER_MUSIC_SVG from "@tabler/icons/outline/music.svg?raw";
+import TABLER_SEARCH_SVG from "@tabler/icons/outline/search.svg?raw";
+import TABLER_CLOSE_SVG from "@tabler/icons/outline/x.svg?raw";
+import TABLER_CHEVRON_SVG from "@tabler/icons/outline/chevron-down.svg?raw";
+import TABLER_PAUSE_SVG from "@tabler/icons/outline/player-pause.svg?raw";
+import TABLER_PLAY_SVG from "@tabler/icons/outline/player-play.svg?raw";
 
 const app = document.getElementById("app");
 const songView = document.getElementById("song-view");
 let countdownTimer = null;
 let sessionSongRolloverTimer = null;
+let pulseUiController = null;
 let countdownClockOffsetMs = 0;
 let countdownClockSource = "device";
 let player = null;
@@ -69,7 +79,7 @@ let autoScrollEnabled = true;
 let venueMode = false;          // 단축모드 (첫 실행 때 저장값을 읽어 옴)
 const READING_MODES = ["kana", "romaji", "both"];
 const storedReadingMode = store("atarayo-reading");
-let readingMode = READING_MODES.includes(storedReadingMode) ? storedReadingMode : "kana";
+let readingMode = READING_MODES.includes(storedReadingMode) ? storedReadingMode : "both";
 let showJapanese = store("atarayo-show-japanese") !== "0";
 let showChinese = store("atarayo-show-chinese") !== "0";
 let chantVersion = DEFAULT_CHANT_VERSION;
@@ -93,7 +103,7 @@ let iconClockStartedAt = performance.now();
 const SYNC_INTERVAL_MS   = 100;
 
 /* 顯示目前網站版本，方便回報問題時確認畫面版本。 */
-const BUILD = "v0.1.0";
+const BUILD = "v1.0.0";
 
 const REPO_URL = "https://github.com/hachibye/atarayo-taipei-2026";
 const FEEDBACK_URL = "https://github.com/hachibye/atarayo-taipei-2026/issues";
@@ -235,6 +245,7 @@ function pad(n){ return String(n).padStart(2,"0"); }
 function router(){
   stopCountdown();
   teardownSetlistReveal();
+  teardownPulseUI();
   const hash = location.hash.replace(/^#\/?/, "");
   let song = null;
   if (hash.startsWith("song/")) {
@@ -546,6 +557,113 @@ function setupSeatMap(){
   const saved = store("atarayo-seat");
   if (saved && SEAT_BLOCKS.some(b => b.id === saved)) show(saved, false);
   else out.textContent = SEAT_HINT;
+}
+
+function tablerIcon(svg, className = ""){
+  return svg
+    .replace("<svg", '<svg aria-hidden="true" focusable="false"')
+    .replace('class="icon ', `class="${className} icon `);
+}
+
+function pulsePanelHtml(){
+  const moods = LISTENING_MOODS.map(mood => `
+    <button class="pulse-mood" type="button" data-pulse-mood="${escapeHtml(mood.id)}" aria-pressed="false">
+      <span aria-hidden="true">${mood.emoji}</span><b>${escapeHtml(mood.label)}</b>
+    </button>`).join("");
+  const songs = ATARAYO_DISCOGRAPHY.map((song, index) => `
+    <button class="pulse-song-option" type="button" role="option" aria-selected="false"
+      data-pulse-song-index="${index}" data-search="${escapeHtml(`${song.title} ${song.note || ""}`.toLocaleLowerCase("ja"))}">
+      <span lang="ja">${escapeHtml(song.title)}</span>
+      <small>${song.year}${song.note ? ` · ${escapeHtml(song.note)}` : ""}</small>
+    </button>`).join("");
+
+  return `
+    <div class="pulse-shell" id="pulse-shell">
+      <button class="fortune-fab" type="button" id="fortune-fab" aria-label="打開今日抽歌與聆聽心情" aria-controls="pulse-panel" aria-expanded="false">
+        ${tablerIcon(TABLER_CARDS_SVG, "tabler-icon")}
+      </button>
+      <div class="pulse-backdrop" id="pulse-backdrop" hidden>
+        <section class="pulse-panel" id="pulse-panel" role="dialog" aria-modal="true" aria-labelledby="pulse-panel-title" tabindex="-1">
+          <header class="pulse-panel-head">
+            <h2 id="pulse-panel-title">留一首歌給今天</h2>
+            <button class="pulse-close" type="button" id="pulse-close" aria-label="關閉">
+              ${tablerIcon(TABLER_CLOSE_SVG, "tabler-icon")}
+            </button>
+          </header>
+
+          <section class="pulse-draw" aria-labelledby="session-song-title">
+            <div class="pulse-draw-mark" aria-hidden="true">${tablerIcon(TABLER_CARDS_SVG, "tabler-icon")}</div>
+            <div class="session-song-copy">
+              <b id="session-song-title">今天你是哪首 Atarayo？</b>
+            </div>
+            <button class="session-song-draw" type="button" id="session-song-draw">抽一首</button>
+            <div class="session-song-result" id="session-song-result" hidden>
+              <div class="session-song-result-copy">
+                <span>今日のあなたは……</span>
+                <b id="session-song-name" lang="ja"></b>
+                <p id="session-song-phrase"></p>
+              </div>
+              <button type="button" id="session-song-open">去聽聽</button>
+            </div>
+          </section>
+
+          <section class="listening-pulse" aria-labelledby="listening-pulse-title">
+            <div class="listening-pulse-head">
+              <span aria-hidden="true">${tablerIcon(TABLER_MESSAGE_SVG, "tabler-icon")}</span>
+              <h3 id="listening-pulse-title">我正在聽...</h3>
+            </div>
+
+            <div class="pulse-combobox-wrap">
+              <button class="pulse-combobox" type="button" id="pulse-combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="pulse-song-menu">
+                <span class="pulse-combobox-icon">${tablerIcon(TABLER_MUSIC_SVG, "tabler-icon")}</span>
+                <span id="pulse-song-value">選擇歌曲</span>
+                ${tablerIcon(TABLER_CHEVRON_SVG, "pulse-chevron")}
+              </button>
+              <div class="pulse-song-menu" id="pulse-song-menu" hidden>
+                <label class="pulse-search">
+                  <span class="sr-only">搜尋歌曲</span>
+                  ${tablerIcon(TABLER_SEARCH_SVG, "tabler-icon")}
+                  <input id="pulse-song-search" type="search" inputmode="search" autocomplete="off" maxlength="60" placeholder="搜尋日文歌名" />
+                </label>
+                <div class="pulse-song-options" id="pulse-song-options" role="listbox" aria-label="Atarayo 歌曲">
+                  ${songs}
+                </div>
+                <p class="pulse-song-empty" id="pulse-song-empty" hidden>沒有符合的歌曲</p>
+              </div>
+            </div>
+
+            <fieldset class="pulse-moods">
+              <legend>我的心情...</legend>
+              <div>${moods}</div>
+            </fieldset>
+
+            <button class="pulse-save" id="pulse-save" type="button" disabled>送出今天的選擇</button>
+            <p class="pulse-status" id="pulse-status" role="status" aria-live="polite"></p>
+            <p class="pulse-reset-note">台灣時間 00:00（GMT+8）重置</p>
+          </section>
+        </section>
+      </div>
+    </div>`;
+}
+
+function resonanceStreamHtml(){
+  return `
+    <section class="resonance-stream" id="resonance-stream" aria-labelledby="resonance-title">
+      <header class="resonance-head">
+        <h2 id="resonance-title">今天的共振</h2>
+        <div class="resonance-meta">
+          <span id="resonance-total"></span>
+          <button type="button" id="resonance-motion" aria-label="暫停漂流" aria-pressed="false" title="暫停漂流" hidden>
+            <span data-motion-icon="pause">${tablerIcon(TABLER_PAUSE_SVG, "tabler-icon")}</span>
+            <span data-motion-icon="play" hidden>${tablerIcon(TABLER_PLAY_SVG, "tabler-icon")}</span>
+          </button>
+        </div>
+      </header>
+      <div class="resonance-viewport" id="resonance-viewport" hidden>
+        <div class="resonance-track" id="resonance-track"></div>
+      </div>
+      <p class="resonance-state" id="resonance-state">正在聽見大家的選擇...</p>
+    </section>`;
 }
 
 function renderHome(){
@@ -896,21 +1014,7 @@ function renderHome(){
       </div>
       </div>
 
-      <section class="session-song" aria-labelledby="session-song-title">
-        <div class="session-song-copy">
-          <span>SESSION PICK</span>
-          <b id="session-song-title">今天你是哪首 Atarayo？</b>
-        </div>
-        <button class="session-song-draw" type="button" id="session-song-draw">抽一首</button>
-        <div class="session-song-result" id="session-song-result" hidden>
-          <div class="session-song-result-copy">
-            <span>今日のあなたは……</span>
-            <b id="session-song-name" lang="ja"></b>
-            <p id="session-song-phrase"></p>
-          </div>
-          <button type="button" id="session-song-open">播放歌曲</button>
-        </div>
-      </section>
+      ${resonanceStreamHtml()}
 
       <!-- 拍攝規範摘要 -->
       <aside class="home-note">
@@ -929,6 +1033,7 @@ function renderHome(){
       </div>
     </section>
 
+    ${pulsePanelHtml()}
     ${siteFooterHtml()}
   `;
 
@@ -939,6 +1044,7 @@ function renderHome(){
   setupAccordions();
   setupPreflightChecklist();
   setupSessionSong();
+  setupPulseUI();
   setupNoticeViewer();
   setupSeatMap();
   setupHomeExtras();
@@ -985,7 +1091,7 @@ function renderStarterGuide(){
         </header>
 
         <section class="primer-grid" aria-label="樂團簡介">
-          <article><span>01</span><h3>Atarayo 是誰</h3><p>2020 年從 YouTube 開始活動的日本三人樂團，自稱「悲しみをたべて育つバンド。」——把悲傷吃下，並從中生長的樂團。作品擅長讓一段私人記憶，變成每個人都曾有過的夜晚。</p></article>
+          <article><span>01</span><h3>Atarayo 是誰</h3><p>2020 年從 YouTube 開始活動的日本三人樂團，自稱「悲しみをたべて育つバンド。」也就是把悲傷吃下，並從中生長的樂團。作品擅長讓一段私人記憶，變成每個人都曾有過的夜晚。</p></article>
           <article><span>02</span><h3>團名的意思</h3><p>「あたらよ」來自日文「可惜夜」：美好得令人捨不得天亮的夜。那份明知終將結束、所以更想留住的心情，也貫穿他們的愛情、季節與青春書寫。</p></article>
           <article><span>03</span><h3>三位團員</h3><p><b>ひとみ</b>（主唱／吉他）以貼近獨白的唱腔與詞曲描出情緒；<b>まーしー</b>（吉他）讓安靜與爆發之間有清楚層次；<b>たけお</b>（貝斯）以沉穩線條托住樂團的呼吸。</p></article>
           <article><span>04</span><h3>音樂風格</h3><p>以日系流行搖滾為骨架，常從乾淨吉他與近距離人聲開始，再讓完整 Band Sound 推高情緒。編曲重視留白，爆發不是炫技，而是把前面忍住的話一次說完。</p></article>
@@ -1018,7 +1124,7 @@ function renderTimeline(){
       </div>
       <main class="editorial-content">
         <header class="editorial-hero timeline-hero">
-          <span class="editorial-kicker">2020 — 2026</span>
+          <span class="editorial-kicker">2020 - 2026</span>
           <h2>從捨不得天亮的夜，走到台北</h2>
           <p>歌曲、作品與一次次相見，沿著時間排成同一條路。</p>
         </header>
@@ -1747,10 +1853,339 @@ function setupSessionSong(){
       paintSong();
       result.hidden = true;
       draw.hidden = false;
+      window.dispatchEvent(new CustomEvent("atarayo:taipei-day"));
       scheduleRollover();
     }, millisecondsUntilNextTaipeiDay());
   };
   scheduleRollover();
+}
+
+function readDailyPulse(){
+  const date = taipeiDateKey(new Date());
+  if (store("atarayo-pulse-submitted-date") !== date) return { date, song: "", mood: "", submitted: false };
+  const song = store("atarayo-pulse-submitted-song") || "";
+  const mood = store("atarayo-pulse-submitted-mood") || "";
+  return {
+    date,
+    song: ATARAYO_DISCOGRAPHY.some(item => item.title === song) ? song : "",
+    mood: LISTENING_MOODS.some(item => item.id === mood) ? mood : "",
+    submitted: true
+  };
+}
+
+function teardownPulseUI(){
+  pulseUiController?.abort();
+  pulseUiController = null;
+  document.body.classList.remove("pulse-open");
+  if (sessionSongRolloverTimer !== null){
+    clearTimeout(sessionSongRolloverTimer);
+    sessionSongRolloverTimer = null;
+  }
+}
+
+function setupPulseUI(){
+  const trigger = document.getElementById("fortune-fab");
+  const backdrop = document.getElementById("pulse-backdrop");
+  const panel = document.getElementById("pulse-panel");
+  const closeButton = document.getElementById("pulse-close");
+  const combo = document.getElementById("pulse-combobox");
+  const menu = document.getElementById("pulse-song-menu");
+  const search = document.getElementById("pulse-song-search");
+  const value = document.getElementById("pulse-song-value");
+  const options = [...document.querySelectorAll("[data-pulse-song-index]")];
+  const moods = [...document.querySelectorAll("[data-pulse-mood]")];
+  const save = document.getElementById("pulse-save");
+  const status = document.getElementById("pulse-status");
+  const empty = document.getElementById("pulse-song-empty");
+  const resonanceTotal = document.getElementById("resonance-total");
+  const resonanceViewport = document.getElementById("resonance-viewport");
+  const resonanceTrack = document.getElementById("resonance-track");
+  const resonanceState = document.getElementById("resonance-state");
+  const resonanceMotion = document.getElementById("resonance-motion");
+  if (!trigger || !backdrop || !panel || !closeButton || !combo || !menu || !search || !value || !save || !status || !empty || !resonanceTotal || !resonanceViewport || !resonanceTrack || !resonanceState || !resonanceMotion) return;
+
+  pulseUiController?.abort();
+  const controller = new AbortController();
+  pulseUiController = controller;
+  const listen = (target, type, handler, options = {}) => target.addEventListener(type, handler, { ...options, signal: controller.signal });
+  let state = readDailyPulse();
+  let selectedSong = state.song;
+  let selectedMood = state.mood;
+  let submitted = state.submitted;
+  let submitting = false;
+  let panelHideTimer = null;
+
+  const relativePulseTime = timestamp => {
+    const elapsed = Math.max(0, Date.now() - Number(timestamp || 0));
+    const minutes = Math.floor(elapsed / 60000);
+    if (minutes < 1) return "剛剛";
+    if (minutes < 60) return `${minutes} 分鐘前`;
+    return "今天稍早";
+  };
+
+  const renderSummary = summary => {
+    const total = Math.max(0, Number(summary?.total) || 0);
+    const recent = (Array.isArray(summary?.recent) ? summary.recent : [])
+      .filter(item => ATARAYO_DISCOGRAPHY.some(song => song.title === item?.title)
+        && LISTENING_MOODS.some(mood => mood.id === item?.mood))
+      .slice(0, 10);
+    resonanceTotal.textContent = total ? `${total} 人留下選擇` : "";
+    resonanceTrack.replaceChildren();
+
+    if (!total || !recent.length){
+      resonanceState.textContent = "今天還沒有人留下選擇，你可以成為第一位。";
+      resonanceState.hidden = false;
+      resonanceViewport.hidden = true;
+      resonanceMotion.hidden = true;
+      return;
+    }
+
+    const cardItems = [
+      ...recent,
+      ...Array.from({ length: Math.max(0, 3 - recent.length) }, () => null)
+    ];
+    const renderGroup = (hiddenFromAssistiveTechnology = false) => {
+      const group = document.createElement("div");
+      group.className = "resonance-group";
+      if (hiddenFromAssistiveTechnology) group.setAttribute("aria-hidden", "true");
+      cardItems.forEach(item => {
+        if (!item){
+          const placeholder = document.createElement("div");
+          placeholder.className = "resonance-card resonance-card-empty";
+          placeholder.setAttribute("aria-hidden", "true");
+          group.append(placeholder);
+          return;
+        }
+        const mood = LISTENING_MOODS.find(entry => entry.id === item.mood);
+        const card = document.createElement("article");
+        card.className = "resonance-card";
+        const time = document.createElement("span");
+        time.className = "resonance-time";
+        time.textContent = relativePulseTime(item.updatedAt);
+        const message = document.createElement("p");
+        message.append("有人聽了");
+        const song = document.createElement("b");
+        song.lang = "ja";
+        song.textContent = `「${item.title}」`;
+        const feeling = document.createElement("strong");
+        feeling.textContent = `「${mood.emoji} ${mood.label}」`;
+        message.append(song, "，覺得", feeling);
+        card.append(time, message);
+        group.append(card);
+      });
+      return group;
+    };
+    resonanceViewport.classList.remove("paused");
+    resonanceMotion.setAttribute("aria-pressed", "false");
+    resonanceMotion.setAttribute("aria-label", "暫停漂流");
+    resonanceMotion.title = "暫停漂流";
+    resonanceMotion.querySelector('[data-motion-icon="pause"]').hidden = false;
+    resonanceMotion.querySelector('[data-motion-icon="play"]').hidden = true;
+    resonanceTrack.append(renderGroup(), renderGroup(true));
+    resonanceState.hidden = true;
+    resonanceViewport.hidden = false;
+    resonanceMotion.hidden = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  };
+
+  const loadSummary = async () => {
+    resonanceState.hidden = false;
+    resonanceState.textContent = "正在聽見大家的選擇...";
+    try {
+      const response = await fetch("/api/pulse", {
+        headers: { Accept: "application/json" },
+        signal: controller.signal
+      });
+      if (!response.ok) throw new Error(`pulse_${response.status}`);
+      const summary = await response.json();
+      renderSummary(summary);
+      if (summary?.selection) lockSelection(summary.selection);
+    } catch {
+      if (controller.signal.aborted) return;
+      resonanceTotal.textContent = "";
+      resonanceViewport.hidden = true;
+      resonanceMotion.hidden = true;
+      resonanceState.hidden = false;
+      resonanceState.textContent = "暫時無法顯示狀態。";
+    }
+  };
+
+  const paint = () => {
+    value.textContent = selectedSong || "選擇歌曲";
+    combo.classList.toggle("has-value", Boolean(selectedSong));
+    options.forEach((option) => {
+      const song = ATARAYO_DISCOGRAPHY[Number(option.dataset.pulseSongIndex)];
+      const active = song?.title === selectedSong;
+      option.classList.toggle("selected", active);
+      option.setAttribute("aria-selected", String(active));
+    });
+    moods.forEach((button) => {
+      const active = button.dataset.pulseMood === selectedMood;
+      button.classList.toggle("selected", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+    combo.disabled = submitted || submitting;
+    search.disabled = submitted || submitting;
+    options.forEach(option => { option.disabled = submitted || submitting; });
+    moods.forEach(button => { button.disabled = submitted || submitting; });
+    save.disabled = submitted || submitting || !(selectedSong && selectedMood);
+    save.textContent = submitted ? "今天已送出" : submitting ? "送出中..." : "送出今天的選擇";
+  };
+
+  const storeSubmittedSelection = selection => {
+    store("atarayo-pulse-submitted-date", taipeiDateKey(new Date()));
+    store("atarayo-pulse-submitted-song", selection.song || "");
+    store("atarayo-pulse-submitted-mood", selection.mood || "");
+  };
+
+  function lockSelection(selection = {}){
+    if (ATARAYO_DISCOGRAPHY.some(item => item.title === selection.song)) selectedSong = selection.song;
+    if (LISTENING_MOODS.some(item => item.id === selection.mood)) selectedMood = selection.mood;
+    submitted = true;
+    submitting = false;
+    closeMenu();
+    storeSubmittedSelection({ song: selectedSong, mood: selectedMood });
+    status.textContent = "";
+    paint();
+  }
+
+  const closeMenu = () => {
+    menu.hidden = true;
+    combo.setAttribute("aria-expanded", "false");
+    combo.classList.remove("open");
+  };
+  const openMenu = () => {
+    menu.hidden = false;
+    combo.setAttribute("aria-expanded", "true");
+    combo.classList.add("open");
+    search.value = "";
+    options.forEach(option => { option.hidden = false; });
+    empty.hidden = true;
+    requestAnimationFrame(() => search.focus());
+  };
+  const openPanel = () => {
+    if (panelHideTimer !== null){
+      clearTimeout(panelHideTimer);
+      panelHideTimer = null;
+    }
+    backdrop.hidden = false;
+    trigger.setAttribute("aria-expanded", "true");
+    document.body.classList.add("pulse-open");
+    requestAnimationFrame(() => {
+      backdrop.classList.add("open");
+      panel.focus();
+    });
+  };
+  const closePanel = () => {
+    closeMenu();
+    backdrop.classList.remove("open");
+    trigger.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("pulse-open");
+    panelHideTimer = window.setTimeout(() => {
+      if (!document.body.contains(backdrop)) return;
+      backdrop.hidden = true;
+      trigger.focus();
+      panelHideTimer = null;
+    }, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 180);
+  };
+
+  listen(trigger, "click", openPanel);
+  listen(resonanceMotion, "click", () => {
+    const paused = resonanceViewport.classList.toggle("paused");
+    resonanceMotion.setAttribute("aria-pressed", String(paused));
+    resonanceMotion.setAttribute("aria-label", paused ? "繼續漂流" : "暫停漂流");
+    resonanceMotion.title = paused ? "繼續漂流" : "暫停漂流";
+    resonanceMotion.querySelector('[data-motion-icon="pause"]').hidden = paused;
+    resonanceMotion.querySelector('[data-motion-icon="play"]').hidden = !paused;
+  });
+  listen(closeButton, "click", closePanel);
+  listen(backdrop, "click", event => { if (event.target === backdrop) closePanel(); });
+  listen(combo, "click", () => { menu.hidden ? openMenu() : closeMenu(); });
+  listen(search, "input", () => {
+    const query = search.value.trim().toLocaleLowerCase("ja");
+    let visible = 0;
+    options.forEach(option => {
+      const match = !query || option.dataset.search.includes(query);
+      option.hidden = !match;
+      if (match) visible += 1;
+    });
+    empty.hidden = visible !== 0;
+  });
+  options.forEach(option => listen(option, "click", () => {
+    const song = ATARAYO_DISCOGRAPHY[Number(option.dataset.pulseSongIndex)];
+    if (!song) return;
+    selectedSong = song.title;
+    status.textContent = "";
+    paint();
+    closeMenu();
+    combo.focus();
+  }));
+  moods.forEach(button => listen(button, "click", () => {
+    selectedMood = button.dataset.pulseMood;
+    status.textContent = "";
+    paint();
+  }));
+  listen(save, "click", async () => {
+    if (submitted || submitting || !selectedSong || !selectedMood) return;
+    submitting = true;
+    status.textContent = "";
+    paint();
+    try {
+      const response = await fetch("/api/pulse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ song: selectedSong, mood: selectedMood }),
+        signal: controller.signal
+      });
+      const result = await response.json().catch(() => ({}));
+      if (response.status === 409 && result?.error === "already_submitted"){
+        lockSelection(result.selection || {});
+        if (result.summary) renderSummary(result.summary);
+        return;
+      }
+      if (!response.ok || !result?.ok) throw new Error(result?.error || `pulse_${response.status}`);
+      lockSelection(result.selection || { song: selectedSong, mood: selectedMood });
+      renderSummary(result.summary);
+    } catch {
+      if (controller.signal.aborted) return;
+      submitting = false;
+      status.textContent = "送出失敗，請稍後再試。";
+      paint();
+    }
+  });
+  listen(window, "atarayo:taipei-day", () => {
+    state = readDailyPulse();
+    selectedSong = "";
+    selectedMood = "";
+    submitted = false;
+    submitting = false;
+    status.textContent = "";
+    closeMenu();
+    paint();
+    resonanceTotal.textContent = "";
+    resonanceTrack.replaceChildren();
+    resonanceViewport.hidden = true;
+    resonanceMotion.hidden = true;
+    resonanceState.hidden = false;
+    resonanceState.textContent = "已跨日，重新整理查看今天的共振。";
+  });
+  listen(document, "keydown", event => {
+    if (backdrop.hidden) return;
+    if (event.key === "Escape"){
+      if (!menu.hidden){ closeMenu(); combo.focus(); }
+      else closePanel();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const focusable = [...panel.querySelectorAll("button:not([disabled]):not([hidden]), input:not([disabled])")]
+      .filter(element => element.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first){ event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last){ event.preventDefault(); first.focus(); }
+  });
+  loadSummary();
+
+  paint();
 }
 
 /* ── 준비물 체크 · 주소 복사 · 공유 · 오프라인 상태 ───────────── */
@@ -2185,6 +2620,12 @@ function buildSongShell(){
         </div>
 
         <div class="lyrics-pane">
+          <div class="reading-segmented" id="reading-segmented" role="group" aria-label="日文讀音顯示：目前為${readingModeLabel()}">
+            <button type="button" data-reading-mode="kana" aria-pressed="${readingMode === "kana" ? "true" : "false"}">假名</button>
+            <button type="button" data-reading-mode="romaji" aria-pressed="${readingMode === "romaji" ? "true" : "false"}">羅馬字</button>
+            <button type="button" data-reading-mode="both" aria-pressed="${readingMode === "both" ? "true" : "false"}">兩者</button>
+          </div>
+
           <!-- 떼창만 듣기 — 켜져 있을 때만 보이는 띠 -->
           <div class="chant-bar" id="chant-bar" hidden role="status">
             <span class="chant-ico">${STATIC_MIC_SVG}</span>
@@ -2225,10 +2666,6 @@ function buildSongShell(){
         <button class="venue-toggle" id="venue-btn" aria-label="開啟／關閉簡潔模式">
           <span class="venue-label">簡潔模式</span>
           <span class="venue-switch"><span class="venue-knob"></span></span>
-        </button>
-        <button class="venue-toggle reading-toggle" id="reading-btn" aria-pressed="${readingMode !== "kana" ? "true" : "false"}" aria-label="切換日文讀音：目前顯示${readingModeLabel()}">
-          <span class="venue-label">讀音</span>
-          <span class="reading-value" id="reading-value">${readingModeLabel()}</span>
         </button>
         <button class="venue-toggle display-toggle${showJapanese ? " active" : ""}" id="japanese-toggle" aria-pressed="${showJapanese ? "true" : "false"}" aria-label="切換日文歌詞：目前${showJapanese ? "顯示" : "隱藏"}">
           <span class="venue-label">日文</span>
@@ -2399,12 +2836,15 @@ function buildSongShell(){
     applyVenueMode();
   });
 
-  document.getElementById("reading-btn").addEventListener("click", ()=>{
-    const current = READING_MODES.indexOf(readingMode);
-    readingMode = READING_MODES[(current + 1) % READING_MODES.length];
-    store("atarayo-reading", readingMode);
-    updateReadingUi();
-    repaintJapaneseReadings();
+  document.querySelectorAll("[data-reading-mode]").forEach(button => {
+    button.addEventListener("click", ()=>{
+      const mode = button.dataset.readingMode;
+      if (!READING_MODES.includes(mode) || mode === readingMode) return;
+      readingMode = mode;
+      store("atarayo-reading", readingMode);
+      updateReadingUi();
+      repaintJapaneseReadings();
+    });
   });
 
   document.getElementById("japanese-toggle").addEventListener("click", ()=>{
@@ -2928,17 +3368,16 @@ function applyVenueMode(){
 }
 
 function updateReadingUi(){
-  const btn = document.getElementById("reading-btn");
-  const value = document.getElementById("reading-value");
   const label = readingModeLabel();
   const page = document.getElementById("song-page");
   if (page) page.classList.toggle("reading-both", readingMode === "both");
-  if (value) value.textContent = label;
-  if (btn){
-    btn.classList.toggle("active", readingMode !== "kana");
-    btn.setAttribute("aria-pressed", readingMode !== "kana" ? "true" : "false");
-    btn.setAttribute("aria-label", `切換日文讀音：目前顯示${label}`);
-  }
+  const group = document.getElementById("reading-segmented");
+  if (group) group.setAttribute("aria-label", `日文讀音顯示：目前為${label}`);
+  document.querySelectorAll("[data-reading-mode]").forEach(button => {
+    const active = button.dataset.readingMode === readingMode;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+  });
 }
 
 function updateLyricDisplayUi(){
