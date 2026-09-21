@@ -1905,9 +1905,9 @@ function buildSongShell(){
           <span class="venue-label">卡拉OK</span>
           <span class="venue-switch"><span class="venue-knob"></span></span>
         </button>
-        <button class="autoscroll-toggle${autoScrollEnabled ? " active" : ""}" id="autoscroll-btn" aria-label="開啟／關閉自動捲動">
-          <span class="autoscroll-label">自動捲動</span>
-          <span class="autoscroll-switch"><span class="autoscroll-knob"></span></span>
+        <button class="venue-toggle autoscroll-toggle${autoScrollEnabled ? " active" : ""}" id="autoscroll-btn" aria-label="開啟／關閉自動捲動">
+          <span class="venue-label">自動捲動</span>
+          <span class="venue-switch"><span class="venue-knob"></span></span>
         </button>
       </div>
 
