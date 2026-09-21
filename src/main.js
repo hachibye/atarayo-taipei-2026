@@ -79,7 +79,7 @@ const SYNC_INTERVAL_MS   = 100;
 /* 지금 폰에 깔려 있는 화면이 몇 번째 판인지 알려 주는 표시.
    새로 올렸는데 화면이 그대로일 때, 옛 판이 남아 있는지 바로 확인할 수 있다.
    sw.js 의 CACHE_VERSION 과 같이 올려 주세요. */
-const BUILD = "v1.6.7";
+const BUILD = "v1.6.8";
 
 const REPO_URL = "https://github.com/watain666/Vaundy-Taiwan-2026";
 const FEEDBACK_URL = `${REPO_URL}/issues`;
@@ -88,7 +88,7 @@ const ORIGINAL_SITE_URL = "https://vaundy-seoul-2026.pages.dev/";
 function siteFooterHtml(){
   return `
     <footer class="credits">
-      <p class="credits-copy">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo;・TAIPEI FAN CHANT GUIDE（非官方粉絲製作）<span class="build">${BUILD}</span></p>
+      <p class="credits-copy">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo;・TAIWAN FAN CHANT GUIDE（非官方粉絲製作）<span class="build">${BUILD}</span></p>
       <nav class="credits-links" aria-label="專案連結">
         <a class="credits-link" href="${REPO_URL}" target="_blank" rel="noopener" aria-label="GitHub Repo" title="GitHub Repo">
           ${GITHUB_SVG}
