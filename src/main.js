@@ -11,6 +11,7 @@ import {
   CHEVRON_SVG,
   SEAT_SVG,
   MANNER_SVG,
+  CHECKLIST_SVG,
   WARN_SVG,
   FLASH_OFF_SVG,
   useSvg,
@@ -59,6 +60,7 @@ import { SONG_STORIES, SESSION_SONG_PHRASES, STARTER_PATHS, ATARAYO_TIMELINE } f
 const app = document.getElementById("app");
 const songView = document.getElementById("song-view");
 let countdownTimer = null;
+let sessionSongRolloverTimer = null;
 let countdownClockOffsetMs = 0;
 let countdownClockSource = "device";
 let player = null;
@@ -789,6 +791,37 @@ function renderHome(){
         </div>
       </div>
 
+      <div class="info-card" id="preflight-card">
+        <button class="menu-row info-toggle" aria-expanded="false">
+          <span class="info-toggle-icon">${CHECKLIST_SVG}</span>
+          <span class="info-toggle-label">行前確認</span>
+          <span class="info-toggle-chevron">${CHEVRON_SVG}</span>
+        </button>
+        <div class="info-panel" inert aria-hidden="true">
+          <div class="info-panel-inner">
+            <div class="way-sec preflight-sec">
+              <h4>出門前再看一次 <span>勾選狀態只保存在這台裝置</span></h4>
+              <div class="preflight-ticket">
+                <b>別忘了先取票</b>
+                <span>KKTIX 票券於演出前 5 日起開放全家 FamiPort 取票，預計 12/14 起可領取；出門前請確認已拿到實體票券。</span>
+              </div>
+              <div class="preflight-list">
+                ${[
+                  ["ticket", "KKTIX 實體票券"],
+                  ["phone", "手機"],
+                  ["wallet-keys", "錢包、鑰匙"],
+                  ["id", "身分證件"],
+                  ["power", "行動電源"],
+                  ["rain", "雨具"],
+                  ["support", "應援物"],
+                  ["water", "水"]
+                ].map(([id, label]) => `<label><input type="checkbox" data-preflight="${id}"><span>${label}</span></label>`).join("")}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="info-card" id="manner-card">
         <button class="menu-row info-toggle" aria-expanded="false">
           <span class="info-toggle-icon">${MANNER_SVG}</span>
@@ -799,25 +832,6 @@ function renderHome(){
           <div class="info-panel-inner">
 
             <p class="way-note">あたらよ的現場重點是<b>跟著歌曲情緒聆聽</b>，不是整場照表操課的固定口號或手勢。應援不是義務，安靜欣賞也完全正確。</p>
-
-            <div class="way-sec preflight-sec">
-              <h4>行前確認 <span>勾選狀態只保存在這台裝置</span></h4>
-              <div class="preflight-ticket">
-                <b>別忘了先取票</b>
-                <span>KKTIX 票券於演出前 5 日起開放全家 FamiPort 取票，預計 12/14 起可領取；出門前請確認已拿到實體票券。</span>
-              </div>
-              <div class="preflight-list">
-                ${[
-                  ["ticket", "KKTIX 實體票券"],
-                  ["phone", "手機"],
-                  ["id", "身分證件"],
-                  ["power", "行動電源"],
-                  ["rain", "雨具"],
-                  ["support", "應援物"],
-                  ["water", "水"]
-                ].map(([id, label]) => `<label><input type="checkbox" data-preflight="${id}"><span>${label}</span></label>`).join("")}
-              </div>
-            </div>
 
             <div class="way-sec">
               <h4>あたらよ的應援方式 <span>知道這些就足夠</span></h4>
@@ -1651,10 +1665,19 @@ function setupPreflightChecklist(){
 }
 
 function sessionSongChoice(){
-  let id = "";
-  try { id = sessionStorage.getItem("atarayo-session-song") || ""; } catch {}
+  const dateKey = taipeiDateKey(new Date());
+  const storedDate = store("atarayo-daily-song-date");
+  const id = storedDate === dateKey ? store("atarayo-daily-song") || "" : "";
   let song = SONGS.find(item => item.id === id);
-  if (song) return song;
+  if (song) {
+    try {
+      if (sessionStorage.getItem("atarayo-session-song-date") !== dateKey) {
+        sessionStorage.removeItem("atarayo-session-song-revealed");
+      }
+      sessionStorage.setItem("atarayo-session-song-date", dateKey);
+    } catch {}
+    return song;
+  }
 
   const previous = store("atarayo-last-session-song");
   const choices = SONGS.filter(item => item.id !== previous);
@@ -1662,9 +1685,25 @@ function sessionSongChoice(){
   if (window.crypto?.getRandomValues) window.crypto.getRandomValues(random);
   else random[0] = Math.floor(Math.random() * 0xffffffff);
   song = choices[random[0] % choices.length] || SONGS[0];
-  try { sessionStorage.setItem("atarayo-session-song", song.id); } catch {}
+  store("atarayo-daily-song-date", dateKey);
+  store("atarayo-daily-song", song.id);
   store("atarayo-last-session-song", song.id);
+  try {
+    sessionStorage.setItem("atarayo-session-song-date", dateKey);
+    sessionStorage.removeItem("atarayo-session-song-revealed");
+  } catch {}
   return song;
+}
+
+function millisecondsUntilNextTaipeiDay(){
+  const key = taipeiDateKey(new Date());
+  const nextMidnight = Date.UTC(
+    Number(key.slice(0, 4)),
+    Number(key.slice(5, 7)) - 1,
+    Number(key.slice(8, 10)) + 1,
+    -8, 0, 0, 50
+  );
+  return Math.max(250, nextMidnight - Date.now());
 }
 
 function setupSessionSong(){
@@ -1674,16 +1713,25 @@ function setupSessionSong(){
   const phrase = document.getElementById("session-song-phrase");
   const open = document.getElementById("session-song-open");
   if (!draw || !result || !name || !phrase || !open) return;
-  const song = sessionSongChoice();
-  name.textContent = song.title;
-  phrase.textContent = SESSION_SONG_PHRASES[song.id] || "今天也讓一首歌陪你走一段路。";
+  let song = sessionSongChoice();
+  const paintSong = ()=>{
+    name.textContent = song.title;
+    phrase.textContent = SESSION_SONG_PHRASES[song.id] || "今天也讓一首歌陪你走一段路。";
+  };
+  paintSong();
 
   let revealed = false;
-  try { revealed = sessionStorage.getItem("atarayo-session-song-revealed") === "1"; } catch {}
+  try {
+    revealed = sessionStorage.getItem("atarayo-session-song-date") === taipeiDateKey(new Date())
+      && sessionStorage.getItem("atarayo-session-song-revealed") === "1";
+  } catch {}
   const show = ()=>{
     result.hidden = false;
     draw.hidden = true;
-    try { sessionStorage.setItem("atarayo-session-song-revealed", "1"); } catch {}
+    try {
+      sessionStorage.setItem("atarayo-session-song-date", taipeiDateKey(new Date()));
+      sessionStorage.setItem("atarayo-session-song-revealed", "1");
+    } catch {}
   };
   if (revealed) show();
   draw.addEventListener("click", show);
@@ -1691,6 +1739,19 @@ function setupSessionSong(){
     setSongFrom("guide");
     gotoSong(song);
   });
+
+  if (sessionSongRolloverTimer !== null) clearTimeout(sessionSongRolloverTimer);
+  const scheduleRollover = ()=>{
+    sessionSongRolloverTimer = window.setTimeout(()=>{
+      if (!document.body.contains(draw)) return;
+      song = sessionSongChoice();
+      paintSong();
+      result.hidden = true;
+      draw.hidden = false;
+      scheduleRollover();
+    }, millisecondsUntilNextTaipeiDay());
+  };
+  scheduleRollover();
 }
 
 /* ── 준비물 체크 · 주소 복사 · 공유 · 오프라인 상태 ───────────── */
