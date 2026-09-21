@@ -82,15 +82,15 @@ const SYNC_INTERVAL_MS   = 100;
 const BUILD = "v1.6.4";
 
 const REPO_URL = "https://github.com/watain666/Vaundy-Taiwan-2026";
-const FEEDBACK_URL = `${REPO_URL}/issues/new`;
+const FEEDBACK_URL = `${REPO_URL}/issues`;
 
 function siteFooterHtml(){
   return `
     <footer class="credits">
       <p class="credits-copy">VAUNDY ASIA ARENA TOUR 2026 &ldquo;HORO&rdquo;・TAIPEI FAN CHANT GUIDE（非官方粉絲製作）<span class="build">${BUILD}</span></p>
       <nav class="credits-links" aria-label="專案連結">
-        <a class="credits-link" href="${REPO_URL}" target="_blank" rel="noopener" aria-label="GitHub Repo">
-          ${GITHUB_SVG}<span>GitHub Repo</span>
+        <a class="credits-link" href="${REPO_URL}" target="_blank" rel="noopener" aria-label="GitHub Repo" title="GitHub Repo">
+          ${GITHUB_SVG}
         </a>
         <a class="credits-link" href="${FEEDBACK_URL}" target="_blank" rel="noopener" aria-label="意見回饋">
           ${EXT_LINK_SVG}<span>意見回饋</span>
