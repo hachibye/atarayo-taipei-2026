@@ -2687,7 +2687,7 @@ function renderRomajiLine(str, includeIcons = true){
 
 function readingModeLabel(mode = readingMode){
   if (mode === "romaji") return "Romaji";
-  if (mode === "both") return "假名＋Romaji";
+  if (mode === "both") return "假名+羅馬字";
   return "假名";
 }
 
