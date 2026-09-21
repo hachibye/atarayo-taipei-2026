@@ -484,6 +484,19 @@
   .credits-link svg{ width:15px;height:15px;flex:none; }
   .credits-link:hover,
   .credits-link:focus-visible{ color:var(--teal); }
+  .credits-fork{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:4px;
+    min-width:0;
+    max-width:100%;
+    overflow-wrap:anywhere;
+  }
+  .credits-fork a{ color:inherit;text-decoration:none; }
+  .credits-fork a:hover,
+  .credits-fork a:focus-visible{ color:var(--teal);text-decoration:underline; }
 
   /* ---------- INFO ACCORDION (공연 정보 / 관객 입장안내) ---------- */
   /* 히어로(첫 화면) 안에 들어가는 공연 정보 카드 */
