@@ -1097,6 +1097,13 @@
     line-height:1.4;
   }
   .lyrics-credit[hidden]{display:none;}
+  .lyrics-credit a{
+    color:inherit;
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .lyrics-credit a:hover,
+  .lyrics-credit a:focus-visible{color:var(--teal);}
   .karaoke-source-status{
     display:block;
     box-sizing:border-box;
@@ -1110,9 +1117,6 @@
     font-size:11px;
     line-height:1.45;
   }
-  .karaoke-source-status[data-state="ready"]{color:var(--teal);}
-  .karaoke-source-status[data-state="loading"],
-  .karaoke-source-status[data-state="fallback"]{color:#b9a98a;}
   .karaoke-source-popover{
     position:absolute;
     top:8px;right:8px;
