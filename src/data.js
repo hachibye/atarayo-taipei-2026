@@ -2,7 +2,7 @@
  * Atarayo Taipei 2026 event data.
  *
  * Event facts come from the official Atarayo tour page and the KKTIX event
- * page. The spoiler list is the user-submitted 2026 Malaysia setlist, not a
+ * page. The spoiler list is the 2026 Japan tour setlist, not a
  * leaked or confirmed Taipei setlist. Titles use the official Japanese forms.
  */
 
@@ -271,31 +271,30 @@ export const SONG_BPM = Object.freeze(
 
 /*
  * Kept under the existing export name to minimise changes to the inherited UI.
- * This is the Malaysia reference setlist, not the Taipei performance order.
+ * This is the 2026 Japan tour reference setlist, not the Taipei performance order.
  */
 export const SETLIST_TOKYO = {
-  label: "2026 馬來西亞獨立專場參考歌單",
-  dates: "2026.07.24｜ATARAYO ONE-MAN LIVE IN JAPAN EXPO MALAYSIA 2026｜非本次亞巡站次",
-  sourceUrl: "https://www.setlist.fm/setlist/atarayo/2026/kl-convention-centre-kuala-lumpur-malaysia-4375d7df.html",
+  label: "2026 日本巡演參考歌單",
+  dates: "2026｜Atarayo ASIA TOUR 2026「夕立が去ったその後で」日本巡演參考曲序",
+  sourceUrl: "",
   items: [
-    { n: 1, songs: [{ id: "NatsuGaKuruTabi", title: "夏が来るたび" }] },
-    { n: 2, songs: [{ id: "Natsugasumi", title: "夏霞" }] },
-    { n: 3, songs: [{ id: "BokuWa", title: "「僕は...」" }] },
+    { n: 1, songs: [{ id: "Sakana", title: "魚" }] },
+    { n: 2, songs: [{ id: "ShounenKazeKaoru", title: "少年、風薫る" }] },
+    { n: 3, songs: [{ id: "BuddyCover", title: "バディ" }] },
     { n: 4, songs: [{ id: "HaruTonari", title: "春となり" }] },
-    { n: 5, songs: [{ id: "JugatsuMukuchi", title: "10月無口な君を忘れる" }] },
-    { n: 6, songs: [{ id: "EightEight", title: "8.8" }] },
-    { n: 7, songs: [{ id: "Usotsuki", title: "嘘つき" }] },
-    { n: 8, songs: [{ id: "AkaneChiru", title: "アカネチル" }] },
-    { n: 9, songs: [{ id: "Oboreteiru", title: "溺れている" }] },
-    { n: 10, songs: [{ id: "Realize", title: "realize" }] },
-    { n: 11, songs: [{ id: "Ureizakura", title: "憂い桜" }] },
-    { n: 12, songs: [{ id: "Harururu", title: "晴るる" }] },
-    { n: 13, songs: [{ id: "Asanagi", title: "朝凪" }] },
-    { n: 14, songs: [{ id: "Kousaten", title: "交差点" }] },
-    { n: 15, songs: [{ id: "TsukiNoFune", title: "ツキノフネ" }] },
-    { n: 16, songs: [{ id: "MataNatsuWoOu", title: "また夏を追う" }] },
-    { n: 17, encore: true, songs: [{ id: "BokuraWaSoreWoAiToYonda", title: "僕らはそれを愛と呼んだ" }] },
-    { n: 18, songs: [{ id: "SoraAoiMama", title: "空蒼いまま" }] }
+    { n: 5, songs: [{ id: "FutariCover", title: "ふたり" }] },
+    { n: 6, songs: [{ id: "JugatsuMukuchi", title: "10月無口な君を忘れる" }] },
+    { n: 7, songs: [{ id: "MataNatsuWoOu", title: "また夏を追う" }] },
+    { n: 8, songs: [{ id: "SemiToTritoma", title: "蝉とトリトマ" }] },
+    { n: 9, songs: [{ id: "Tsutaetakatta", title: "伝えたかったこと" }] },
+    { n: 10, songs: [{ id: "Suzukaze", title: "涼風" }] },
+    { n: 11, songs: [{ id: "Root", title: "√" }] },
+    { n: 12, songs: [{ id: "BokuWa", title: "「僕は...」" }] },
+    { n: 13, songs: [{ id: "TsukiNoFune", title: "ツキノフネ" }] },
+    { n: 14, songs: [{ id: "Haku", title: "ハク" }] },
+    { n: 15, songs: [{ id: "Natsugasumi", title: "夏霞" }] },
+    { n: 16, songs: [{ id: "Asanagi", title: "朝凪" }] },
+    { n: 17, songs: [{ id: "NatsuGaKuruTabi", title: "夏が来るたび" }] }
   ]
 };
 

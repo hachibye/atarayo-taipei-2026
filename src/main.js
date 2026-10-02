@@ -1008,7 +1008,7 @@ function renderHome(){
         </a>
         <button class="menu-chip spoiler" type="button" id="setlist-btn">
           <span class="chip-ico warn">${WARN_SVG}</span>
-          <span class="chip-label">2026 馬來西亞場歌單</span>
+          <span class="chip-label">2026 日本巡演參考歌單</span>
           <span class="chip-note">有劇透</span>
         </button>
       </div>
@@ -1516,7 +1516,7 @@ function paintSetlist(){
 
   const desc = document.getElementById("setlist-desc");
   if (desc) desc.innerHTML = isOrder
-    ? `${escapeHtml(SETLIST_TOKYO.dates)}<br><a href="${SETLIST_TOKYO.sourceUrl}" target="_blank" rel="noopener">查看 setlist.fm 原始紀錄 ↗</a>`
+    ? `${escapeHtml(SETLIST_TOKYO.dates)}${SETLIST_TOKYO.sourceUrl ? `<br><a href="${SETLIST_TOKYO.sourceUrl}" target="_blank" rel="noopener">查看原始紀錄 ↗</a>` : ""}`
     : `${escapeHtml(SETLIST_TOKYO.dates)}<br>目前已將參考歌單<b>隨機排列</b>`;
 
   app.querySelectorAll(".set-mode").forEach(b=>{
@@ -1554,14 +1554,14 @@ function renderSetlist(){
         <div class="spoiler-mark">${WARN_SVG}</div>
         <h2 class="spoiler-title">前方有 2026 歌單劇透</h2>
         <p class="spoiler-desc">
-          這裡整理的是<b>2026 年 7 月 24 日馬來西亞獨立專場</b>，不是台北場正式歌單。
+          這裡整理的是<b>Atarayo ASIA TOUR 2026「夕立が去ったその後で」日本巡演場次參考歌單</b>，不是台北場正式歌單。
         </p>
         <div class="tour-scope" aria-label="活動歸屬說明">
-          <p><b>本次亞巡</b><span>「夕立が去ったその後で」自 8 月 22 日大阪開跑，官方站次為日本四城、香港三場與台北。</span></p>
-          <p><b>馬來西亞場</b><span>正式名稱為「ATARAYO ONE-MAN LIVE IN JAPAN EXPO MALAYSIA 2026」，是同年度海外專場，但未列入本次亞巡。</span></p>
+          <p><b>本次巡演</b><span>「夕立が去ったその後で」自 8 月起於日本各城巡迴展開，台北場為本次巡演壓軸站次。</span></p>
+          <p><b>參考歌單</b><span>依日本場現場演出曲序整理，供台北場歌迷提早熟悉曲目與預習。台北場實際曲目與順序仍以當天演出為準。</span></p>
         </div>
         <p class="spoiler-source"><a href="https://atarayo-jp.com/contents/tour/asia_tour2026" target="_blank" rel="noopener">查看官方亞巡日程 ↗</a></p>
-        <p class="spoiler-desc">日本國內場目前沒有可驗證的公開歌單，台北場曲目與順序也可能不同。</p>
+        <p class="spoiler-desc">台北場正式演出曲目與順序可能有所不同。</p>
         <button class="spoiler-safe" type="button" id="spoiler-safe">返回首頁</button>
 
         <div class="spoiler-choice">
@@ -1571,7 +1571,7 @@ function renderSetlist(){
           </button>
           <button class="spoiler-open" type="button" data-mode="order">
             <b>查看完整曲序</b>
-            <span>包含安可位置</span>
+            <span>依日本場曲序排列</span>
           </button>
         </div>
       </section>
@@ -1587,7 +1587,7 @@ function renderSetlist(){
           <button class="set-mode" type="button" data-mode="random">隨機順序</button>
         </div>
         <div class="set-order-confirm" id="set-order-confirm" role="group" aria-label="確認公開演出順序" hidden>
-          <p>將顯示馬來西亞場的完整演出順序。</p>
+          <p>將顯示日本巡演場次的完整演出順序。</p>
           <button type="button" id="set-order-cancel">取消</button>
           <button type="button" id="set-order-reveal">確認切換</button>
         </div>
