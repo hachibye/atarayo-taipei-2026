@@ -104,7 +104,33 @@ export const SONGS = [
   previewSong("Realize", "realize", "hks9PHSMo-g"),
   previewSong("Asanagi", "朝凪", "nrPxKCdPgnM"),
   previewSong("Kousaten", "交差点", "xNmv1tCigFg"),
-  previewSong("SoraAoiMama", "空蒼いまま", "gOJpsOhNi4A")
+  previewSong("SoraAoiMama", "空蒼いまま", "gOJpsOhNi4A"),
+  previewSong("Shogetsu", "祥月", "w6gD2XS-fxM"),
+  previewSong("Pierce", "ピアス", "Q0VOAAWODf4"),
+  previewSong("Kyokuya", "極夜", "Gs8pBBH6-FU"),
+  previewSong("Shiritakunakatta", "「知りたくなかった、失うのなら」", "IkA71P0_e5U"),
+  previewSong("KanashiiLoveSong", "悲しいラブソング", "mB00Bwv3p3A"),
+  previewSong("Gojuni", "52", "xUWSVNSWbp4"),
+  previewSong("Sai", "差異", "WcDOGGDIXXI"),
+  previewSong("YasashiiAprilFool", "優しいエイプリルフール", "jPEyk9lsh2M"),
+  previewSong("TadaSukiToIetara", "ただ好きと言えたら", "tQUqMISD0H8"),
+  previewSong("KonyaFutari", "今夜2人だけのダンスを", "bPcdl4BZ7Rw"),
+  previewSong("ChristmasNoYoru", "クリスマスのよる", "sZz8KDIIoiM"),
+  previewSong("AoWoSukuu", "青を掬う", "B9d2RMJP0e0"),
+  previewSong("TodokuMiraiE", "届く、未来へ", "Y_6sFi9R6QI"),
+  previewSong("NemurenaiYoru", "眠れない夜を君に", "yZhyDl1oaaI"),
+  previewSong("YukiSayuru", "雪冴ゆる", "trexKoD6a6Q"),
+  previewSong("Jyuusangatsu", "13月", "3cAVI0zccC0"),
+  previewSong("Refrain", "リフレイン", "JsApqqd02Mc"),
+  previewSong("KimiTo", "君と", "-L-VvspxyMU"),
+  previewSong("Hikare", "光れ", "vJt-S01eNOI"),
+  previewSong("Shinaide", "しないで", "5fdsAeMU5B0"),
+  previewSong("Yumeutsutsu", "夢現、夏風薫る", "54pVJd03s2U"),
+  previewSong("FutariCover", "ふたり", "DCq41_6-DA4"),
+  previewSong("BuddyCover", "バディ", "GAv9lmzpKro"),
+  previewSong("Root", "√", "OLxE7tmPWWI"),
+  previewSong("SemiToTritoma", "蝉とトリトマ", "5DUjsIHJR9c"),
+  previewSong("Tsutaetakatta", "伝えたかったこと", "O4jLFgdtESs")
 ];
 
 /*
@@ -140,7 +166,33 @@ export const STREAMING_IDS = Object.freeze({
   Realize: ["5XvpDIZqga1XDpt8HcAUOA", "1757790975"],
   Asanagi: ["6CUbPRA9vVWqBc7ncQ8sfY", "1834548535"],
   Kousaten: ["30PNP1Wa8tKyxUOTyX8KXx", "1609923384"],
-  SoraAoiMama: ["7KuDruzY7dnXzRXgLL1Oi0", "1664317608"]
+  SoraAoiMama: ["7KuDruzY7dnXzRXgLL1Oi0", "1664317608"],
+  Shogetsu: ["6wshmuVd6TBngLDEkm5CTO", "1613670048"],
+  Pierce: ["56XoTJJOKtHip2SQ8uWcWF", "1586096308"],
+  Kyokuya: ["71FYJKdXLroV5UYWjg4qA1", "1613670047"],
+  Shiritakunakatta: ["4Uhz9f0VQKcSY867rqz80l", "1613670049"],
+  KanashiiLoveSong: ["6exgbyrb2Bdjob70v2DhHx", "1613670050"],
+  Gojuni: ["5gQC15sAmhMxHDqKqtSlBR", "1613670053"],
+  Sai: ["5h2TIuO8wLJMZV5zMVd15F", "1613670055"],
+  YasashiiAprilFool: ["1wycwu57y4UGSxNFUUpJOx", "1630899492"],
+  TadaSukiToIetara: ["4IipBgo7ezhvECl2odGarn", "1698938108"],
+  KonyaFutari: ["6ljAfGfbmkBnhEwREQQsAY", "1698938110"],
+  ChristmasNoYoru: ["4watSjupcRe4jV3ZOid7YE", "1698938388"],
+  AoWoSukuu: ["3vB8shteBMXiu72Y0I57xp", "1698938389"],
+  TodokuMiraiE: ["4B4Zq784FjGiUnb9x7fI94", "1698938390"],
+  NemurenaiYoru: ["6LswTLrybtNM47zddXfPsI", "1698938391"],
+  YukiSayuru: ["5pCaX1pIz2jH49DNRFv08A", "1698938392"],
+  Jyuusangatsu: ["2XyHmpis59lgOvG6Ds28ar", "1698938394"],
+  Refrain: ["1sv9BSRemtQco3cQnNXWfy", "1764228953"],
+  KimiTo: ["63WA25WfYdOGJWSKW9g2NG", "1764228956"],
+  Hikare: ["7MWIeb6gdPRAEXSzJrHs5H", "1764228958"],
+  Shinaide: ["40qZtWHCLVkO7jpnjPca0M", "1838386844"],
+  Yumeutsutsu: ["6BxrqlNGUdE4CPIhfc3IDo", "1838386845"],
+  FutariCover: ["1sTUvRot7jiJ5iFsicqb6M", "6793854739"],
+  BuddyCover: ["5BayhomxUoRprSLNCQxpf4", "6793854740"],
+  Root: ["3nwqfTCMIywEIi5mZx74s9", "6793854743"],
+  SemiToTritoma: ["5ib4lqUK4QVLUDYogdQ9eK", "6793854744"],
+  Tsutaetakatta: ["5srwkwZMVSdVTgw46L4XMx", "6793854745"]
 });
 
 /*
@@ -153,11 +205,14 @@ export const GUIDE_COLLECTIONS = [
     id: "new-2026",
     label: "2026 新作",
     title: "先聽今年的新歌",
-    description: "收錄 2026 專輯中已發布官方影片的歌曲。",
+    description: "完整收錄 2026 最新專輯《私雨に夏の灯を知る》全 9 首曲目。",
     sourceLabel: "官方專輯與影片",
     sourceUrl: "https://atarayo-jp.com/musics/21060",
-    checkedAt: "2026.09.21",
-    songIds: ["Suzukaze", "Sakana", "HaruTonari", "Haku"]
+    checkedAt: "2026.10.02",
+    songIds: [
+      "Suzukaze", "Sakana", "HaruTonari", "FutariCover", "BuddyCover",
+      "Haku", "Root", "SemiToTritoma", "Tsutaetakatta"
+    ]
   },
   {
     id: "spotify-top",
@@ -166,7 +221,7 @@ export const GUIDE_COLLECTIONS = [
     description: "依 Spotify 藝人頁目前顯示的熱門歌曲排序。",
     sourceLabel: "Spotify Top tracks",
     sourceUrl: "https://open.spotify.com/artist/2yRnjWtHzmDELwYaUiX0Yh",
-    checkedAt: "2026.09.21",
+    checkedAt: "2026.10.02",
     songIds: [
       "JugatsuMukuchi", "BokuWa", "Natsugasumi", "MataNatsuWoOu", "Suzukaze",
       "Sakana", "HaruTonari", "Usotsuki", "BokuraWaSoreWoAiToYonda", "NatsuGaKuruTabi"
@@ -179,10 +234,10 @@ export const GUIDE_COLLECTIONS = [
     description: "依 Apple Music 藝人頁目前顯示的熱門歌曲排序。",
     sourceLabel: "Apple Music Top Songs",
     sourceUrl: "https://music.apple.com/tw/artist/atarayo/1558407178",
-    checkedAt: "2026.09.21",
+    checkedAt: "2026.10.02",
     songIds: [
-      "BokuWa", "Natsugasumi", "JugatsuMukuchi", "MataNatsuWoOu", "Usotsuki",
-      "Ureizakura", "Suzukaze", "EightEight", "Outcry", "Sakana"
+      "Natsugasumi", "BokuWa", "MataNatsuWoOu", "JugatsuMukuchi", "BokuraWaSoreWoAiToYonda",
+      "Usotsuki", "EightEight", "HaruTonari", "Kousaten", "Outcry"
     ]
   },
   {
@@ -192,10 +247,10 @@ export const GUIDE_COLLECTIONS = [
     description: "依官方網站影片頁順序，整理 2024 至 2026 年作品。",
     sourceLabel: "Atarayo 官方影片",
     sourceUrl: "https://atarayo-jp.com/movies/categories/video",
-    checkedAt: "2026.09.21",
+    checkedAt: "2026.10.02",
     songIds: [
-      "Suzukaze", "Sakana", "HaruTonari", "Haku", "YozoraWoMushibande", "Bouai",
-      "TsukiNoFune", "Shizuku", "AkegataNoNatsu", "ShounenKazeKaoru", "BokuWa", "KoisuruMonoNoAware"
+      "SemiToTritoma", "Suzukaze", "Sakana", "HaruTonari", "Haku", "YozoraWoMushibande",
+      "Bouai", "TsukiNoFune", "Shizuku", "AkegataNoNatsu", "ShounenKazeKaoru", "BokuWa"
     ]
   },
   {
@@ -205,7 +260,7 @@ export const GUIDE_COLLECTIONS = [
     description: "包含上述分類及目前已整理的官方影片。",
     sourceLabel: "Atarayo 官方影片",
     sourceUrl: "https://atarayo-jp.com/movies/categories/video",
-    checkedAt: "2026.09.21",
+    checkedAt: "2026.10.02",
     songIds: SONGS.map(song => song.id)
   }
 ];
