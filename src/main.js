@@ -38,7 +38,7 @@ import {
   STREAMING_IDS,
   GUIDE_COLLECTIONS,
   SONG_BPM,
-  SETLIST_TOKYO,
+  REFERENCE_SETLISTS,
   SEAT_VIEW,
   SEAT_BLOCKS,
   SEAT_GRADE,
@@ -54,7 +54,7 @@ import {
 } from "./chant-guide.js";
 import { loadFurigana, loadKaraokeSources } from "./services/lazy-modules.js";
 import { store } from "./services/storage.js";
-import { traditionalChineseFor } from "./data/lyrics-zh-tw.js";
+import { hasTraditionalChineseLyrics, traditionalChineseFor } from "./data/lyrics-zh-tw.js";
 import { SONG_STORIES, SESSION_SONG_PHRASES, STARTER_PATHS, ATARAYO_TIMELINE } from "./editorial.js";
 import { ATARAYO_DISCOGRAPHY, LISTENING_MOODS } from "./data/discography.js";
 import TABLER_CARDS_SVG from "@tabler/icons/outline/cards.svg?raw";
@@ -81,7 +81,6 @@ const READING_MODES = ["kana", "romaji", "both"];
 const storedReadingMode = store("atarayo-reading");
 let readingMode = READING_MODES.includes(storedReadingMode) ? storedReadingMode : "both";
 let showJapanese = store("atarayo-show-japanese") !== "0";
-let showChinese = store("atarayo-show-chinese") !== "0";
 let chantVersion = DEFAULT_CHANT_VERSION;
 // 卡拉OK 預設關閉；若使用者曾手動選擇，則沿用保存的設定。
 let karaokeEnabled = store("atarayo-karaoke") === "1";
@@ -1008,7 +1007,7 @@ function renderHome(){
         </a>
         <button class="menu-chip spoiler" type="button" id="setlist-btn">
           <span class="chip-ico warn">${WARN_SVG}</span>
-          <span class="chip-label">2026 日本巡演參考歌單</span>
+          <span class="chip-label">2026 場次參考歌單</span>
           <span class="chip-note">有劇透</span>
         </button>
       </div>
@@ -1089,6 +1088,11 @@ function renderStarterGuide(){
           <h2>先從一個捨不得天亮的夜晚開始</h2>
           <p>不用先背完整歷史。認識 Atarayo，最好的方式是挑一種你熟悉的情緒，讓一首歌帶你走進下一首。</p>
         </header>
+
+        <figure class="starter-band-photo">
+          <img src="https://atarayo-jp.com/s3/skiyaki/uploads/artist_photo/image/25738/DSC00065_re_43s.jpg"
+               alt="Atarayo 三位團員合照" loading="lazy" decoding="async">
+        </figure>
 
         <section class="primer-grid" aria-label="樂團簡介">
           <article><span>01</span><h3>Atarayo 是誰</h3><p>2020 年從 YouTube 開始活動的日本三人樂團，自稱「悲しみをたべて育つバンド。」也就是把悲傷吃下，並從中生長的樂團。作品擅長讓一段私人記憶，變成每個人都曾有過的夜晚。</p></article>
@@ -1366,6 +1370,20 @@ let setlistMode     = "random";
 let setlistShuffle  = null;   // 섞은 순서 (곡 키 배열)
 let setlistRevealed = false;  // 가림막을 이미 걷었는지 (이번 방문 동안)
 let setlistScrollY  = 0;      // 곡을 보러 가기 전 스크롤 위치
+let setlistSelection = (()=>{
+  const saved = store("atarayo-reference-setlist");
+  return REFERENCE_SETLISTS.some(item => item.id === saved)
+    ? saved
+    : REFERENCE_SETLISTS[0].id;
+})();
+
+function activeSetlist(){
+  return REFERENCE_SETLISTS.find(item => item.id === setlistSelection) || REFERENCE_SETLISTS[0];
+}
+
+function setlistShuffleKey(){
+  return `atarayo-set-shuffle-${activeSetlist().id}`;
+}
 
 /* 홈으로 나가면 셋리스트를 처음 상태로 되돌린다.
    · 곡을 보러 갔다 '뒤로' 오는 건 보던 화면 그대로 (중간에 끊기면 불편하므로)
@@ -1392,7 +1410,7 @@ function setSetlistPos(i){
    드러나지 않는다. */
 function setlistFlat(){
   const out = [];
-  SETLIST_TOKYO.items.forEach(it =>
+  activeSetlist().items.forEach(it =>
     it.songs.forEach((e, i) => out.push({
       key: it.n + ":" + i,
       id: e.id,
@@ -1409,13 +1427,13 @@ function makeSetlistShuffle(){
     const t = keys[i]; keys[i] = keys[j]; keys[j] = t;
   }
   setlistShuffle = keys;
-  store("atarayo-set-shuffle2", JSON.stringify(keys));
+  store(setlistShuffleKey(), JSON.stringify(keys));
 }
 
 function ensureSetlistShuffle(){
   const flat = setlistFlat();
   if (setlistShuffle && setlistShuffle.length === flat.length) return;
-  const saved = store("atarayo-set-shuffle2");
+  const saved = store(setlistShuffleKey());
   if (saved){
     try {
       const arr = JSON.parse(saved);
@@ -1492,15 +1510,24 @@ function setlistRandomRowHtml(x){
     </li>`;
 }
 
+function setlistSourceHtml(setlist){
+  const sources = Array.isArray(setlist.sources) ? setlist.sources : [];
+  if (!sources.length) return "";
+  return `<span class="setlist-sources">${sources.map(source =>
+    `<a href="${escapeHtml(source.url)}" target="_blank" rel="noopener">${escapeHtml(source.label)} ↗</a>`
+  ).join("")}</span>`;
+}
+
 /* 목록만 다시 그린다 (보기 방식을 바꿀 때 화면 전체를 새로 그리지 않도록) */
 function paintSetlist(){
   const listEl = document.getElementById("set-list");
   if (!listEl) return;
+  const setlist = activeSetlist();
   const isOrder = setlistMode === "order";
   const total = setlistFlat().length;
 
   listEl.innerHTML = isOrder
-    ? SETLIST_TOKYO.items.map(setlistRowHtml).join("")
+    ? setlist.items.map(setlistRowHtml).join("")
     : setlistRandomSongs().map(setlistRandomRowHtml).join("");
 
   const countEl = document.getElementById("setlist-count");
@@ -1516,8 +1543,19 @@ function paintSetlist(){
 
   const desc = document.getElementById("setlist-desc");
   if (desc) desc.innerHTML = isOrder
-    ? `${escapeHtml(SETLIST_TOKYO.dates)}${SETLIST_TOKYO.sourceUrl ? `<br><a href="${SETLIST_TOKYO.sourceUrl}" target="_blank" rel="noopener">查看原始紀錄 ↗</a>` : ""}`
-    : `${escapeHtml(SETLIST_TOKYO.dates)}<br>目前已將參考歌單<b>隨機排列</b>`;
+    ? `${escapeHtml(setlist.dates)}${setlistSourceHtml(setlist)}`
+    : `${escapeHtml(setlist.dates)}<br>目前已將參考歌單<b>隨機排列</b>${setlistSourceHtml(setlist)}`;
+
+  const titleEl = document.getElementById("setlist-title");
+  if (titleEl) titleEl.textContent = setlist.label;
+  const orderConfirmCopy = document.getElementById("set-order-confirm-copy");
+  if (orderConfirmCopy) orderConfirmCopy.textContent = `將顯示${setlist.shortLabel}的完整演出順序。`;
+
+  app.querySelectorAll(".setlist-event").forEach(button => {
+    const on = button.dataset.setlist === setlist.id;
+    button.classList.toggle("active", on);
+    button.setAttribute("aria-pressed", on ? "true" : "false");
+  });
 
   app.querySelectorAll(".set-mode").forEach(b=>{
     const on = b.dataset.mode === setlistMode;
@@ -1554,11 +1592,11 @@ function renderSetlist(){
         <div class="spoiler-mark">${WARN_SVG}</div>
         <h2 class="spoiler-title">前方有 2026 歌單劇透</h2>
         <p class="spoiler-desc">
-          這裡整理的是<b>Atarayo ASIA TOUR 2026「夕立が去ったその後で」日本巡演場次參考歌單</b>，不是台北場正式歌單。
+          這裡整理<b>東京亞巡場</b>與<b>馬來西亞獨立專場</b>兩份公開參考紀錄，不是台北場正式歌單。
         </p>
         <div class="tour-scope" aria-label="活動歸屬說明">
-          <p><b>本次巡演</b><span>「夕立が去ったその後で」自 8 月起於日本各城巡迴展開，台北場為本次巡演壓軸站次。</span></p>
-          <p><b>參考歌單</b><span>依日本場現場演出曲序整理，供台北場歌迷提早熟悉曲目與預習。台北場實際曲目與順序仍以當天演出為準。</span></p>
+          <p><b>東京場</b><span>2026 年 9 月 18 日 Spotify O-EAST，屬於「夕立が去ったその後で」亞洲巡演。</span></p>
+          <p><b>馬來西亞場</b><span>2026 年 7 月 24 日 KLCC Hall 6，為同年度海外獨立專場，不屬於本次亞巡站次。</span></p>
         </div>
         <p class="spoiler-source"><a href="https://atarayo-jp.com/contents/tour/asia_tour2026" target="_blank" rel="noopener">查看官方亞巡日程 ↗</a></p>
         <p class="spoiler-desc">台北場正式演出曲目與順序可能有所不同。</p>
@@ -1571,14 +1609,23 @@ function renderSetlist(){
           </button>
           <button class="spoiler-open" type="button" data-mode="order">
             <b>查看完整曲序</b>
-            <span>依日本場曲序排列</span>
+            <span>包含安可位置</span>
           </button>
         </div>
       </section>
 
       <section class="setlist-body" id="setlist-body" hidden inert>
+        <div class="setlist-events" role="group" aria-label="選擇參考場次">
+          ${REFERENCE_SETLISTS.map(setlist => `
+            <button class="setlist-event${setlist.id === setlistSelection ? " active" : ""}" type="button"
+                    data-setlist="${escapeHtml(setlist.id)}" aria-pressed="${setlist.id === setlistSelection ? "true" : "false"}">
+              <span>${escapeHtml(setlist.shortLabel)}</span>
+              <small>${escapeHtml(setlist.scope)}</small>
+            </button>
+          `).join("")}
+        </div>
         <div class="setlist-head">
-          <h2>${escapeHtml(SETLIST_TOKYO.label)}</h2>
+          <h2 id="setlist-title">${escapeHtml(activeSetlist().label)}</h2>
           <p id="setlist-desc"></p>
         </div>
 
@@ -1587,7 +1634,7 @@ function renderSetlist(){
           <button class="set-mode" type="button" data-mode="random">隨機順序</button>
         </div>
         <div class="set-order-confirm" id="set-order-confirm" role="group" aria-label="確認公開演出順序" hidden>
-          <p>將顯示日本巡演場次的完整演出順序。</p>
+          <p id="set-order-confirm-copy">將顯示所選場次的完整演出順序。</p>
           <button type="button" id="set-order-cancel">取消</button>
           <button type="button" id="set-order-reveal">確認切換</button>
         </div>
@@ -1626,6 +1673,18 @@ function renderSetlist(){
 
   app.querySelectorAll(".spoiler-choice .spoiler-open").forEach(b=>{
     b.addEventListener("click", ()=> reveal(b.dataset.mode));
+  });
+
+  app.querySelectorAll(".setlist-event").forEach(button => {
+    button.addEventListener("click", ()=>{
+      if (!REFERENCE_SETLISTS.some(item => item.id === button.dataset.setlist)) return;
+      if (setlistSelection === button.dataset.setlist) return;
+      setlistSelection = button.dataset.setlist;
+      setlistShuffle = null;
+      store("atarayo-reference-setlist", setlistSelection);
+      orderConfirm.hidden = true;
+      paintSetlist();
+    });
   });
 
   // 이미 펼친 뒤 보기 방식을 바꿀 때
@@ -2671,10 +2730,6 @@ function buildSongShell(){
           <span class="venue-label">日文</span>
           <span class="venue-switch"><span class="venue-knob"></span></span>
         </button>
-        <button class="venue-toggle display-toggle${showChinese ? " active" : ""}" id="chinese-toggle" aria-pressed="${showChinese ? "true" : "false"}" aria-label="切換繁中翻譯：目前${showChinese ? "顯示" : "隱藏"}">
-          <span class="venue-label">中文</span>
-          <span class="venue-switch"><span class="venue-knob"></span></span>
-        </button>
         <button class="venue-toggle display-toggle karaoke-toggle${karaokeEnabled ? " active" : ""}" id="karaoke-btn" aria-pressed="${karaokeEnabled ? "true" : "false"}" aria-label="切換逐字卡拉OK高亮：目前${karaokeEnabled ? "開啟" : "關閉"}">
           <span class="venue-label">卡拉OK</span>
           <span class="venue-switch"><span class="venue-knob"></span></span>
@@ -2850,12 +2905,6 @@ function buildSongShell(){
   document.getElementById("japanese-toggle").addEventListener("click", ()=>{
     showJapanese = !showJapanese;
     store("atarayo-show-japanese", showJapanese ? "1" : "0");
-    updateLyricDisplayUi();
-  });
-
-  document.getElementById("chinese-toggle").addEventListener("click", ()=>{
-    showChinese = !showChinese;
-    store("atarayo-show-chinese", showChinese ? "1" : "0");
     updateLyricDisplayUi();
   });
 
@@ -3123,6 +3172,12 @@ function setLyricsNote(text){
   if (row) row.hidden = !text;
 }
 
+function translationAvailabilityNote(song){
+  return hasTraditionalChineseLyrics(song && song.id)
+    ? ""
+    : "繁中歌詞請開啟影片內的 YouTube CC 字幕；可用語言依各支官方影片提供為準。";
+}
+
 function setLyricsPanelMessage(title = "", detail = "", state = ""){
   const panel = document.getElementById("lyrics-empty");
   const titleEl = document.getElementById("lyrics-empty-title");
@@ -3384,19 +3439,12 @@ function updateLyricDisplayUi(){
   const page = document.getElementById("song-page");
   if (!page) return;
   page.classList.toggle("hide-japanese", !showJapanese);
-  page.classList.toggle("hide-chinese", !showChinese);
 
   const japaneseBtn = document.getElementById("japanese-toggle");
   if (japaneseBtn){
     japaneseBtn.classList.toggle("active", showJapanese);
     japaneseBtn.setAttribute("aria-pressed", showJapanese ? "true" : "false");
     japaneseBtn.setAttribute("aria-label", `切換日文歌詞：目前${showJapanese ? "顯示" : "隱藏"}`);
-  }
-  const chineseBtn = document.getElementById("chinese-toggle");
-  if (chineseBtn){
-    chineseBtn.classList.toggle("active", showChinese);
-    chineseBtn.setAttribute("aria-pressed", showChinese ? "true" : "false");
-    chineseBtn.setAttribute("aria-label", `切換繁中翻譯：目前${showChinese ? "顯示" : "隱藏"}`);
   }
   updateLyricsPadding();
 }
@@ -3878,7 +3926,7 @@ async function loadKaraokeTiming(song){
     const timingLabel = timed.precision === "estimated-line" ? "估算逐句時間"
       : timed.precision === "line" ? "逐句時間" : "逐字時間";
     setKaraokeSourceStatus("ready", `歌詞與${timingLabel}：${source}（${lyricLines.length} 行）`);
-    setLyricsNote("");
+    setLyricsNote(translationAvailabilityNote(song));
     updateLyricsSync(true);
     return;
   }

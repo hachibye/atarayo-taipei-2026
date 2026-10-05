@@ -2,8 +2,8 @@
  * Atarayo Taipei 2026 event data.
  *
  * Event facts come from the official Atarayo tour page and the KKTIX event
- * page. The spoiler list is the 2026 Japan tour setlist, not a
- * leaked or confirmed Taipei setlist. Titles use the official Japanese forms.
+ * page. The spoiler lists are reference records from Tokyo and Kuala Lumpur,
+ * not leaked or confirmed Taipei setlists. Titles use the official Japanese forms.
  */
 
 export const SHOW_TIMELINE = {
@@ -269,14 +269,16 @@ export const SONG_BPM = Object.freeze(
   Object.fromEntries(SONGS.map(song => [song.id, 90]))
 );
 
-/*
- * Kept under the existing export name to minimise changes to the inherited UI.
- * This is the 2026 Japan tour reference setlist, not the Taipei performance order.
- */
 export const SETLIST_TOKYO = {
-  label: "2026 日本巡演參考歌單",
-  dates: "2026｜Atarayo ASIA TOUR 2026「夕立が去ったその後で」日本巡演參考曲序",
-  sourceUrl: "",
+  id: "tokyo-2026",
+  shortLabel: "東京 09.18",
+  label: "2026 東京 Spotify O-EAST 場參考歌單",
+  dates: "2026.09.18｜東京 Spotify O-EAST｜ASIA TOUR 2026「夕立が去ったその後で」",
+  scope: "本次亞巡東京場",
+  sources: [
+    { label: "非官方觀眾演出紀錄", url: "https://ameblo.jp/serment-musicinlife/entry-12980356580.html" },
+    { label: "LiveFans 場次頁面", url: "https://www.livefans.jp/events/1970940" }
+  ],
   items: [
     { n: 1, songs: [{ id: "Sakana", title: "魚" }] },
     { n: 2, songs: [{ id: "ShounenKazeKaoru", title: "少年、風薫る" }] },
@@ -293,10 +295,46 @@ export const SETLIST_TOKYO = {
     { n: 13, songs: [{ id: "TsukiNoFune", title: "ツキノフネ" }] },
     { n: 14, songs: [{ id: "Haku", title: "ハク" }] },
     { n: 15, songs: [{ id: "Natsugasumi", title: "夏霞" }] },
-    { n: 16, songs: [{ id: "Asanagi", title: "朝凪" }] },
+    { n: 16, encore: true, songs: [{ id: "Asanagi", title: "朝凪" }] },
     { n: 17, songs: [{ id: "NatsuGaKuruTabi", title: "夏が来るたび" }] }
   ]
 };
+
+export const SETLIST_MALAYSIA = {
+  id: "malaysia-2026",
+  shortLabel: "吉隆坡 07.24",
+  label: "2026 馬來西亞獨立專場參考歌單",
+  dates: "2026.07.24｜KLCC Hall 6｜ATARAYO ONE-MAN LIVE IN JAPAN EXPO MALAYSIA 2026",
+  scope: "同年度海外獨立專場",
+  sources: [
+    { label: "setlist.fm 使用者紀錄", url: "https://www.setlist.fm/setlist/atarayo/2026/kl-convention-centre-kuala-lumpur-malaysia-4375d7df.html" }
+  ],
+  items: [
+    { n: 1, songs: [{ id: "NatsuGaKuruTabi", title: "夏が来るたび" }] },
+    { n: 2, songs: [{ id: "Natsugasumi", title: "夏霞" }] },
+    { n: 3, songs: [{ id: "BokuWa", title: "「僕は...」" }] },
+    { n: 4, songs: [{ id: "HaruTonari", title: "春となり" }] },
+    { n: 5, songs: [{ id: "JugatsuMukuchi", title: "10月無口な君を忘れる" }] },
+    { n: 6, songs: [{ id: "EightEight", title: "8.8" }] },
+    { n: 7, songs: [{ id: "Usotsuki", title: "嘘つき" }] },
+    { n: 8, songs: [{ id: "AkaneChiru", title: "アカネチル" }] },
+    { n: 9, songs: [{ id: "Oboreteiru", title: "溺れている" }] },
+    { n: 10, songs: [{ id: "Realize", title: "realize" }] },
+    { n: 11, songs: [{ id: "Ureizakura", title: "憂い桜" }] },
+    { n: 12, songs: [{ id: "Harururu", title: "晴るる" }] },
+    { n: 13, songs: [{ id: "Asanagi", title: "朝凪" }] },
+    { n: 14, songs: [{ id: "Kousaten", title: "交差点" }] },
+    { n: 15, songs: [{ id: "TsukiNoFune", title: "ツキノフネ" }] },
+    { n: 16, songs: [{ id: "MataNatsuWoOu", title: "また夏を追う" }] },
+    { n: 17, encore: true, songs: [{ id: "BokuraWaSoreWoAiToYonda", title: "僕らはそれを愛と呼んだ" }] },
+    { n: 18, songs: [{ id: "SoraAoiMama", title: "空蒼いまま" }] }
+  ]
+};
+
+export const REFERENCE_SETLISTS = Object.freeze([
+  SETLIST_TOKYO,
+  SETLIST_MALAYSIA
+]);
 
 // The current Taipei venue section uses the official KKTIX seating image.
 // Legacy vector-map exports remain empty so inherited helper code stays safe.

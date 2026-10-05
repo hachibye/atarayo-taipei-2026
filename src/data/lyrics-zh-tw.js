@@ -14,3 +14,8 @@ export function traditionalChineseFor(songId, japaneseLine){
   const song = ZH_TW_LYRICS[songId];
   return song && song[japaneseLine] || "";
 }
+
+export function hasTraditionalChineseLyrics(songId){
+  const song = ZH_TW_LYRICS[songId];
+  return Boolean(song && Object.keys(song).length);
+}

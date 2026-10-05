@@ -1936,10 +1936,9 @@
     line-height:1.5;
     color:var(--ui-muted, #a9a9af);
   }
-  /* 日文原文與繁中翻譯各自獨立顯示，兩種模式都沿用這兩個開關。 */
+  /* 日文原文與其假名／羅馬字讀音共用同一個顯示開關。 */
   .song-page.hide-japanese .lyric-body > .lyric-jp,
   .song-page.hide-japanese .lyric-body > .lyric-romaji{ display:none; }
-  .song-page.hide-chinese .lyric-body > .lyric-zh{ display:none; }
   /* 4번째 줄 — 코러스처럼 뒤에 깔리는 떼창 (백킹 코러스) */
   .lyric-bg{
     display:block;

@@ -30,25 +30,27 @@ GitHub 的「Forked from」標籤只能在 GitHub 建立 fork 時產生，無法
 - 場館：台北流行音樂中心・表演廳
 - 售票：KKTIX，官方頁面目前標示完售
 - VIP Upgrade：NT$1,200，不含演唱會門票
-- 54 首 Atarayo 完整作品收錄，包含 2026 日本巡演 17 首參考歌單完整入口
+- 54 首 Atarayo 作品入口，包含東京亞巡場與馬來西亞獨立專場兩份 2026 參考歌單
 - 歌曲頁整合官方 YouTube 影片、Spotify 與 Apple Music 對應單曲直連
-- 開源同步歌詞、假名／羅馬字讀音與繁中翻譯；載入失敗時會明確提示改看官方影片 CC 字幕
+- 開源同步日文歌詞與假名／羅馬字讀音；不內建未授權的繁中逐句譯文，繁中歌詞請使用官方影片提供的 YouTube CC 字幕
 - 每首歌曲的原創繁中導讀，整理故事、心境與情緒轉折（非官方解說／非逐句翻譯）
 - 左側懸浮抽歌按鈕與歌曲短語；同一裝置同一天固定，於台灣時間 00:00（GMT+8）重置
 - 依官方 Discography 去重整理的 54 首歌曲，可每日送出一次「我正在聽」與 emoji 心情，並查看匿名彙總分布
 - 「5 分鐘認識 Atarayo」入坑指南與依心情選歌的聆聽路線
+- 入坑指南直接嵌入 Atarayo 官方 Profile 團體合照
 - 2020-2026 作品與現場 Timeline，終點為 2026/12/19 台北場
 - 官方座位圖與北流交通資訊
 - 獨立的行前確認清單，包含取票提醒與隨身物品；勾選狀態只保存在使用者裝置
 - ASIA TOUR 2026 完整站點（含香港追加、再追加公演）
 - 2026 海外獨立專場：吉隆坡、曼谷（非本次亞巡站次）
-- 2026 日本巡演參考歌單（日文原題、17 首完整曲序）
+- 2026/09/18 東京 Spotify O-EAST 場參考歌單（日文原題、17 首完整曲序與安可位置）
+- 2026/07/24 馬來西亞獨立專場參考歌單（日文原題、18 首完整曲序與安可位置）
 - あたらよ現場風格與過往台北場合唱觀察
 - 深色與淺色模式
 
-台北場正式歌單尚未公布。網站中的劇透歌單依 Atarayo ASIA TOUR 2026『夕立が去ったその後で』日本巡演現場曲序整理，供歌迷提早熟悉曲目與預習準備，不代表台北場實際演出曲目或順序。
+台北場正式歌單尚未公布。網站中的劇透歌單分別依 2026/09/18 東京 Spotify O-EAST 場觀眾紀錄與 2026/07/24 馬來西亞獨立專場 setlist.fm 紀錄整理，供歌迷提早熟悉曲目與預習準備，不代表台北場實際演出曲目或順序。
 
-歌曲頁會在瀏覽器中向開源歌詞服務取得日文歌詞與時間碼，並在本機產生假名／羅馬字讀音。繁中欄位只會顯示專案內已有對應的內容；若來源查無資料、離線或逾時，歌詞區會顯示狀態與官方影片 CC 字幕提醒，官方影片及 Spotify／Apple Music 連結仍可使用。每日抽歌保存在瀏覽器；聆聽歌曲與心情則透過 Cloudflare Pages Function 寫入 D1。資料庫只保存台灣日期、隨機裝置識別碼的 SHA-256 雜湊、歌曲與心情，不保存姓名、信箱或原始識別碼。
+歌曲頁會在瀏覽器中向開源歌詞服務取得日文歌詞與時間碼，並在本機產生假名／羅馬字讀音。本站不接入網易雲使用者投稿譯文，也不內建未授權的繁中逐句譯文；若官方影片提供中文 YouTube CC，使用者可直接在內嵌播放器開啟。若歌詞來源查無資料、離線或逾時，歌詞區會顯示狀態與官方影片 CC 字幕提醒，官方影片及 Spotify／Apple Music 連結仍可使用。每日抽歌保存在瀏覽器；聆聽歌曲與心情則透過 Cloudflare Pages Function 寫入 D1。資料庫只保存台灣日期、隨機裝置識別碼的 SHA-256 雜湊、歌曲與心情，不保存姓名、信箱或原始識別碼。
 
 ## 開發
 
@@ -74,7 +76,9 @@ Vite 開發伺服器通常使用 `http://localhost:5173/`，只供前端畫面�
 - 台北場售票、票價與座位圖：[KKTIX 官方活動頁](https://binliveco.kktix.cc/events/kbrte)
 - 影片：[Atarayo 官方 YouTube 頻道](https://www.youtube.com/@Atarayo)
 - 曲目：[Atarayo 官方 Discography](https://atarayo-jp.com/discography)
-- 2026 日本巡演歌單：Atarayo ASIA TOUR 2026『夕立が去ったその後で』日本巡演現場曲序整理
+- 2026 東京場曲序：[非官方觀眾演出紀錄](https://ameblo.jp/serment-musicinlife/entry-12980356580.html)；日期與場館核對：[LiveFans 場次頁面](https://www.livefans.jp/events/1970940)
+- 2026 馬來西亞場歌單：[setlist.fm 原始紀錄](https://www.setlist.fm/setlist/atarayo/2026/kl-convention-centre-kuala-lumpur-malaysia-4375d7df.html)
+- 團體合照：[Atarayo 官方 Profile](https://atarayo-jp.com/profiles)
 - 過往台北場合唱觀察：[Atarayo TOUR 2025 in Taipei 觀眾紀錄](https://mapleleaf3659.github.io/ml-blog/articles/life/atarayo-tour-2025-in-taipei.html)
 - `images/atarayo-rainy-night.png`：為本專案生成的原創無文字主視覺，不是官方海報
 - `images/atarayo-seating*.png`：KKTIX 公開的台北場官方座位圖，版權屬原權利人
