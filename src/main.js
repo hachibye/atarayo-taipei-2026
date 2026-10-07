@@ -2747,6 +2747,7 @@ function buildSongShell(){
           <div class="song-sheet-head">
             <span class="song-sheet-title" id="song-sheet-title">選擇歌曲</span>
             <span class="song-sheet-count" id="song-sheet-count">${SONGS.length} 首</span>
+            <button class="song-sheet-all-chip" id="sheet-all-chip" type="button" hidden>切換至全部歌曲</button>
             <button class="song-sheet-close" data-close-sheet aria-label="關閉">${CLOSE_SVG}</button>
           </div>
           <div class="sheet-search">
@@ -2816,6 +2817,20 @@ function buildSongShell(){
       sheetInput.value = "";
       applySheetFilter();
       sheetInput.focus();
+    });
+  }
+
+  const sheetAllChip = document.getElementById("sheet-all-chip");
+  if (sheetAllChip){
+    sheetAllChip.addEventListener("click", ()=>{
+      songCollection = "all";
+      store("atarayo-song-collection", "all");
+      renderSongSheetList(currentSong);
+      if (currentSong){
+        const neighbors = songNeighbors(currentSong);
+        document.getElementById("prev-song").title = `上一首：${neighbors.prev.title}`;
+        document.getElementById("next-song").title = `下一首：${neighbors.next.title}`;
+      }
     });
   }
 
@@ -3241,8 +3256,48 @@ function renderLyricsList(song){
   observeLyricLines();
 }
 
+function renderSongSheetList(song = currentSong){
+  const selectableSongs = sheetSongs();
+  const listEl = document.getElementById("song-sheet-list");
+  if (listEl && song){
+    listEl.innerHTML = selectableSongs.map((s, i)=>`
+      <li data-no="${i + 1}">
+        <button class="song-sheet-item${s.id === song.id ? " current" : ""}" data-id="${s.id}" data-pos="${i}"${s.id === song.id ? ' aria-current="true"' : ""}>
+          <span class="song-sheet-num">${pad(i + 1)}</span>
+          <span class="song-sheet-name">${renderSongTitle(s.title)}</span>
+          ${s.id === song.id ? `<span class="song-sheet-now">目前播放</span>` : ""}
+        </button>
+      </li>`).join("");
+  }
+
+  const sheetTitle = document.getElementById("song-sheet-title");
+  if (sheetTitle) {
+    if (songFrom === "setlist") {
+      sheetTitle.textContent = "日本巡演歌單";
+    } else if (songCollection !== "all") {
+      sheetTitle.textContent = `${activeGuideCollection().label}`;
+    } else {
+      sheetTitle.textContent = "全部歌曲";
+    }
+  }
+  const sheetCount = document.getElementById("song-sheet-count");
+  if (sheetCount) sheetCount.textContent = `${selectableSongs.length} 首`;
+
+  const allChip = document.getElementById("sheet-all-chip");
+  if (allChip){
+    allChip.hidden = (songFrom === "setlist" || songCollection === "all");
+  }
+
+  applySheetFilter();
+}
+
 function renderSong(song){
   buildSongShell();
+
+  if (songFrom !== "setlist" && !activeGuideCollection().songIds.includes(song.id)){
+    songCollection = "all";
+    store("atarayo-song-collection", "all");
+  }
 
   currentSong = song;
   prepareSongReadings(song);
@@ -3316,24 +3371,8 @@ function renderSong(song){
   setLyricsNote("正在載入日文歌詞與時間碼…");
   setKaraokeSourceStatus("loading", "歌詞逐字時間：正在尋找開源時間碼…");
 
-  const selectableSongs = sheetSongs();
-  document.getElementById("song-sheet-list").innerHTML = selectableSongs.map((s, i)=>`
-    <li data-no="${i + 1}">
-      <button class="song-sheet-item${s.id === song.id ? " current" : ""}" data-id="${s.id}" data-pos="${i}"${s.id === song.id ? ' aria-current="true"' : ""}>
-        <span class="song-sheet-num">${pad(i + 1)}</span>
-        <span class="song-sheet-name">${renderSongTitle(s.title)}</span>
-        ${s.id === song.id ? `<span class="song-sheet-now">目前播放</span>` : ""}
-      </button>
-    </li>`).join("");
-
-  const sheetTitle = document.getElementById("song-sheet-title");
-  if (sheetTitle) sheetTitle.textContent =
-    songFrom === "setlist" ? "歌單歌曲" : "選擇歌曲";
-  const sheetCount = document.getElementById("song-sheet-count");
-  if (sheetCount) sheetCount.textContent = `${selectableSongs.length} 首`;
-
+  renderSongSheetList(song);
   closeSongSheet();
-  applySheetFilter();
 
   // 곡 화면 보이기 (먼저 보여야 컨테이너 높이를 정확히 잴 수 있음)
   songView.classList.remove("offstage");

@@ -361,6 +361,22 @@ button{touch-action:manipulation;}
 .song-page .song-sheet-num,
 .song-page .sheet-empty{color:var(--stage-muted);}
 .song-page .song-sheet-close{border:0;background:var(--stage-surface);}
+.song-page .song-sheet-all-chip{
+  margin-left:auto;
+  margin-right:8px;
+  padding:4px 10px;
+  border:1px solid var(--ui-line, rgba(255,255,255,.15));
+  border-radius:999px;
+  background:var(--stage-surface, var(--ui-surface));
+  color:var(--gold-soft, #e9d9a3);
+  font-size:11px;
+  cursor:pointer;
+  transition:all .15s ease;
+}
+.song-page .song-sheet-all-chip:hover{
+  background:var(--ui-accent, #e9d9a3);
+  color:var(--ui-bg, #111);
+}
 .song-page .sheet-search .song-search-box{border:0;background:var(--stage-surface);}
 .song-page .sheet-search .song-search-box:focus-within{outline:2px solid var(--cream);outline-offset:2px;}
 .song-page .song-sheet-item.current{background:rgba(255,255,255,.075);box-shadow:none;}
