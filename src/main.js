@@ -3273,7 +3273,7 @@ function renderSongSheetList(song = currentSong){
   const sheetTitle = document.getElementById("song-sheet-title");
   if (sheetTitle) {
     if (songFrom === "setlist") {
-      sheetTitle.textContent = "日本巡演歌單";
+      sheetTitle.textContent = `${activeSetlist().shortLabel} 歌單`;
     } else if (songCollection !== "all") {
       sheetTitle.textContent = `${activeGuideCollection().label}`;
     } else {
@@ -3292,12 +3292,16 @@ function renderSongSheetList(song = currentSong){
 }
 
 function renderSong(song){
-  buildSongShell();
-
-  if (songFrom !== "setlist" && !activeGuideCollection().songIds.includes(song.id)){
+  if (songFrom === "setlist" && !setlistFlat().some(item => item.id === song.id)){
+    setSongFrom("guide");
+    songCollection = "all";
+    store("atarayo-song-collection", "all");
+  } else if (songFrom !== "setlist" && !activeGuideCollection().songIds.includes(song.id)){
     songCollection = "all";
     store("atarayo-song-collection", "all");
   }
+
+  buildSongShell();
 
   currentSong = song;
   prepareSongReadings(song);
