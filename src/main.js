@@ -55,6 +55,7 @@ import {
 import { loadFurigana, loadKaraokeSources } from "./services/lazy-modules.js";
 import { store } from "./services/storage.js";
 import { hasTraditionalChineseLyrics, traditionalChineseFor } from "./data/lyrics-zh-tw.js";
+import { LOCAL_TIMED_LYRICS } from "./data/local-lyrics.js";
 import { SONG_STORIES, SESSION_SONG_PHRASES, STARTER_PATHS, ATARAYO_TIMELINE } from "./editorial.js";
 import { ATARAYO_DISCOGRAPHY, LISTENING_MOODS } from "./data/discography.js";
 import TABLER_CARDS_SVG from "@tabler/icons/outline/cards.svg?raw";
@@ -3371,9 +3372,9 @@ function renderSong(song){
       "正在查找日文歌詞與同步時間碼。",
       "loading"
     );
+    setLyricsNote("正在載入日文歌詞與時間碼…");
+    setKaraokeSourceStatus("loading", "歌詞逐字時間：正在尋找開源時間碼…");
   }
-  setLyricsNote("正在載入日文歌詞與時間碼…");
-  setKaraokeSourceStatus("loading", "歌詞逐字時間：正在尋找開源時間碼…");
 
   renderSongSheetList(song);
   closeSongSheet();
@@ -3888,6 +3889,44 @@ function nextDisplayedLyricTime(song, index){
 async function loadKaraokeTiming(song){
   const seq = ++karaokeLoadSeq;
   karaokeTiming = null;
+
+  if (LOCAL_TIMED_LYRICS[song && song.id] || (song && song.lyricsMode === "local-timed")) {
+    const localLines = LOCAL_TIMED_LYRICS[song.id] || (song && song.lyrics) || [];
+    const lyricLines = localLines.map(line => ({
+      time: Number(line.time) || 0,
+      jp: line.jp || "",
+      tr: line.tr || traditionalChineseFor(song.id, line.jp || "")
+    }));
+    song.lyrics = lyricLines;
+    karaokeTiming = {
+      format: "timed-lyrics-v1",
+      source: "本地校對官方歌詞（逐句時間）",
+      songId: song.id,
+      matchedLines: lyricLines.length,
+      totalLines: lyricLines.length,
+      precision: "line",
+      lines: lyricLines.map((l, idx) => {
+        const next = lyricLines[idx + 1];
+        const end = next ? next.time : l.time + 4;
+        return {
+          start: l.time,
+          end,
+          text: l.jp,
+          words: [{ text: l.jp, start: l.time, end }]
+        };
+      })
+    };
+    chantBlockCache.clear();
+    songMarksCache.clear();
+    renderLyricsList(song);
+    applyKaraokeTimingToDom(song);
+    prepareSongReadings(song);
+    setKaraokeSourceStatus("ready", `歌詞與逐句時間：本地校對歌詞（${lyricLines.length} 行）`);
+    setLyricsNote(translationAvailabilityNote(song));
+    updateLyricsSync(true);
+    return;
+  }
+
   setKaraokeSourceStatus("loading", "歌詞逐字時間：正在尋找開源時間碼…");
 
   const api = await loadKaraokeSources();

@@ -54,19 +54,22 @@ export const OVERSEAS_ONE_MAN_STOPS = [
 export const NOTICES = [];
 export const PICS = {};
 
+import { LOCAL_TIMED_LYRICS } from "./data/local-lyrics.js";
+
 const previewSong = (id, title, youtubeId, note = "先用官方影片熟悉歌曲。現場互動請以成員帶領為準。", duration = null) => {
   if (typeof note === "number") {
     duration = note;
     note = "先用官方影片熟悉歌曲。現場互動請以成員帶領為準。";
   }
+  const localLyrics = LOCAL_TIMED_LYRICS[id];
   return {
     id,
     title,
     artist: "あたらよ",
     youtubeId,
     duration,
-    lyricsMode: "remote-timed",
-    lyrics: [
+    lyricsMode: localLyrics ? "local-timed" : "remote-timed",
+    lyrics: localLyrics ? localLyrics.map(l => ({ ...l, tr: "" })) : [
       { time: 0, jp: title, tr: note }
     ]
   };
