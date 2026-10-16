@@ -64,7 +64,7 @@ npx wrangler pages dev dist
 
 Vite 開發伺服器通常使用 `http://localhost:5173/`，只供前端畫面開發。若要連同 Pages Function 與本機 D1 一起測試，先建置再執行 `npx wrangler pages dev dist`。請使用終端機顯示的 `localhost` 網址，不要直接開啟 `index.html`，也不要改成 `127.0.0.1`；YouTube 可能拒絕後兩者的內嵌播放器來源。
 
-正式建置輸出在 `dist/`。Cloudflare Pages 的建置指令為 `npm run build`，`wrangler.toml` 會將部署輸出固定為 `dist`，避免直接發布未經 Vite 打包的原始碼；目前正式網站部署於 [atarayo-taipei-2026.pages.dev](https://atarayo-taipei-2026.pages.dev/)，`public/_headers` 會一併部署安全標頭。專案既有 GitHub Actions 也可在推送到 `main` 後建置並部署 GitHub Pages。
+正式建置輸出在 `dist/`。Cloudflare Pages 的建置指令為 `npm run build`，`wrangler.toml` 會將部署輸出固定為 `dist`，避免直接發布未經 Vite 打包的原始碼；目前正式網站部署於 [atarayo-taipei-2026.pages.dev](https://atarayo-taipei-2026.pages.dev/)，`public/_headers` 會一併部署安全標頭。正式部署僅使用 Cloudflare Pages，不使用 GitHub Actions 或 GitHub Pages。
 
 匿名統計使用 `PULSE_DB` D1 binding。API 只接受同源 JSON、限制 request body 大小，歌曲與心情必須通過固定白名單，所有 SQL 都使用 D1 prepared statement 綁定參數；`(taipei_date, voter_hash)` 唯一鍵與 API 邏輯共同阻止同一匿名裝置在同一天改票。
 
