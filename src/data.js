@@ -55,6 +55,7 @@ export const NOTICES = [];
 export const PICS = {};
 
 import { LOCAL_TIMED_LYRICS } from "./data/local-lyrics.js";
+import { JP_CHANT_GUIDES } from "./chant-guide.js";
 
 const previewSong = (id, title, youtubeId, note = "先用官方影片熟悉歌曲。現場互動請以成員帶領為準。", duration = null) => {
   if (typeof note === "number") {
@@ -216,6 +217,16 @@ export const GUIDE_COLLECTIONS = [
       "Suzukaze", "Sakana", "HaruTonari", "FutariCover", "BuddyCover",
       "Haku", "Root", "SemiToTritoma", "Tsutaetakatta"
     ]
+  },
+  {
+    id: "sing-along",
+    label: "現場大合唱",
+    title: "現場觀眾大合唱曲目",
+    description: "整理過往有現場觀眾大合唱段落的歌曲清單。進場前練唱必備！",
+    sourceLabel: "現場演出紀錄與官方影片",
+    sourceUrl: "https://www.youtube.com/@Atarayo",
+    checkedAt: "2026.10.26",
+    songIds: Object.keys(JP_CHANT_GUIDES)
   },
   {
     id: "spotify-top",

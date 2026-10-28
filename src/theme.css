@@ -404,9 +404,8 @@ button{touch-action:manipulation;}
 .song-page .song-sheet-item.current{background:rgba(255,255,255,.075);box-shadow:none;}
 .song-page .venue-toggle,
 .song-page .play-toggle{border:0;background:var(--stage-raised);}
-.song-page .player-controls .venue-toggle,
+.song-page .player-controls .venue-toggle:not(.chant-toggle),
 .song-page .karaoke-source-popover,
-.song-page .chant-bar,
 .song-page .tip-pic{display:none !important;}
 .song-page .player-controls{justify-content:center;}
 .song-page .lyrics-note{justify-content:center;text-align:center;}
@@ -907,10 +906,12 @@ button{touch-action:manipulation;}
 .song-page .chant-toggle.active .chant-ico{ opacity:1; }
 
 
-/* 일반·簡潔模式都將「只聽大合唱」縮成麥克風圖示，
-   讓新增的歌詞切換按鈕加入後，兩種模式的控制列高度一致。 */
-.song-page .chant-toggle .venue-label{ display:none; }
-.song-page .chant-toggle{ padding-left:9px;padding-right:9px; }
+/* 控制列上的「只聽大合唱」按鈕：平時顯示圖示＋文字，極窄螢幕時才縮為純圖示 */
+.song-page .chant-toggle{ padding-left:12px;padding-right:12px; }
+@media (max-width:360px){
+  .song-page .chant-toggle .venue-label{ display:none; }
+  .song-page .chant-toggle{ padding-left:9px;padding-right:9px; }
+}
 
 /* Song-level editorial note, kept compact until the listener asks for it. */
 .song-story{

@@ -223,13 +223,15 @@ function renderChantVersionNote(song = currentSong){
   if (!el) return;
 
   const guide = chantGuideFor(song, "jp");
-  if (!guide){
-    el.innerHTML = `<b>${CHANT_VERSIONS.jp.label}</b>：這首歌目前沒有經過查證的現場提示。`;
+  if (!guide || !Array.isArray(guide.notes) || guide.notes.length === 0){
+    el.hidden = true;
+    el.innerHTML = "";
     return;
   }
 
-  const notes = (guide.notes || []).map(note => `<li>${escapeHtml(note)}</li>`).join("");
+  const notes = guide.notes.map(note => `<li>${escapeHtml(note)}</li>`).join("");
   el.innerHTML = `<b>${CHANT_VERSIONS.jp.label}</b>：${notes ? `<ul>${notes}</ul>` : ""}`;
+  el.hidden = false;
 }
 
 document.addEventListener("click", event => {
@@ -1255,7 +1257,7 @@ function renderGuide(){
           <h1>官方影片預習</h1>
           <p>選一條路線，用 Atarayo 官方影片開始補歌</p>
           <div class="song-legend">
-            <span class="legend-item"><span class="legend-icon chant">${INLINE_ICONS.mic}</span>官方頻道</span>
+            <span class="legend-item"><span class="legend-icon chant">${INLINE_ICONS.mic}</span>現場大合唱</span>
             <span class="legend-item common">非台北場正式歌單</span>
           </div>
         </div>
@@ -2719,7 +2721,7 @@ function buildSongShell(){
 
       <div class="player-controls">
         <button class="play-toggle" id="play-toggle" aria-label="播放／暫停">${PLAY_SVG}</button>
-        <button class="venue-toggle chant-toggle" id="chant-btn" aria-pressed="false" aria-label="開啟／關閉只聽大合唱">
+        <button class="venue-toggle chant-toggle" id="chant-btn" aria-pressed="false" aria-label="開啟／關閉只聽大合唱" title="只聽大合唱" hidden>
           <span class="chant-ico">${STATIC_MIC_SVG}</span>
           <span class="venue-label">只聽大合唱</span>
         </button>
@@ -3022,12 +3024,15 @@ function setChantVersion(next){
    떼창이 아예 없는 곡에서는 흐리게 처리를 하지 않는다 — 안 그러면
    가사 전체가 흐려져서 읽을 수가 없다. */
 function syncChantUi(){
+  const blocks = currentChantBlocks();
+  const hasChant = blocks.length > 0;
   const page = document.getElementById("song-page");
-  if (page) page.classList.toggle("chant-only", chantOnly && currentChantBlocks().length > 0);
+  if (page) page.classList.toggle("chant-only", chantOnly && hasChant);
   const btn = document.getElementById("chant-btn");
   if (btn){
     btn.classList.toggle("active", chantOnly);
     btn.setAttribute("aria-pressed", chantOnly ? "true" : "false");
+    btn.hidden = !hasChant;
   }
 }
 
@@ -4010,6 +4015,8 @@ async function loadKaraokeTiming(song){
     setKaraokeSourceStatus("ready", `歌詞與${timingLabel}：${source}（${lyricLines.length} 行）`);
     setLyricsNote(translationAvailabilityNote(song));
     updateLyricsSync(true);
+    syncChantUi();
+    renderChantVersionNote(song);
     return;
   }
 
@@ -4315,13 +4322,114 @@ function lyricIconsHtml(line, song = currentSong){
   return html;
 }
 
+function parseTimeSeconds(val){
+  if (typeof val === "number") return Number.isFinite(val) ? val : NaN;
+  if (typeof val === "string"){
+    const trimmed = val.trim();
+    if (!trimmed) return NaN;
+    if (trimmed.includes(":")){
+      const parts = trimmed.split(":").map(Number);
+      if (parts.length === 2 && Number.isFinite(parts[0]) && Number.isFinite(parts[1])){
+        return parts[0] * 60 + parts[1];
+      }
+      if (parts.length === 3 && Number.isFinite(parts[0]) && Number.isFinite(parts[1]) && Number.isFinite(parts[2])){
+        return parts[0] * 3600 + parts[1] * 60 + parts[2];
+      }
+    }
+    const num = Number(trimmed);
+    return Number.isFinite(num) ? num : NaN;
+  }
+  return NaN;
+}
+
 function lineIsChantJp(line, song){
   if (!line || !song) return false;
   const guide = JP_CHANT_GUIDES[song.id];
   // 沒有人工查證資料的歌曲不推測合唱段落。
   if (!guide) return false;
+  if (guide.all) return true;
+
   const time = Number(line.time);
-  return Number.isFinite(time) && guide.chantTimes.some(mark => Math.abs(Number(mark) - time) < 0.01);
+  const jp = typeof line.jp === "string" ? line.jp.trim() : "";
+
+  // 1. 若設定了 sections，逐一檢查各片段條件
+  if (Array.isArray(guide.sections) && guide.sections.length > 0){
+    const matchSection = guide.sections.some(sec => {
+      if (!sec) return false;
+      let rangeOk = true;
+      if (sec.range){
+        let start, end;
+        if (Array.isArray(sec.range)){
+          start = parseTimeSeconds(sec.range[0]);
+          end = parseTimeSeconds(sec.range[1]);
+        } else if (typeof sec.range === "object"){
+          start = parseTimeSeconds(sec.range.start ?? sec.range.from);
+          end = parseTimeSeconds(sec.range.end ?? sec.range.to);
+        }
+        if (Number.isFinite(start) && Number.isFinite(end)){
+          rangeOk = time >= start && time <= end;
+        }
+      }
+      let textOk = true;
+      if (sec.text){
+        const target = String(sec.text).trim();
+        textOk = target ? (jp === target || jp.includes(target)) : false;
+      }
+      return rangeOk && textOk;
+    });
+    if (matchSection) return true;
+  }
+
+  // 2. 指定文字 (texts) 與時間區間 (ranges)
+  let matchText = false;
+  const hasTexts = Array.isArray(guide.texts) && guide.texts.length > 0;
+  if (hasTexts && jp){
+    matchText = guide.texts.some(t => {
+      if (!t) return false;
+      const target = String(t).trim();
+      return target && (jp === target || jp.includes(target));
+    });
+  }
+
+  let matchRange = false;
+  const hasRanges = Number.isFinite(time) && Array.isArray(guide.ranges) && guide.ranges.length > 0;
+  if (hasRanges){
+    matchRange = guide.ranges.some(range => {
+      if (!range) return false;
+      let start, end;
+      if (Array.isArray(range)){
+        start = parseTimeSeconds(range[0]);
+        end = parseTimeSeconds(range[1]);
+      } else if (typeof range === "object"){
+        start = parseTimeSeconds(range.start ?? range.from);
+        end = parseTimeSeconds(range.end ?? range.to);
+      }
+      if (Number.isFinite(start) && Number.isFinite(end)){
+        return time >= start && time <= end;
+      }
+      return false;
+    });
+  }
+
+  // 同時提供 texts 與 ranges 時，必須兩者皆符合（精準鎖定特定時間區間內的特定歌詞）
+  if (hasTexts && hasRanges){
+    if (matchText && matchRange) return true;
+  } else if (hasTexts){
+    if (matchText) return true;
+  } else if (hasRanges){
+    if (matchRange) return true;
+  }
+
+  // 3. 精確時間點 (chantTimes: [92.02, 242.41] 或 ["01:32.02", "04:02.41"])
+  if (Number.isFinite(time) && Array.isArray(guide.chantTimes) && guide.chantTimes.length > 0){
+    const matchTime = guide.chantTimes.some(mark => {
+      const markSec = parseTimeSeconds(mark);
+      return Number.isFinite(markSec) && Math.abs(markSec - time) < 0.5;
+    });
+    if (matchTime) return true;
+  }
+
+  return false;
 }
 
 /* ── 떼창 구간 ───────────────────────────────────────────────
@@ -4408,6 +4516,12 @@ function songMarks(song){
     // 판단 기준은 lineIsChant 한 곳에서만 (떼창만 듣기와 어긋나지 않도록)
     if (lineIsChant(line, song)) mark.chant++;
   });
+
+  // 若歌詞尚未完整載入（仍為初始單行占位符），且本曲已有現場大合唱指南，提供預設行數標記
+  if ((!song.lyrics || song.lyrics.length <= 1) && JP_CHANT_GUIDES[song.id]) {
+    const guide = JP_CHANT_GUIDES[song.id];
+    mark.chant = guide.chantLineCount || (guide.all ? 38 : (guide.texts?.length || guide.ranges?.length || 1));
+  }
 
   songMarksCache.set(cacheKey, mark);
   return mark;
